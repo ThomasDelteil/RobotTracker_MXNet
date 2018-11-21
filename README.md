@@ -1,4 +1,4 @@
-# Robot Arm Controls with Python and MXNet
+# 6-axis Robot Arm Controls with Python and MXNet
 
 
 ---------------------------
