@@ -22,3 +22,11 @@ $ python
 >>> robot.servos.move_servo_to_percent(4, 100)
 ```
 
+----------------------------
+
+
+Usage:
+
+```
+python demo_webcam_run.py --num-frames -1 
+```
