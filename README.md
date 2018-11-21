@@ -8,6 +8,8 @@ This is meant to run on a [jetson TX2 board](https://www.amazon.com/NVIDIA-945-8
 a [SainSmart 6 axes](https://www.amazon.com/SainSmart-Desktop-Grippers-Assembled-MEGA2560/dp/B00UMOSQCI) robot via i2c.
 
 
+The robot has a webcam at its extremity and is centering itself on the highest scored person detected in the current frame.
+
 ---------------------------
 
 
