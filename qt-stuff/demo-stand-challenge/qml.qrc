@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>welcome.qml</file>
+        <file>challenge.qml</file>
+        <file>FancyButton.qml</file>
+        <file>MessageBox.qml</file>
+    </qresource>
+</RCC>
