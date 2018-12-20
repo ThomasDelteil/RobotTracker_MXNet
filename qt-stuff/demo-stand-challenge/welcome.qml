@@ -48,7 +48,7 @@ Item {
                     rightPadding: leftPadding
                     clip: true
                     color: "blue"
-                    //text: "some@example.org"
+                    text: "some@example.org"
                     //font.family: "Courier New"
                 }
             }

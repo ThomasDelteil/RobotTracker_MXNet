@@ -30,6 +30,7 @@ ApplicationWindow {
 
         Camera {
             id: camera
+            deviceId: "/dev/video0" // QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./camera-test
             //cameraState: tabCamera.checked ? Camera.ActiveState : Camera.LoadedState
             //viewfinder.resolution: Qt.size(848, 480) // picture quality
             metaData.orientation: cameraUpsideDown ? 180 : 0
@@ -57,10 +58,10 @@ ApplicationWindow {
             }
 
             Component.onCompleted: {
-                console.log(qsTr("camera orientation:"), camera.orientation);
-                console.log(qsTr("camera state:"), camera.cameraState);
-                console.log(qsTr("camera status:"), camera.cameraStatus);
-                console.log(qsTr("camera supported resolutions:"), imageCapture.supportedResolutions);
+//                console.log(qsTr("camera orientation:"), camera.orientation);
+//                console.log(qsTr("camera state:"), camera.cameraState);
+//                console.log(qsTr("camera status:"), camera.cameraStatus);
+//                console.log(qsTr("camera supported resolutions:"), imageCapture.supportedResolutions);
 
 //                var supRezes = camera.supportedViewfinderResolutions();
 //                for (var rez in supRezes)
@@ -76,13 +77,36 @@ ApplicationWindow {
             fillMode: VideoOutput.PreserveAspectCrop
             source: camera
         }
+
+        ListView {
+            anchors.fill: parent
+            anchors.margins: 10
+            model: QtMultimedia.availableCameras
+            delegate: Text {
+                text: modelData.displayName + " | " + modelData.deviceId
+                font.pixelSize: 16
+            }
+        }
+
+        Rectangle {
+            id: target1
+            x: parent.width / 4
+            y: parent.height / 4
+            width: 40
+            height: 40
+            color: "red"
+            radius: 20
+        }
+        MouseArea {
+            anchors.fill: parent
+            onPositionChanged: {
+                //console.log(mouseX, mouseY);
+                target1.x = mouseX - target1.width / 2;
+                target1.y = mouseY - target1.height / 2;
+            }
+        }
     }
 
 //    Component.onCompleted: {
-//        console.log("stopping the camera...");
-//        camera.stop();
-//        console.log("starting the camera...");
-//        camera.start();
-//        console.log("started the camera");
 //    }
 }

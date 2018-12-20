@@ -28,6 +28,7 @@ Item {
 
             Camera {
                 id: camera
+                //deviceId: "/dev/video0" // QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
                 //cameraState: tabCamera.checked ? Camera.ActiveState : Camera.LoadedState
                 //viewfinder.resolution: Qt.size(848, 480) // picture quality
                 metaData.orientation: root.cameraUpsideDown ? 180 : 0
@@ -68,6 +69,27 @@ Item {
                 fillMode: VideoOutput.PreserveAspectCrop
                 source: camera
             }
+
+            // for simulation purposes
+            Rectangle {
+                id: target1
+                x: parent.width / 4
+                y: parent.height / 4
+                width: 40
+                height: 40
+                color: "red"
+                radius: 20
+                visible: btn_stop.enabled
+            }
+            // TODO replace with https://doc-snapshots.qt.io/qt5-dev/qtquickhandlers-index.html (take the ones from 5.12)
+            MouseArea {
+                anchors.fill: parent
+                onPositionChanged: {
+                    //console.log(mouseX, mouseY);
+                    target1.x = mouseX - target1.width / 2;
+                    target1.y = mouseY - target1.height / 2;
+                }
+            }
         }
 
         RowLayout {
@@ -93,7 +115,6 @@ Item {
 
                         FancyButton {
                             id: btn_start
-                            //Layout.alignment: Qt.AlignHCenter
                             unpressedColor: "#0096FF"
                             pressedColor: "#3679CC"
                             text: "Start"
@@ -105,7 +126,6 @@ Item {
 
                         FancyButton {
                             id: btn_stop
-                            //Layout.alignment: Qt.AlignHCenter
                             unpressedColor: "#FF2600"
                             pressedColor: "#B5331E"
                             text: "Stop"
@@ -113,6 +133,18 @@ Item {
                             enabled: !btn_start.enabled
                             onClicked: {
                                 btn_start.enabled = true;
+                            }
+                        }
+
+                        FancyButton {
+                            id: btn_play
+                            unpressedColor: "#0096FF"
+                            pressedColor: "#3679CC"
+                            text: "Playback"
+                            font.pixelSize: root.primaryFontSize * 2
+                            enabled: btn_start.enabled
+                            onClicked: {
+                                btn_start.enabled = false;
                             }
                         }
                     }
