@@ -96,3 +96,5 @@ ENV/
 # qt
 **/build-*/*
 *.pro.user*
+
+**/docs/*

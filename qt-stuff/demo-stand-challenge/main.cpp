@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
     QString basePath = getBasePath(app.applicationDirPath());
     //qDebug() << basePath;
     engine.rootContext()->setContextProperty("basePath", basePath);
+
     qmlRegisterType<Backend>("io.qt.Backend", 1, 0, "Backend");
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));

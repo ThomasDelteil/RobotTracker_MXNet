@@ -87,11 +87,17 @@ Item {
             onClicked: {
                 if (root.checkEmail(text_email.text))
                 {
-                    if (backend.createFolder(basePath + text_email.text) !== true)
+                    var profilePath = basePath + text_email.text;
+                    if (backend.createFolder(profilePath) !== true)
                     {
                         dialogError.textMain = "Couldn't create your profile!";
                         dialogError.show();
                         return;
+                    }
+                    else
+                    {
+                        backend.set_currentProfile(text_email.text);
+                        backend.set_currentProfilePath(profilePath);
                     }
 
                     welcomed();

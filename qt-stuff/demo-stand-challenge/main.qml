@@ -19,7 +19,20 @@ ApplicationWindow {
     property string backgroundColor: "#ECECEC"
     property bool cameraUpsideDown: false // if you need to rotate viewfinder to 180
 
-    Backend { id: backend }
+    property double timerRate: 0.1 * 1000 // ms, the rate of grabbing frames (one per specified value)
+    property string mxNetEndpoint: "http://localhost:8080/predictions/pose"
+
+    Backend {
+        id: backend
+
+        onRequestDone: {
+            loader.item.processResults(result);
+        }
+
+        onRequestFailed: {
+            loader.item.appendToOutput("Error: " + error, true);
+        }
+    }
 
     Binding {
         target: VirtualKeyboardSettings
@@ -90,5 +103,10 @@ ApplicationWindow {
     function checkEmail(email)
     {
         return /^[^@]+\@[^@]+$/.test(email);
+    }
+
+    function getCurrentDateTime()
+    {
+        return new Date().toISOString().replace(/[:|.|T]/g, "-").replace("Z", "");
     }
 }
