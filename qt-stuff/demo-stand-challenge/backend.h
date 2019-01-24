@@ -5,39 +5,40 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QHttpMultiPart>
-#include <QDir>
-#include <QFile>
+#include <QNetworkProxy>
 #include <QDebug>
+#include "videowrapper.h"
 
 class Backend : public QObject
 {
     Q_OBJECT
 public:
     explicit Backend(QObject *parent = nullptr);
+    Q_PROPERTY(QObject *videoWrapper READ get_videoWrapper)
 
 signals:
     QString requestDone(QString result);
     QString requestFailed(QString error);
+    void videoSourceChanged();
 
 public slots:
-    void uploadFile(QString endpoint, QString fpath);
-
-    bool createFolder(QString folderName);
-    bool deleteProfileFolder();
+    void uploadBuffer(QBuffer *imgBuffer);
 
     void set_currentProfile(QString profileName);
     QString get_currentProfile();
 
-    void set_currentProfilePath(QString profilePath);
-    QString get_currentProfilePath();
+    VideoWrapper *get_videoWrapper();
+
+    void enableSendingToMXNet(bool sendingEnabled);
 
 private slots:
     void requestFinished(QNetworkReply *reply);
 
 private:
+    VideoWrapper *videoWrapper;
     QNetworkAccessManager *manager;
+    QString _endpoint = "http://localhost:8080/predictions/pose";
     QString _currentProfile;
-    QString _currentProfilePath;
 };
 
 #endif // BACKEND_H

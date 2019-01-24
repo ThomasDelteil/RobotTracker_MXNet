@@ -2,22 +2,35 @@
 
 Backend::Backend(QObject *parent) : QObject(parent)
 {
+    videoWrapper = new VideoWrapper();
+    connect(
+            videoWrapper, &VideoWrapper::gotNewShotBytes,
+            this, &Backend::uploadBuffer
+            );
+
     manager = new QNetworkAccessManager(this);
     connect(
-            manager, SIGNAL(finished(QNetworkReply*)),
-            this, SLOT(requestFinished(QNetworkReply*))
+            manager, &QNetworkAccessManager::finished,
+            this, &Backend::requestFinished
             );
+
+    // for debugging with HTTP proxy
+    //QNetworkProxy proxy;
+    //proxy.setType(QNetworkProxy::HttpProxy);
+    //proxy.setHostName("localhost");
+    //proxy.setPort(4321);
+    //manager->setProxy(proxy);
 }
 
-void Backend::uploadFile(QString endpoint, QString fpath)
+void Backend::uploadBuffer(QBuffer *imgBuffer)
 {
-    QFile *file = new QFile(fpath);
-    file->open(QIODevice::ReadOnly);
-
-    QNetworkRequest request = QNetworkRequest(QUrl(endpoint));
+    //qDebug() << "uploading" << imgBuffer->size() << "bytes";
+    QNetworkRequest request = QNetworkRequest(QUrl(_endpoint));
     request.setRawHeader("Content-Type", "multipart/form-data;");
 
-    manager->post(request, file);
+    imgBuffer->open(QIODevice::ReadOnly);
+    manager->post(request, imgBuffer);
+    imgBuffer->close();
 }
 
 void Backend::requestFinished(QNetworkReply *reply)
@@ -31,7 +44,7 @@ void Backend::requestFinished(QNetworkReply *reply)
     {
         QString errorMessage = QString(data);
         QNetworkReply::NetworkError err = reply->error();
-        if (err != QNetworkReply::NoError)
+        if (status == 0)
         {
             // dictionary: http://doc.qt.io/qt-5/qnetworkreply.html#NetworkError-enum
             errorMessage = QString("QNetworkReply::NetworkError code: %1").arg(QString::number(err));
@@ -42,31 +55,6 @@ void Backend::requestFinished(QNetworkReply *reply)
     emit requestDone(QString(data));
 }
 
-// TODO signal errors
-bool Backend::createFolder(QString folderName)
-{
-    if (!QDir().exists(folderName))
-    {
-        return QDir().mkdir(folderName);
-    }
-    return true;
-}
-
-bool Backend::deleteProfileFolder()
-{
-    return QDir(_currentProfilePath).removeRecursively();
-}
-
-void Backend::set_currentProfilePath(QString profilePath)
-{
-    _currentProfilePath = profilePath;
-}
-
-QString Backend::get_currentProfilePath()
-{
-    return _currentProfilePath;
-}
-
 void Backend::set_currentProfile(QString profileName)
 {
     _currentProfile = profileName;
@@ -75,4 +63,14 @@ void Backend::set_currentProfile(QString profileName)
 QString Backend::get_currentProfile()
 {
     return _currentProfile;
+}
+
+VideoWrapper *Backend::get_videoWrapper()
+{
+    return videoWrapper;
+}
+
+void Backend::enableSendingToMXNet(bool sendingEnabled)
+{
+    videoWrapper->enableSending(sendingEnabled);
 }

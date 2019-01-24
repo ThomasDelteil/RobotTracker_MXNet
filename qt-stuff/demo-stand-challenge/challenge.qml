@@ -5,6 +5,7 @@ import QtMultimedia 5.12
 
 Item {
     id: chllng
+
     signal finishedTrial
 
     function processResults(result)
@@ -12,19 +13,20 @@ Item {
         appendToOutput(result);
 
         var jsn = JSON.parse(result);
-        thingLeft.x = cameraBackground.width * jsn["lw_x"];
-        thingLeft.y = cameraBackground.height * jsn["lw_y"];
-        thingRight.x = cameraBackground.width * jsn["rw_x"];
-        thingRight.y = cameraBackground.height * jsn["rw_y"];
+        trackerOne.x = cameraBackground.width * jsn["lw_x"];
+        trackerOne.y = cameraBackground.height * jsn["lw_y"];
+        trackerTwo.x = cameraBackground.width * jsn["rw_x"];
+        trackerTwo.y = cameraBackground.height * jsn["rw_y"];
     }
 
     function appendToOutput(msg, consoleAsWell = false)
     {
+        // https://bugreports.qt.io/browse/QTCREATORBUG-21884
+        //if (consoleAsWell === undefined) { consoleAsWell = false; }
+
         ta_mxnetOutput.append(msg + "\n---");
         if (consoleAsWell === true) { console.log(msg); }
     }
-
-    property bool readyForNextCapture: true
 
     ColumnLayout {
         anchors.fill: parent
@@ -57,8 +59,7 @@ Item {
 
                     Camera {
                         id: camera
-                        deviceId: "/dev/video0" // QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
-                        //cameraState: tabCamera.checked ? Camera.ActiveState : Camera.LoadedState
+                        deviceId: "/dev/video0" // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
                         viewfinder.resolution: Qt.size(640, 480) // picture quality
                         metaData.orientation: root.cameraUpsideDown ? 180 : 0
 
@@ -67,38 +68,10 @@ Item {
                         //    focusPointMode: Camera.FocusPointCenter
                         //}
 
-                        imageCapture {
-                            onCaptureFailed: {
-                                appendToOutput("Capture #" + requestId + " error: " + message);
-                                //camera.imageCapture.cancelCapture();
-                                //console.log("Some error taking a picture: ", message);
-                            }
-                            onImageCaptured: {
-                                // TODO try to send frames without saving them to disk
-                                //console.log("photo has been captured: ", requestId, preview) // image://camera/preview_1
-                                readyForNextCapture = true;
-                            }
-                            onImageSaved: {
-                                //console.log("photo has been saved:", path)
-                                appendToOutput("Sending #" + requestId + " to MXNet");
-                                backend.uploadFile(root.mxNetEndpoint, path);
-                            }
-                        }
-
                         onError: {
                             cameraStatus.text = qsTr("Error: ") + errorString;
                             console.log(errorCode, errorString);
                         }
-
-//                        onAvailabilityChanged: {
-//                            console.log(camera.availability);
-//                        }
-//                        onCameraStateChanged: {
-//                            console.log(camera.cameraState);
-//                        }
-//                        onCameraStatusChanged: {
-//                            console.log(camera.cameraStatus);
-//                        }
 
 
                         Component.onCompleted: {
@@ -109,16 +82,22 @@ Item {
                         }
                     }
 
+                    Binding {
+                        target: backend.videoWrapper
+                        property: "source"
+                        value: camera
+                    }
+
                     VideoOutput {
                         anchors.fill: parent
                         orientation: root.cameraUpsideDown ? 180 : 0
                         fillMode: VideoOutput.PreserveAspectCrop
-                        source: camera
+                        source: backend.videoWrapper
                     }
 
-                    // left thing
+                    // tracker #1
                     Rectangle {
-                        id: thingLeft
+                        id: trackerOne
                         x: parent.width / 4
                         y: parent.height / 4
                         width: 40
@@ -129,9 +108,9 @@ Item {
                         border.width: 3
                         border.color: "white"
                     }
-                    // right thing
+                    // tracker #2
                     Rectangle {
-                        id: thingRight
+                        id: trackerTwo
                         x: parent.width / 1.3
                         y: parent.height / 1.3
                         width: 40
@@ -142,16 +121,6 @@ Item {
                         border.width: 3
                         border.color: "white"
                     }
-
-                    // TODO replace with https://doc-snapshots.qt.io/qt5-dev/qtquickhandlers-index.html (take the ones from 5.12)
-//                    MouseArea {
-//                        anchors.fill: parent
-//                        onPositionChanged: {
-//                            //console.log(mouseX, mouseY);
-//                            target1.x = mouseX - target1.width / 2;
-//                            target1.y = mouseY - target1.height / 2;
-//                        }
-//                    }
                 }
 
                 Rectangle {
@@ -220,8 +189,6 @@ Item {
                             onClicked: {
                                 btn_start.enabled = true;
                                 tm_sendFrame.stop();
-                                camera.imageCapture.cancelCapture();
-                                readyForNextCapture = true;
                             }
                         }
 
@@ -256,9 +223,6 @@ Item {
                     enabled: !btn_stop.enabled
                     onClicked: {
                         finishedTrial();
-                        console.log(backend.get_);
-                        // TODO also delete shots at application closing
-                        backend.deleteProfileFolder();
                     }
                 }
             }
@@ -270,26 +234,7 @@ Item {
         repeat: true
         interval: root.timerRate
         onTriggered: {
-            if (readyForNextCapture === true)
-            {
-                readyForNextCapture = false;
-                var reqID = camera.imageCapture.captureToLocation(
-                            backend.get_currentProfilePath()
-                            + "/"
-                            + getCurrentDateTime()
-                            + ".jpg"
-                            );
-                //console.log(reqID);
-            }
-            else
-            {
-                chllng.appendToOutput("waiting for the camera, skipping the frame...", true);
-                //camera.stop();
-                //camera.start();
-                //console.log("before: ", camera.imageCapture.errorString.length);
-                //camera.imageCapture.cancelCapture();
-                //console.log("after: ", camera.imageCapture.errorString.length);
-            }
+            backend.enableSendingToMXNet(true);
         }
     }
 }

@@ -17,10 +17,9 @@ ApplicationWindow {
     property int primaryFontSize: 24
     property int secondaryFontSize: 18
     property string backgroundColor: "#ECECEC"
-    property bool cameraUpsideDown: false // if you need to rotate viewfinder to 180
 
-    property double timerRate: 0.1 * 1000 // ms, the rate of grabbing frames (one per specified value)
-    property string mxNetEndpoint: "http://localhost:8080/predictions/pose"
+    property bool cameraUpsideDown: false // if you need to rotate viewfinder to 180
+    property double timerRate: 0.05 * 1000 // ms, the rate of grabbing frames (0.05 * 1000 = 20 FPS)
 
     Backend {
         id: backend
