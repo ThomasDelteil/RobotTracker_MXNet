@@ -20,6 +20,7 @@ signals:
     QString requestDone(QString result);
     QString requestFailed(QString error);
     void videoSourceChanged();
+    void counterIncreased();
 
 public slots:
     void uploadBuffer(QBuffer *imgBuffer);
@@ -32,7 +33,7 @@ public slots:
     void enableSendingToMXNet(bool sendingEnabled);
 
 private slots:
-    void requestFinished(QNetworkReply *reply);
+    bool requestFinished(QNetworkReply *reply);
 
 private:
     VideoWrapper *videoWrapper;

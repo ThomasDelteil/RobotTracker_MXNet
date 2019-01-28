@@ -20,6 +20,7 @@ ApplicationWindow {
 
     property bool cameraUpsideDown: false // if you need to rotate viewfinder to 180
     property double timerRate: 0.05 * 1000 // ms, the rate of grabbing frames (0.05 * 1000 = 20 FPS)
+    property bool debugOutput: false // show debug panel (really kills the performance)
 
     Backend {
         id: backend
@@ -30,6 +31,10 @@ ApplicationWindow {
 
         onRequestFailed: {
             loader.item.appendToOutput("Error: " + error, true);
+        }
+
+        onCounterIncreased: {
+            loader.item.increaseFPScounter_camera();
         }
     }
 
@@ -48,11 +53,8 @@ ApplicationWindow {
 
         Connections {
             target: loader.item
-            onWelcomed: {
-                loader.source = "qrc:/challenge.qml"
-            }
-            onFinishedTrial: {
-                loader.source = "qrc:/welcome.qml"
+            onNextWindow: {
+                loader.source = "qrc:/" + windowName
             }
         }
 
@@ -83,7 +85,7 @@ ApplicationWindow {
                 Layout.fillHeight: true
 
                 TextArea {
-                    font.pixelSize: root.secondaryFontSize
+                    font.pointSize: root.secondaryFontSize
                     text: "We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything."
                     wrapMode: Text.WordWrap
                 }

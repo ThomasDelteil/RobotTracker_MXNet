@@ -6,11 +6,16 @@ import QtMultimedia 5.12
 Item {
     id: chllng
 
-    signal finishedTrial
+    property int currentFPSvalue_camera: 0
+    property int currentFPSvalue_trackers: 0
+
+    signal nextWindow(string windowName)
 
     function processResults(result)
     {
-        appendToOutput(result);
+        currentFPSvalue_trackers++;
+
+        appendToOutput(result, false);
 
         var jsn = JSON.parse(result);
         trackerOne.x = cameraBackground.width * jsn["lw_x"];
@@ -19,13 +24,22 @@ Item {
         trackerTwo.y = cameraBackground.height * jsn["rw_y"];
     }
 
-    function appendToOutput(msg, consoleAsWell = false)
+    function increaseFPScounter_camera()
     {
-        // https://bugreports.qt.io/browse/QTCREATORBUG-21884
-        //if (consoleAsWell === undefined) { consoleAsWell = false; }
+        currentFPSvalue_camera++;
+    }
 
-        ta_mxnetOutput.append(msg + "\n---");
-        if (consoleAsWell === true) { console.log(msg); }
+    // https://bugreports.qt.io/browse/QTCREATORBUG-21884
+    //function appendToOutput(msg, panelAsWell = false)
+    function appendToOutput(msg, panelAsWell)
+    {
+        if (panelAsWell === undefined) { panelAsWell = false; }
+
+        if (root.debugOutput === true)
+        {
+            console.log(msg);
+            if (panelAsWell === true) { ta_mxnetOutput.append(msg + "\n---"); }
+        }
     }
 
     ColumnLayout {
@@ -35,7 +49,7 @@ Item {
 
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: parent.height * 0.7
+            Layout.preferredHeight: parent.height * 0.8
 
             RowLayout {
                 anchors.fill: parent
@@ -43,7 +57,8 @@ Item {
 
                 Rectangle {
                     id: cameraBackground
-                    Layout.preferredWidth: parent.width * 0.6
+                    Layout.preferredWidth: root.debugOutput ? parent.width * 0.6 : parent.width
+                    Layout.fillWidth: !root.debugOutput
                     Layout.fillHeight: true
                     color: root.backgroundColor
 
@@ -52,7 +67,7 @@ Item {
                         anchors.centerIn: parent
                         width: parent.width
                         text: qsTr("loading camera...")
-                        font.pixelSize: 40
+                        font.pointSize: 40
                         horizontalAlignment: Text.AlignHCenter
                         wrapMode: Text.WordWrap
                     }
@@ -107,6 +122,21 @@ Item {
                         visible: btn_stop.enabled
                         border.width: 3
                         border.color: "white"
+
+                        /* // animation
+                        Behavior on x {
+                            NumberAnimation {
+                                //duration: 10
+                                easing.type: Easing.OutQuart
+                            }
+                        }
+                        Behavior on y {
+                            NumberAnimation {
+                                //duration: 10
+                                easing.type: Easing.OutQuart
+                            }
+                        }
+                        */
                     }
                     // tracker #2
                     Rectangle {
@@ -120,6 +150,41 @@ Item {
                         visible: btn_stop.enabled
                         border.width: 3
                         border.color: "white"
+
+                        /* // animation
+                        Behavior on x {
+                            NumberAnimation {
+                                duration: 10
+                                easing.type: Easing.OutQuart
+                            }
+                        }
+                        Behavior on y {
+                            NumberAnimation {
+                                duration: 10
+                                easing.type: Easing.OutQuart
+                            }
+                        }
+                        */
+                    }
+
+                    Text {
+                        id: fpsCounter_camera
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.topMargin: 10
+                        anchors.leftMargin: 15
+                        text: "0"
+                        font.pointSize: 40
+                        color: "yellow"
+                    }
+                    Text {
+                        id: fpsCounter_trackers
+                        anchors.top: fpsCounter_camera.bottom
+                        anchors.left: fpsCounter_camera.left
+                        text: "0"
+                        font.pointSize: 40
+                        color: "blue"
+                        //visible: btn_stop.enabled
                     }
                 }
 
@@ -128,6 +193,7 @@ Item {
                     Layout.fillHeight: true
                     color: root.backgroundColor
                     border.width: 1
+                    visible: root.debugOutput
 
                     ScrollView {
                         anchors.fill: parent
@@ -136,7 +202,7 @@ Item {
                         TextArea {
                             id: ta_mxnetOutput
                             readOnly: true
-                            font.pixelSize: root.secondaryFontSize
+                            font.pointSize: root.secondaryFontSize
                             font.family: "Courier New"
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             selectByMouse: true
@@ -148,84 +214,62 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: parent.height * 0.3
-            spacing: 0
+            Layout.preferredHeight: parent.height * 0.2
+            spacing: 20
 
-            Rectangle {
-                Layout.preferredWidth: parent.width * 0.7
-                Layout.fillHeight: true
-                color: root.backgroundColor
-                //border.width: 1
-
-//                Rectangle {
-//                    anchors.centerIn: parent
-//                    width: parent.width * 0.6
-//                    height: parent.height * 0.7
-//                    radius: 10
-
-                    RowLayout {
-                        anchors.centerIn: parent
-                        spacing: 30
-
-                        FancyButton {
-                            id: btn_start
-                            unpressedColor: "#0096FF"
-                            pressedColor: "#3679CC"
-                            text: "Start"
-                            font.pixelSize: root.primaryFontSize * 2
-                            onClicked: {
-                                btn_start.enabled = false;
-                                tm_sendFrame.start();
-                            }
-                        }
-
-                        FancyButton {
-                            id: btn_stop
-                            unpressedColor: "#FF2600"
-                            pressedColor: "#B5331E"
-                            text: "Stop"
-                            font.pixelSize: root.primaryFontSize * 2
-                            enabled: !btn_start.enabled
-                            onClicked: {
-                                btn_start.enabled = true;
-                                tm_sendFrame.stop();
-                            }
-                        }
-
-                        FancyButton {
-                            id: btn_play
-                            unpressedColor: "#0096FF"
-                            pressedColor: "#3679CC"
-                            text: "Playback"
-                            font.pixelSize: root.primaryFontSize * 2
-                            enabled: btn_start.enabled
-                            onClicked: {
-                                btn_start.enabled = false;
-                            }
-                        }
-                    }
-//                }
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                color: root.backgroundColor
-                //color: "blue"
-                //border.width: 1
-
-                FancyButton {
-                    anchors.centerIn: parent
-                    unpressedColor: "#008F00"
-                    pressedColor: "#2C641B"
-                    text: "Done"
-                    font.pixelSize: root.primaryFontSize * 3
-                    enabled: !btn_stop.enabled
-                    onClicked: {
-                        finishedTrial();
-                    }
+            FancyButton {
+                id: btn_start
+                Layout.leftMargin: 15
+                unpressedColor: "#0096FF"
+                pressedColor: "#3679CC"
+                text: "Start"
+                font.pointSize: root.primaryFontSize * 1.5
+                onClicked: {
+                    startChallenge();
                 }
             }
+
+            FancyButton {
+                id: btn_stop
+                unpressedColor: "#FF2600"
+                pressedColor: "#B5331E"
+                text: "Stop"
+                font.pointSize: root.primaryFontSize * 1.5
+                enabled: !btn_start.enabled
+                onClicked: {
+                    stopChallenge();
+                }
+            }
+
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
+//            FancyButton {
+//                id: btn_play
+//                unpressedColor: "#0096FF"
+//                pressedColor: "#3679CC"
+//                text: "Playback"
+//                font.pointSize: root.primaryFontSize * 1.5
+//                enabled: btn_start.enabled
+//                onClicked: {
+//                    btn_start.enabled = false;
+//                }
+//            }
+
+            FancyButton {
+                Layout.rightMargin: 15
+                unpressedColor: "#008F00"
+                pressedColor: "#2C641B"
+                text: "Done"
+                font.pointSize: root.primaryFontSize * 2.5
+                enabled: !btn_stop.enabled
+                onClicked: {
+                    nextWindow("welcome.qml");
+                }
+            }
+
         }
     }
 
@@ -236,5 +280,32 @@ Item {
         onTriggered: {
             backend.enableSendingToMXNet(true);
         }
+    }
+
+    Timer {
+        id: tm_fpsCounter
+        running: true
+        repeat: true
+        interval: 1000
+        onTriggered: {
+            fpsCounter_camera.text = currentFPSvalue_camera;
+            currentFPSvalue_camera = 0;
+
+            fpsCounter_trackers.text = currentFPSvalue_trackers;
+            currentFPSvalue_trackers = 0;
+        }
+    }
+
+    function startChallenge()
+    {
+        btn_start.enabled = false;
+        tm_sendFrame.start();
+    }
+
+    function stopChallenge()
+    {
+        btn_start.enabled = true;
+        tm_sendFrame.stop();
+        currentFPSvalue_trackers = 0;
     }
 }

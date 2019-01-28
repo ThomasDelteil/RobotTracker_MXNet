@@ -3,7 +3,7 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
 
 Item {
-    signal welcomed
+    signal nextWindow(string windowName)
 
     ColumnLayout {
         anchors.fill: parent
@@ -16,7 +16,7 @@ Item {
         Text {
             Layout.alignment: Qt.AlignHCenter
             text: "Greetings, challenger"
-            font.pixelSize: root.primaryFontSize * 2.5
+            font.pointSize: root.primaryFontSize * 2.5
 //            font.bold: true
         }
 
@@ -30,7 +30,7 @@ Item {
             Text {
                 text: "Your e-mail:"
                 //horizontalAlignment: Text.AlignRight
-                font.pixelSize: root.primaryFontSize
+                font.pointSize: root.primaryFontSize
             }
             Rectangle {
                 Layout.fillWidth: true
@@ -42,7 +42,7 @@ Item {
                     id: text_email
                     anchors.verticalCenter: parent.verticalCenter
                     width: parent.width
-                    font.pixelSize: root.primaryFontSize
+                    font.pointSize: root.primaryFontSize
                     //horizontalAlignment: Text.AlignHCenter
                     leftPadding: 10
                     rightPadding: leftPadding
@@ -63,12 +63,12 @@ Item {
                 id: checkbox_consent
 
                 text: "I agree to the terms"
-                font.pixelSize: root.secondaryFontSize
+                font.pointSize: root.secondaryFontSize
             }
             Text {
                 id: txt_terms
                 text: "(read the terms)"
-                font.pixelSize: root.secondaryFontSize
+                font.pointSize: root.secondaryFontSize
                 color: "blue"
                 font.italic: true
 
@@ -82,14 +82,14 @@ Item {
             text: "Register"
             Layout.topMargin: 20
             Layout.alignment: Qt.AlignHCenter
-            font.pixelSize: root.primaryFontSize
+            font.pointSize: root.primaryFontSize
             enabled: checkbox_consent.checkState == 2
             onClicked: {
                 if (root.checkEmail(text_email.text))
                 {
                     // TODO actually create the profile (new record in DB and whatnot)
                     backend.set_currentProfile(text_email.text);
-                    welcomed();
+                    nextWindow("challenge.qml");
                 }
                 else
                 {

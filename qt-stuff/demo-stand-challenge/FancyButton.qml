@@ -14,7 +14,7 @@ Button {
 
     contentItem: Text {
         text: btn.text
-        font.pixelSize: btn.font.pixelSize
+        font.pointSize: btn.font.pointSize
         color: "white"
     }
 

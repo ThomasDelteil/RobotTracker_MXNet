@@ -7,6 +7,10 @@ Backend::Backend(QObject *parent) : QObject(parent)
             videoWrapper, &VideoWrapper::gotNewShotBytes,
             this, &Backend::uploadBuffer
             );
+    connect(
+            videoWrapper, &VideoWrapper::gotNewFrame,
+            this, [=](){ this->counterIncreased(); }
+            );
 
     manager = new QNetworkAccessManager(this);
     connect(
@@ -33,7 +37,7 @@ void Backend::uploadBuffer(QBuffer *imgBuffer)
     imgBuffer->close();
 }
 
-void Backend::requestFinished(QNetworkReply *reply)
+bool Backend::requestFinished(QNetworkReply *reply)
 {
     int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     QByteArray data = reply->readAll();
@@ -50,9 +54,11 @@ void Backend::requestFinished(QNetworkReply *reply)
             errorMessage = QString("QNetworkReply::NetworkError code: %1").arg(QString::number(err));
         }
         emit requestFailed(QString("Code %1 | %2").arg(status).arg(errorMessage));
+        return false;
     }
 
     emit requestDone(QString(data));
+    return true;
 }
 
 void Backend::set_currentProfile(QString profileName)

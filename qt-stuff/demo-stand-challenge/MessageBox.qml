@@ -42,7 +42,7 @@ Window {
                     verticalAlignment: Text.AlignVCenter
                     text: dialog.textMain
                     font.family: "Courier New"
-                    font.pixelSize: 16
+                    font.pointSize: root.secondaryFontSize
                     wrapMode: Text.WordWrap
                 }
             }

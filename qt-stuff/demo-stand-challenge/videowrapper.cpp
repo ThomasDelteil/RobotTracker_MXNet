@@ -33,6 +33,8 @@ bool VideoWrapper::present(const QVideoFrame &frame)
         frameCopy.unmap();
     }
 
+    emit gotNewFrame();
+
     return true;
 }
 

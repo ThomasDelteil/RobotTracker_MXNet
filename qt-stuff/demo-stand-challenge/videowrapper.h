@@ -39,6 +39,7 @@ public:
 signals:
     void sourceChanged();
     void gotNewShotBytes(QBuffer *imgBuffer);
+    void gotNewFrame();
 
 private:
     QObject *m_source = nullptr;
