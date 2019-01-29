@@ -1,0 +1,14 @@
+{
+  "name": "niryo-proxy",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node niryo-proxy.js"
+  },
+  "dependencies": {
+    "roslib": "^1.0.0"
+  },
+  "main": "niryo-proxy.js",
+  "author": "Anton Chernov",
+  "license": "ISC",
+  "description": ""
+}
