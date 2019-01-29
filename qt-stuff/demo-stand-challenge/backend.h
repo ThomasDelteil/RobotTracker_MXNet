@@ -14,12 +14,11 @@ class Backend : public QObject
     Q_OBJECT
 public:
     explicit Backend(QObject *parent = nullptr);
-    Q_PROPERTY(QObject *videoWrapper READ get_videoWrapper)
+    Q_PROPERTY(QObject *videoWrapper READ get_videoWrapper CONSTANT)
 
 signals:
     QString requestDone(QString result);
     QString requestFailed(QString error);
-    void videoSourceChanged();
     void counterIncreased();
 
 public slots:

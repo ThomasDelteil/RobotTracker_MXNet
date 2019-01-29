@@ -59,10 +59,6 @@ ApplicationWindow {
                 loader.source = "qrc:/" + windowName
             }
         }
-
-        Component.onCompleted: {
-            checkEmail();
-        }
     }
 
     MessageBox {

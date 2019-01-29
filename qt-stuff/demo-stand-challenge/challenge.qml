@@ -86,7 +86,7 @@ Item {
                             //console.log(qsTr("camera orientation:"), camera.orientation);
                             //console.log(qsTr("camera state:"), camera.cameraState);
                             //console.log(qsTr("camera status:"), camera.cameraStatus);
-                            console.log(qsTr("camera supported resolutions:"), imageCapture.supportedResolutions);
+                            //console.log(qsTr("camera supported resolutions:"), imageCapture.supportedResolutions);
                         }
                     }
 

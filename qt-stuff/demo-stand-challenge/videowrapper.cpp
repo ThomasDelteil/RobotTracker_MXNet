@@ -84,18 +84,20 @@ QObject *VideoWrapper::get_source()
 
 void VideoWrapper::set_source(QObject *qsrc)
 {
-    if (m_source)
-    {
-        QCamera *camera = qvariant_cast<QCamera*>(m_source->property("mediaObject"));
-        if (camera)
-        {
-            camera->setViewfinder((QAbstractVideoSurface*)0);
-        }
-        else
-        {
-            qsrc->setProperty("videoSurface", QVariant::fromValue<QAbstractVideoSurface*>(NULL));
-        }
-    }
+//    //m_source = nullptr;
+
+//    if (m_source)
+//    {
+//        QCamera *camera = qvariant_cast<QCamera*>(m_source->property("mediaObject"));
+//        if (camera)
+//        {
+//            camera->setViewfinder((QAbstractVideoSurface*)0);
+//        }
+//        else
+//        {
+//            qsrc->setProperty("videoSurface", QVariant::fromValue<QAbstractVideoSurface*>(NULL));
+//        }
+//    }
 
     m_source = qsrc;
 
