@@ -13,8 +13,6 @@ Item {
 
     function processResults(result)
     {
-        currentFPSvalue_trackers++;
-
         appendToOutput(result, false);
 
         var jsn = JSON.parse(result);
@@ -22,11 +20,6 @@ Item {
         trackerOne.y = cameraBackground.height * jsn["lw_y"];
         trackerTwo.x = cameraBackground.width * jsn["rw_x"];
         trackerTwo.y = cameraBackground.height * jsn["rw_y"];
-    }
-
-    function increaseFPScounter_camera()
-    {
-        currentFPSvalue_camera++;
     }
 
     // https://bugreports.qt.io/browse/QTCREATORBUG-21884
@@ -145,7 +138,7 @@ Item {
                         y: parent.height / 1.3
                         width: 40
                         height: 40
-                        color: "red"
+                        color: "green"
                         radius: 20
                         visible: btn_stop.enabled
                         border.width: 3
@@ -176,6 +169,7 @@ Item {
                         text: "0"
                         font.pointSize: 40
                         color: "yellow"
+                        visible: root.fpsCounters
                     }
                     Text {
                         id: fpsCounter_trackers
@@ -183,8 +177,9 @@ Item {
                         anchors.left: fpsCounter_camera.left
                         text: "0"
                         font.pointSize: 40
-                        color: "blue"
+                        color: "red"
                         //visible: btn_stop.enabled
+                        visible: root.fpsCounters
                     }
                 }
 
@@ -284,7 +279,7 @@ Item {
 
     Timer {
         id: tm_fpsCounter
-        running: true
+        running: root.fpsCounters
         repeat: true
         interval: 1000
         onTriggered: {

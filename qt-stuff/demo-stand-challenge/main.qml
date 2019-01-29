@@ -21,11 +21,13 @@ ApplicationWindow {
     property bool cameraUpsideDown: false // if you need to rotate viewfinder to 180
     property double timerRate: 0.05 * 1000 // ms, the rate of grabbing frames (0.05 * 1000 = 20 FPS)
     property bool debugOutput: false // show debug panel (really kills the performance)
+    property bool fpsCounters: true // show FPS counters
 
     Backend {
         id: backend
 
         onRequestDone: {
+            if (root.fpsCounters === true) { loader.item.currentFPSvalue_trackers++; }
             loader.item.processResults(result);
         }
 
@@ -34,7 +36,7 @@ ApplicationWindow {
         }
 
         onCounterIncreased: {
-            loader.item.increaseFPScounter_camera();
+            if (root.fpsCounters === true) { loader.item.currentFPSvalue_camera++; }
         }
     }
 
