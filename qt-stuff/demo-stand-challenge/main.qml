@@ -9,9 +9,9 @@ ApplicationWindow {
     id: root
     visible: true
     width: 1100
-    minimumWidth: 700
+    minimumWidth: 900
     height: 700
-    minimumHeight: 500
+    minimumHeight: 600
     title: qsTr("Challenge")
 
     property int primaryFontSize: 24
@@ -22,6 +22,7 @@ ApplicationWindow {
     property double timerRate: 0.05 * 1000 // ms, the rate of grabbing frames (0.05 * 1000 = 20 FPS)
     property bool debugOutput: false // show debug panel (really kills the performance)
     property bool fpsCounters: true // show FPS counters
+    property bool maintenance: true // enable maintenance window
 
     Backend {
         id: backend
