@@ -3,7 +3,7 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
 
 Item {
-    signal nextWindow(string windowName)
+    anchors.fill: parent
 
     Image {
         anchors.fill: parent
@@ -49,7 +49,7 @@ Item {
                     RowLayout {
                         anchors.fill: parent
                         anchors.margins: 15
-                        spacing: 20
+                        spacing: 15
 
                         GridLayout {
                             rows: 3
@@ -85,7 +85,7 @@ Item {
                             FancyButton {
                                 Layout.row: 2
                                 Layout.column: 1
-                                font.pointSize: root.secondaryFontSize * 2
+                                font.pointSize: root.secondaryFontSize * 1.5
                                 unpressedColor: "#FF2600"
                                 pressedColor: "#B5331E"
                                 text: "RESET"
@@ -156,19 +156,18 @@ Item {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                         }
-                    }
-                }
 
-                FancyButton {
-                    Layout.alignment: Qt.AlignRight | Qt.AlignBottom
-                    Layout.rightMargin: 10
-                    Layout.bottomMargin: 10
-                    font.pointSize: root.primaryFontSize
-                    unpressedColor: "#A9A9A9"
-                    pressedColor: "#929292"
-                    text: "Close"
-                    onClicked: {
-                        nextWindow("welcome.qml");
+                        FancyButton {
+                            Layout.row: 2
+                            Layout.column: 1
+                            font.pointSize: root.secondaryFontSize * 1.5
+                            unpressedColor: "#FF2600"
+                            pressedColor: "#B5331E"
+                            text: "EMERGENCY\nSTOP"
+                            onClicked: {
+                                appendToMaintenanceOutput("EMERGENCY STOP");
+                            }
+                        }
                     }
                 }
             }

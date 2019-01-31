@@ -13,6 +13,7 @@ ApplicationWindow {
     height: 700
     minimumHeight: 600
     title: qsTr("Challenge")
+    color: root.backgroundColor
 
     property int primaryFontSize: 24
     property int secondaryFontSize: 18
@@ -47,7 +48,15 @@ ApplicationWindow {
         value: true
     }
 
-    color: root.backgroundColor
+    Drawer {
+        id: drawer
+        edge: Qt.TopEdge
+        width: root.width
+        height: root.height
+        interactive: root.maintenance
+
+        Maintenance {}
+    }
 
     Loader {
         id: loader

@@ -210,15 +210,17 @@ Item {
         RowLayout {
             Layout.fillWidth: true
             Layout.preferredHeight: parent.height * 0.2
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
             spacing: 20
 
             FancyButton {
                 id: btn_start
-                Layout.leftMargin: 15
                 unpressedColor: "#0096FF"
                 pressedColor: "#3679CC"
                 text: "Start"
                 font.pointSize: root.primaryFontSize * 1.5
+                visible: enabled
                 onClicked: {
                     startChallenge();
                 }
@@ -231,6 +233,7 @@ Item {
                 text: "Stop"
                 font.pointSize: root.primaryFontSize * 1.5
                 enabled: !btn_start.enabled
+                visible: enabled
                 onClicked: {
                     stopChallenge();
                 }
@@ -254,7 +257,6 @@ Item {
 //            }
 
             FancyButton {
-                Layout.rightMargin: 15
                 unpressedColor: "#008F00"
                 pressedColor: "#2C641B"
                 text: "Done"

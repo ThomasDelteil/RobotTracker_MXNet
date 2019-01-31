@@ -14,6 +14,7 @@ Button {
 
     contentItem: Text {
         text: btn.text
+        horizontalAlignment: Text.AlignHCenter
         font.pointSize: btn.font.pointSize
         color: "white"
     }

@@ -6,6 +6,6 @@
         <file>FancyButton.qml</file>
         <file>MessageBox.qml</file>
         <file>img/under-construction.png</file>
-        <file>maintenance.qml</file>
+        <file>Maintenance.qml</file>
     </qresource>
 </RCC>

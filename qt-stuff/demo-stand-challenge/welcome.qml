@@ -17,14 +17,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             text: "Greetings, challenger"
             font.pointSize: root.primaryFontSize * 2.5
-//            font.bold: true
-
-            TapHandler {
-                longPressThreshold: 5
-                onLongPressed: {
-                    if (root.maintenance === true) { nextWindow("maintenance.qml"); }
-                }
-            }
+            //font.bold: true
         }
 
         RowLayout {
