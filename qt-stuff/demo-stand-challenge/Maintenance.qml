@@ -24,19 +24,68 @@ Item {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: parent.height * 0.6
+                    color: "transparent"
                     border.width: 1
 
-                    ScrollView {
+                    RowLayout {
                         anchors.fill: parent
-                        anchors.margins: 5
+                        spacing: 0
 
-                        TextArea {
-                            id: ta_maintenanceOutput
-                            readOnly: true
-                            font.pointSize: root.secondaryFontSize
-                            font.family: "Courier New"
-                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            selectByMouse: true
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            border.width: 1
+
+                            ScrollView {
+                                anchors.fill: parent
+                                anchors.margins: 5
+
+                                TextArea {
+                                    id: ta_maintenanceOutput
+                                    readOnly: true
+                                    font.pointSize: root.secondaryFontSize
+                                    font.family: "Courier New"
+                                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                    selectByMouse: true
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            Layout.preferredWidth: parent.width * 0.3
+                            Layout.fillHeight: true
+                            color: "transparent"
+
+                            ColumnLayout {
+                                anchors.fill: parent
+                                anchors.margins: 15
+                                spacing: 15
+
+                                StatusRow {
+                                    text: "Algorithm server:"
+                                    color: "green"
+                                }
+
+                                StatusRow {
+                                    text: "Arm proxy server:"
+                                    color: "red"
+                                }
+
+                                StatusRow {
+                                    text: "Arm left:"
+                                    color: "yellow"
+                                }
+
+                                StatusRow {
+                                    text: "Arm right:"
+                                    color: "green"
+                                }
+
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                }
+                            }
                         }
                     }
                 }

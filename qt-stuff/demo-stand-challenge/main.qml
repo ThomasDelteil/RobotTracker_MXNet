@@ -55,7 +55,7 @@ ApplicationWindow {
         height: root.height
         interactive: root.maintenance
 
-        Maintenance {}
+        Maintenance { id: maintenanceView }
     }
 
     Loader {
