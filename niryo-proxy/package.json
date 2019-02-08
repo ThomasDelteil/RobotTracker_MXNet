@@ -5,9 +5,10 @@
     "start": "node niryo-proxy.js"
   },
   "dependencies": {
+    "connect-timeout": "^1.9.0",
     "express": "^4.16.4",
-    "roslib": "^1.0.0",
-    "connect-timeout": "^1.9.0"
+    "request": "^2.88.0",
+    "roslib": "^1.0.0"
   },
   "main": "niryo-proxy.js",
   "author": "Anton Chernov",

@@ -17,10 +17,40 @@ class ArmConfig {
     }
 }
 
+class RobotState {
+    constructor(name, armStateMsg) {
+        this.name = name
+        this.x = armStateMsg.position.x
+        this.y = armStateMsg.position.y
+        this.z = armStateMsg.position.z
+        this.yaw = armStateMsg.rpy.yaw
+        this.pitch = armStateMsg.rpy.pitch
+        this.roll = armStateMsg.rpy.roll
+    }
+
+    equals(other) {
+        if (other == null) {
+            return false
+        }
+
+        if (this.x != other.x ||
+            this.y != other.y ||
+            this.z != other.z ||
+            this.yaw != other.yaw ||
+            this.roll != other.roll ||
+            this.pitch != other.pitch) {
+            return false
+        }
+
+        return true
+    }
+}
+
 class Arm extends EventEmitter {
     constructor(config) {
         super()
         this.config = config
+        this.state = null
     }
 
     init() {
@@ -55,6 +85,20 @@ class Arm extends EventEmitter {
             ros: this.ros,
             serverName: this.config.server_name,
             actionName: this.config.action_name
+        })
+
+        this.robotStateSubscriber = new rosLib.Topic({
+          ros: this.ros,
+          name: '/niryo_one/robot_state',
+          messageType: 'niryo_one_msgs/RobotState',
+        })
+
+        this.robotStateSubscriber.subscribe(function (message) {
+            let newState = new RobotState(that.config.name, message)
+            if(!newState.equals(that.state)) {
+                that.state = newState
+                that.emit('position_change', that.state)
+            }
         })
     }
 
