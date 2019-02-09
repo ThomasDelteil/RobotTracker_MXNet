@@ -52,18 +52,19 @@ Item {
                         }
 
                         Rectangle {
-                            Layout.preferredWidth: parent.width * 0.3
+                            Layout.preferredWidth: parent.width * 0.2
+                            Layout.minimumWidth: 250;
                             Layout.fillHeight: true
                             color: "transparent"
 
                             ColumnLayout {
                                 anchors.fill: parent
                                 anchors.margins: 15
-                                spacing: 15
+                                spacing: 10
 
                                 StatusRow {
                                     text: "Algorithm server:"
-                                    color: "green"
+                                    color: "red"
                                 }
 
                                 StatusRow {
@@ -71,19 +72,29 @@ Item {
                                     color: "red"
                                 }
 
-                                StatusRow {
-                                    text: "Arm left:"
-                                    color: "yellow"
-                                }
-
-                                StatusRow {
-                                    text: "Arm right:"
-                                    color: "green"
-                                }
-
                                 Item {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
+                                }
+
+                                ArmsData {
+                                    Layout.fillWidth: true
+                                    Layout.alignment: Qt.AlignHCenter
+
+                                    statusLeft: "red"
+                                    statusRight: "red"
+                                    xLeft: "0"
+                                    xRight: "0"
+                                    yLeft: "0"
+                                    yRight: "0"
+                                    zLeft: "0"
+                                    zRight: "0"
+                                    yawLeft: "0"
+                                    yawRight: "0"
+                                    pitchLeft: "0"
+                                    pitchRight: "0"
+                                    rollLeft: "0"
+                                    rollRight: "0"
                                 }
                             }
                         }

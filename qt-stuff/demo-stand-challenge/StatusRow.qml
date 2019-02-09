@@ -7,11 +7,12 @@ Row {
     property alias color: val.color
 
     Layout.alignment: Qt.AlignRight
-    spacing: 10
+    spacing: 5
     Text {
         id: lbl
         text: "status:"
-        font.pointSize: root.primaryFontSize
+        font.pointSize: root.secondaryFontSize
+        font.bold: true
     }
     Rectangle {
         id: val

@@ -9,6 +9,11 @@ Item {
     property int currentFPSvalue_camera: 0
     property int currentFPSvalue_trackers: 0
 
+    property real trackerOneX: cameraBackground.width / 4
+    property real trackerOneY: cameraBackground.height / 4
+    property real trackerTwoX: cameraBackground.width / 1.3
+    property real trackerTwoY: cameraBackground.height / 1.3
+
     signal nextWindow(string windowName)
 
     function processResults(result)
@@ -22,10 +27,10 @@ Item {
         trackerTwo.y = cameraBackground.height * jsn["rw_y"];
     }
 
-    // https://bugreports.qt.io/browse/QTCREATORBUG-21884
     //function appendToOutput(msg, panelAsWell = false)
     function appendToOutput(msg, panelAsWell)
     {
+        // https://bugreports.qt.io/browse/QTCREATORBUG-21884
         if (panelAsWell === undefined) { panelAsWell = false; }
 
         if (root.debugOutput === true)
@@ -54,6 +59,7 @@ Item {
                     Layout.fillWidth: !root.debugOutput
                     Layout.fillHeight: true
                     color: root.backgroundColor
+                    z: 1
 
                     Text {
                         id: cameraStatus
@@ -83,10 +89,18 @@ Item {
 
 
                         Component.onCompleted: {
-                            //console.log(qsTr("camera orientation:"), camera.orientation);
-                            //console.log(qsTr("camera state:"), camera.cameraState);
-                            //console.log(qsTr("camera status:"), camera.cameraStatus);
-                            //console.log(qsTr("camera supported resolutions:"), imageCapture.supportedResolutions);
+                            //console.log("camera orientation:", camera.orientation);
+                            //console.log("camera state:", camera.cameraState);
+                            //console.log("camera status:", camera.cameraStatus);
+                            /*
+                            console.log("camera supported IC resolutions:", imageCapture.supportedResolutions);
+                            console.log("camera supported VF resolutions:");
+                            var supRezes = camera.supportedViewfinderResolutions();
+                            for (var rez in supRezes)
+                            {
+                                console.log(supRezes[rez].width, "x", supRezes[rez].height);
+                            }
+                            */
                         }
                     }
 
@@ -106,15 +120,39 @@ Item {
                     // tracker #1
                     Rectangle {
                         id: trackerOne
-                        x: parent.width / 4
-                        y: parent.height / 4
+                        x: trackerOneX
+                        y: trackerOneY
                         width: 40
                         height: 40
                         color: "blue"
                         radius: 20
-                        visible: btn_stop.enabled
+                        visible: root.manualTrackers || btn_stop.enabled
                         border.width: 3
                         border.color: "white"
+
+                        DragHandler {
+                            enabled: root.manualTrackers
+                            onActiveChanged: {
+                                if (active) // dragging started
+                                {
+                                    chllng.trackerOneX = trackerOne.x;
+                                    chllng.trackerOneY = trackerOne.y;
+                                }
+                                else // dragging stopped
+                                {
+                                    var xMovement = checkXmovement(translation.x, trackerOne),
+                                        yMovement = checkYmovement(translation.y, trackerOne);
+
+                                    if (xMovement === 0) { trackerOne.x = chllng.trackerOneX; }
+                                    if (yMovement === 0) { trackerOne.y = chllng.trackerOneY; }
+
+                                    appendToOutput("Left arm movement: ".concat(xMovement, " | ", yMovement), true);
+                                }
+                            }
+                            //onTranslationChanged: {
+                            //    console.log(translation)
+                            //}
+                        }
 
                         /* // animation
                         Behavior on x {
@@ -134,15 +172,39 @@ Item {
                     // tracker #2
                     Rectangle {
                         id: trackerTwo
-                        x: parent.width / 1.3
-                        y: parent.height / 1.3
+                        x: trackerTwoX
+                        y: trackerTwoY
                         width: 40
                         height: 40
                         color: "green"
                         radius: 20
-                        visible: btn_stop.enabled
+                        visible: root.manualTrackers || btn_stop.enabled
                         border.width: 3
                         border.color: "white"
+
+                        DragHandler {
+                            enabled: root.manualTrackers
+                            onActiveChanged: {
+                                if (active) // dragging started
+                                {
+                                    chllng.trackerTwoX = trackerTwo.x;
+                                    chllng.trackerTwoY = trackerTwo.y;
+                                }
+                                else // dragging stopped
+                                {
+                                    var xMovement = checkXmovement(translation.x, trackerTwo),
+                                        yMovement = checkYmovement(translation.y, trackerTwo);
+
+                                    if (xMovement === 0) { trackerTwo.x = chllng.trackerTwoX; }
+                                    if (yMovement === 0) { trackerTwo.y = chllng.trackerTwoY; }
+
+                                    appendToOutput("Right arm movement: ".concat(xMovement, " | ", yMovement), true);
+                                }
+                            }
+                            //onTranslationChanged: {
+                            //    console.log(translation)
+                            //}
+                        }
 
                         /* // animation
                         Behavior on x {
@@ -304,5 +366,47 @@ Item {
         btn_start.enabled = true;
         tm_sendFrame.stop();
         currentFPSvalue_trackers = 0;
+    }
+
+    function checkXmovement(val, tracker)
+    {
+        /*
+        if (tracker.x < cameraBackground.x)
+        {
+            tracker.x = cameraBackground.x;
+            return 0;
+        }
+        if (tracker.x > cameraBackground.width)
+        {
+            tracker.x = cameraBackground.width - tracker.width;
+            return 1;
+        }
+        */
+        if (tracker.x + tracker.width / 2 < cameraBackground.x || tracker.x - tracker.width / 2 > cameraBackground.width)
+        {
+            return 0;
+        }
+        return (val / cameraBackground.width).toFixed(3);
+    }
+
+    function checkYmovement(val, tracker)
+    {
+        /*
+        if (tracker.y < cameraBackground.y)
+        {
+            tracker.y = cameraBackground.y;
+            return 0;
+        }
+        if (tracker.y > cameraBackground.height)
+        {
+            tracker.y = cameraBackground.height - tracker.height;
+            return 1;
+        }
+        */
+        if (tracker.y + tracker.height / 2 < cameraBackground.y || tracker.y - tracker.height / 2 > cameraBackground.height)
+        {
+            return 0;
+        }
+        return (val / cameraBackground.height).toFixed(3);
     }
 }

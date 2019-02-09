@@ -8,5 +8,6 @@
         <file>img/under-construction.png</file>
         <file>Maintenance.qml</file>
         <file>StatusRow.qml</file>
+        <file>ArmsData.qml</file>
     </qresource>
 </RCC>

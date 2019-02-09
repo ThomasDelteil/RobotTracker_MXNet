@@ -33,8 +33,9 @@ void Backend::uploadBuffer(QBuffer *imgBuffer)
     request.setRawHeader("Content-Type", "multipart/form-data;");
 
     imgBuffer->open(QIODevice::ReadOnly);
-    manager->post(request, imgBuffer);
-    imgBuffer->close();
+    auto reply = manager->post(request, imgBuffer);
+    //imgBuffer->close();
+    connect(reply, &QNetworkReply::finished, imgBuffer, &QBuffer::deleteLater);
 }
 
 bool Backend::requestFinished(QNetworkReply *reply)
