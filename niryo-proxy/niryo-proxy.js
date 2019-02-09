@@ -68,14 +68,53 @@ const make_arm = (config) => {
             }, failed_callback)
         })
     }
+
+    return arm
 }
 
-make_arm(left_config)
-make_arm(right_config)
+let left_arm = make_arm(left_config)
+let right_arm = make_arm(right_config)
 
 app.get('/', (req, res) => {
     res.send('Hello World!')
 })
+
+let pos1 = {
+    x: 0.225,
+    y: -0.220,
+    z: 0.1,
+    roll: 0.0,
+    pitch: 1.57,
+    yaw: 1.67
+}
+
+let pos2 = {
+    x: 0.225,
+    //    y: 0.220,
+    y: 0.0,
+    z: 0.1,
+    roll: 0.0,
+    pitch: 1.57,
+    yaw: 1.67
+}
+
+let po2 = { ...pos1 }
+let left = true
+
+app.get('/move', (req, res) => {
+    left_arm.move_pose(pos1)
+    console.info(`started move!`)
+    
+    console.info(`po2: ${JSON.stringify(po2)}`)
+
+    left_arm.move_pose(po2)
+
+    po2.y += 0.05
+
+    console.info(`started second move!`)
+    left = !left
+})
+
 
 console.log(`All app routes: ${JSON.stringify(app._router.stack)}`)
 

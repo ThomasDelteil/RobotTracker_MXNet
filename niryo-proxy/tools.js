@@ -58,6 +58,52 @@ class Arm extends EventEmitter {
         })
     }
 
+    // move_pose(pos) {
+    //     console.log(`${this.config.name}: move_pose`)
+
+    //     const command = {
+    //         'cmd_type': 2,
+    //         'position': {
+    //             'x': pos.x,
+    //             'y': pos.y,
+    //             'z': pos.z,
+    //         },
+    //         'rpy': {
+    //             'roll': pos.roll,
+    //             'pitch': pos.pitch,
+    //             'yaw': pos.yaw,
+    //         }
+    //     }
+
+    //     let that = this
+
+    //     // Create a goal.
+    //     var goal = new rosLib.Goal({
+    //         actionClient: this.client,
+    //         goalMessage: new rosLib.Message({ 'cmd': command })
+    //     });
+
+    //     goal.on('feedback', function (feedback) {
+    //         console.log(`${that.config.name}: feedback: ${feedback.sequence}`)
+    //         that.emit('feedback', feedback)
+    //     });
+
+    //     goal.on('result', function (result) {
+    //         console.log(`${that.config.name}: result: ${result.sequence}`)
+    //         that.emit('result', result)
+    //     });
+
+    //     goal.on('timeout', function () {
+    //         console.log(`${that.config.name}: timeout`)
+    //         that.emit('timeout')
+    //     });
+
+    //     // Send the goal to the action server.
+    //     goal.send(1000);
+
+    //     console.log(`${this.config.name}: move_pose: goal sent`)
+    // }
+
     move_pose(pos) {
         console.log(`${this.config.name}: move_pose`)
 
@@ -75,33 +121,17 @@ class Arm extends EventEmitter {
             }
         }
 
-        let that = this
+        this.move_topic = new rosLib.Topic({
+            ros: this.ros,
+			name: '/niryo_one/commander/trajectory',
+			messageType: 'niryo_one_msgs/RobotMoveCommand'
+        })
 
-        // Create a goal.
-        var goal = new rosLib.Goal({
-            actionClient: this.client,
-            goalMessage: new rosLib.Message({ 'cmd': command })
-        });
+        console.log(`${this.config.name}: move_pose: this.move_topic: ${this.move_topic}`)
 
-        goal.on('feedback', function (feedback) {
-            console.log(`${that.config.name}: feedback: ${feedback.sequence}`)
-            that.emit('feedback', feedback)
-        });
+        this.move_topic.publish(new rosLib.Message(command))
 
-        goal.on('result', function (result) {
-            console.log(`${that.config.name}: result: ${result.sequence}`)
-            that.emit('result', result)
-        });
-
-        goal.on('timeout', function () {
-            console.log(`${that.config.name}: timeout`)
-            that.emit('timeout')
-        });
-
-        // Send the goal to the action server.
-        goal.send(1000);
-
-        console.log(`${this.config.name}: move_pose: goal sent`)
+        console.log(`${this.config.name}: move_pose: move sent`)
     }
 
     describe() {
