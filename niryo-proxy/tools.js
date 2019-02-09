@@ -3,6 +3,20 @@
 const rosLib = require('roslib')
 const EventEmitter = require('events');
 
+const ROBOT_COMMAND_TYPE = {
+    "JOINTS": 1,
+    "POSE": 2,
+    "POSITION": 3,
+    "RPY": 4,
+    "SHIFT_POSE": 5,
+    "TOOL": 6
+}
+
+const GRIP_COMMAND = {
+    "OPEN": 1,
+    "CLOSE": 2
+}
+
 class ArmConfig {
     constructor(name, host, port, server_name, action_name) {
         this.name = name
@@ -18,7 +32,6 @@ class ArmConfig {
 }
 
 class ArmState {
-    
     constructor() {
         this.x = null
         this.y = null
@@ -29,6 +42,8 @@ class ArmState {
         this.calibrationNeeded = null
         this.open = null
         this.learningMode = null
+        this.toolId = null
+        this.gripOpen = null
     }
 
     updatePosition(positionMessage) {
@@ -46,8 +61,24 @@ class ArmState {
     }
 
     updateLearningMode(learningMode) {
-        if(this.updateLearningMode != learningMode) {
+        if (this.updateLearningMode != learningMode) {
             this.learningMode = learningMode
+            return true
+        }
+        return false
+    }
+
+    updateToolId(toolId) {
+        if (toolId != this.toolId) {
+            this.toolId = toolId
+            return true
+        }
+        return false
+    }
+
+    updateGripOpen(gripOpen) {
+        if (gripOpen != this.gripOpen) {
+            this.gripOpen = gripOpen
             return true
         }
         return false
@@ -95,24 +126,45 @@ class Arm extends EventEmitter {
         // If there is an error on the backend, an 'error' emit will be emitted.
         this.ros.on('error', function(error) {
             console.log(`${that.config.name}: error: ${error}`)
-            //that.emit('error', error)
+                //that.emit('error', error)
         })
 
         // Find out exactly when we made a connection.
         this.ros.on('connection', function() {
             console.log(`${that.config.name}: connected`)
             that.emit('connection')
+            that.onconnect()
         })
 
         this.ros.on('close', function() {
             console.log(`${that.config.name}: disconnected`)
-            //that.emit('close')
+                //that.emit('close')
         })
 
         this.client = new rosLib.ActionClient({
             ros: this.ros,
             serverName: this.config.server_name,
             actionName: this.config.action_name
+        })
+
+        this.changeToolClient = new rosLib.Service({
+            ros: this.ros,
+            name: '/niryo_one/change_tool',
+            serviceType: 'niryo_one_msgs/SetInt',
+        })
+    }
+
+    onconnect() {
+
+        let that = this
+
+        let toolParam = new rosLib.Param({
+            ros: this.ros,
+            name: '/niryo_one_tools/tool_list',
+        })
+
+        toolParam.get(function(message) {
+            that.toolList = message
         })
 
         let robotState = new rosLib.Topic({
@@ -122,36 +174,113 @@ class Arm extends EventEmitter {
         })
 
         robotState.subscribe(function(message) {
-            if(that.state.updatePosition(message)) {
+            if (that.state.updatePosition(message)) {
                 that.emit('state_change', that.state)
             }
         })
 
         let hardwareStatus = new rosLib.Topic({
-          ros: this.ros,
-          name: '/niryo_one/hardware_status',
-          messageType: 'niryo_one_msgs/HardwareStatus',
+            ros: this.ros,
+            name: '/niryo_one/hardware_status',
+            messageType: 'niryo_one_msgs/HardwareStatus',
         })
 
         hardwareStatus.subscribe(function(message) {
-            if(that.state.updateHardwareStatus(message)) {
+            if (that.state.updateHardwareStatus(message)) {
                 that.emit('state_change', that.state)
             }
         })
 
         let learningModelStatus = new rosLib.Topic({
-          ros: this.ros,
-          name: '/niryo_one/learning_mode',
-          messageType: 'std_msgs/Bool',
+            ros: this.ros,
+            name: '/niryo_one/learning_mode',
+            messageType: 'std_msgs/Bool',
         })
 
         learningModelStatus.subscribe(function(message) {
-            if(that.state.updateLearningMode(message.data)) {
+            if (that.state.updateLearningMode(message.data)) {
+                that.emit('state_change', that.state)
+            }
+        })
+
+        // Tool id
+        let currentTool = new rosLib.Topic({
+            ros: this.ros,
+            name: '/niryo_one/current_tool_id',
+            messageType: 'std_msgs/Int32',
+        });
+
+        currentTool.subscribe(function(message) {
+            if (that.state.updateToolId(message.data)) {
                 that.emit('state_change', that.state)
             }
         })
     }
 
+    changeTool(toolId) {
+        let that = this
+        let request = new rosLib.ServiceRequest({
+            value: toolId
+        })
+
+        this.changeToolClient.callService(request, function(response) {
+            if (response.status === 200) {
+                console.log(`${that.config.name}: changeTool: changed to tool ${toolId}`)
+            } else {
+                console.log(`${that.config.name}: changeTool: error ${response.message}`)
+            }
+        }, function(error) {
+            console.log(`${that.config.name}: changeTool: ${error}`)
+        })
+    }
+
+    openGrip() {
+        this.runGripCommand(GRIP_COMMAND.OPEN)
+    }
+
+    closeGrip() {
+        this.runGripCommand(GRIP_COMMAND.CLOSE)
+    }
+
+    runGripCommand(toolCmd) {
+        let that = this
+        const command = {
+            'cmd_type': ROBOT_COMMAND_TYPE.TOOL,
+            'tool_cmd': {
+                'tool_id': this.state.toolId,
+                'cmd_type': toolCmd,
+                'gripper_open_speed': 300,
+                'gripper_close_speed': 500,
+                'activate': false,
+                'gpio': 0
+            }
+        }
+
+        var goal = new rosLib.Goal({
+            actionClient: this.client,
+            goalMessage: new rosLib.Message({
+                'cmd': command
+            })
+        })
+
+        goal.on('feedback', function(feedback) {
+            console.log(`${that.config.name}: feedback: ${JSON.stringify(feedback)}`)
+        })
+
+        goal.on('result', function(result) {
+            console.log(`${that.config.name}: result: ${JSON.stringify(result)}`)
+            if (result.status == 1) {
+                that.state.updateGripOpen(toolCmd == GRIP_COMMAND.OPEN)
+            }
+        })
+
+        goal.on('timeout', function() {
+            console.log(`${that.config.name}: timeout`)
+        })
+
+        goal.send(1000);
+    }
+    
     // move_pose(pos) {
     //     console.log(`${this.config.name}: move_pose`)
 
@@ -199,7 +328,7 @@ class Arm extends EventEmitter {
     // }
 
     move_pose(pos) {
-        console.log(`${this.config.name}: move_pose`)
+        console.log(`${this.config.name}: move_pose: ${JSON.stringify(pos)}`)
 
         const command = {
             'cmd_type': 2,
