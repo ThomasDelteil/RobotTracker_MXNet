@@ -1,46 +1,34 @@
 import QtQuick 2.0
 
-Item {
+QtObject {
     id: root
 
-    property alias data: data
-
-    QtObject {
-        id: data
-
-        property real x
-        property real y
-        property real z
-
-        property real roll
-        property real pitch
-        property real yaw
-
-        property bool open
+    enum State {
+        Disconnected,
+        Connecting,
+        Connected,
+        Error
     }
+
+    property int state: RobotArm.State.Disconnected
+
+    property real x
+    property real y
+    property real z
+
+    property real roll
+    property real pitch
+    property real yaw
+
+    property bool open
 
     function parse(object) {
-        root.data.x = object.x
-        root.data.y = object.y
-        root.data.z = object.z
-        root.data.roll = object.roll
-        root.data.pitch = object.pitch
-        root.data.yaw = object.yaw
-        root.data.open = object.open
+        root.x = object.x
+        root.y = object.y
+        root.z = object.z
+        root.roll = object.roll
+        root.pitch = object.pitch
+        root.yaw = object.yaw
+        root.open = object.open
     }
-
-    states: [
-        State {
-            name: "disconnected"
-        },
-        State {
-            name: "connecting"
-        },
-        State {
-            name: "connected"
-        },
-        State {
-            name: "error"
-        }
-    ]
 }
