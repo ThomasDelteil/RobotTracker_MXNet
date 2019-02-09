@@ -42,6 +42,10 @@ ApplicationWindow {
         }
     }
 
+    RobotsModel {
+        id: robotsModel
+    }
+
     Binding {
         target: VirtualKeyboardSettings
         property: "fullScreenMode"

@@ -8,5 +8,7 @@
         <file>img/under-construction.png</file>
         <file>Maintenance.qml</file>
         <file>StatusRow.qml</file>
+        <file>RobotArm.qml</file>
+        <file>RobotsModel.qml</file>
     </qresource>
 </RCC>
