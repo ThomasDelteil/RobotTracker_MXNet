@@ -2,11 +2,11 @@
 
 const rosLib = require('roslib')
 
-const LEFT_ARM_HOST = '10.10.1.16'
+const LEFT_ARM_HOST = 'localhost'
 const LEFT_ARM_PORT = 9090
 
-const RIGHT_ARM_HOST = '10.10.1.19'
-const RIGHT_ARM_PORT = 9090
+const RIGHT_ARM_HOST = 'localhost'
+const RIGHT_ARM_PORT = 9091
 
 const MAX_LEFT = new rosLib.Vector3(0.225, -0.220, 0.1)
 const MAX_RIGHT = new rosLib.Vector3(0.225, 0.220, 0.1)

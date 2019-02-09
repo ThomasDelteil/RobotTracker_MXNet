@@ -9,5 +9,7 @@
         <file>Maintenance.qml</file>
         <file>StatusRow.qml</file>
         <file>ArmsData.qml</file>
+        <file>RobotArm.qml</file>
+        <file>RobotsModel.qml</file>
     </qresource>
 </RCC>

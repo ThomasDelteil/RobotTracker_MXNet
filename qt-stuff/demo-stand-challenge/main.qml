@@ -44,6 +44,10 @@ ApplicationWindow {
         }
     }
 
+    RobotsModel {
+        id: robotsModel
+    }
+
     Binding {
         target: VirtualKeyboardSettings
         property: "fullScreenMode"
@@ -70,6 +74,10 @@ ApplicationWindow {
             onNextWindow: {
                 loader.source = "qrc:/" + windowName
             }
+        }
+
+        onItemChanged: {
+            item.robotsModel = robotsModel
         }
     }
 
