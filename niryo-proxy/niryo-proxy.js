@@ -1,6 +1,7 @@
 "use strict";
 
 /* const eventemitter2 = require('eventemitter2') */
+const EventEmitter = require('events');
 const config = require('./config.js')
 const tools = require('./tools.js')
 const rosLib = require('roslib')
@@ -10,10 +11,50 @@ let right_config = new tools.ArmConfig(...Object.values(config.arms.right))
 
 const express = require('express')
 const timeout = require('connect-timeout')
+const request = require('request')
+const WebSocket = require('ws')
+
 const app = express()
+const expressWs = require('express-ws')(app)
+
 app.use(timeout('1s'))
 const port = 3000
 
+let stateCallbackUrl = null
+
+class State extends EventEmitter {
+    constructor(leftArm, rightArm) {
+        super()
+        this.left = {}
+        this.right = {}
+
+        let that = this
+
+        leftArm.on('state_change', function(state) {
+            that.left = state
+            that.emitStateChange()
+        })
+
+        rightArm.on('state_change', function(state) {
+            that.right = state
+            that.emitStateChange()
+        })
+    }
+
+    emitStateChange() {
+        this.emit('state_change', {
+            "left": this.left,
+            "right": this.right
+        })
+    }
+
+    toString() {
+        return JSON.stringify({
+            "left": this.left,
+            "right": this.right
+        })
+    }
+}
 
 const make_arm = (config) => {
     const arm = new tools.Arm(config);
@@ -44,7 +85,7 @@ const make_arm = (config) => {
                 return
             }
 
-            const func = arm.ros[action]
+            const func = arm.ros[action].bind(arm.ros)
             func((result) => {
                 console.log(`${arm.config.name}: ${action}: ${result}`)
                 res.send(result)
@@ -60,8 +101,8 @@ const make_arm = (config) => {
                 return
             }
 
-            const func = arm.ros[action]
             const param = req.param('param')
+            const func = arm.ros[action].bind(arm.ros)
             func(param, (result) => {
                 console.log(`${arm.config.name}: ${action} (param: ${param}): ${result}`)
                 res.send(result)
@@ -69,14 +110,77 @@ const make_arm = (config) => {
         })
     }
 
+    app.get(`/${arm.config.name}/state`, (req, res) => {
+        if (not_ready(res)) {
+            return
+        }
+        res.send(arm.state)
+    })
+
     return arm
 }
 
-let left_arm = make_arm(left_config)
-let right_arm = make_arm(right_config)
+let leftArm = make_arm(left_config)
+let rightArm = make_arm(right_config)
+
+app.use(express.json())
 
 app.get('/', (req, res) => {
     res.send('Hello World!')
+})
+
+app.post('/register', (req, res) => {
+    if (not_ready(res)) {
+        return
+    }
+    stateCallbackUrl = req.body.callback
+    res.send('OK')
+})
+
+app.post('/deregister', (req, res) => {
+    if (not_ready(res)) {
+        return
+    }
+    stateCallbackUrl = null
+    res.send('OK')
+})
+
+app.post('/devnull', (req, res) => {
+    if (not_ready(res)) {
+        return
+    }
+    console.log('devnull')
+    console.log(req.body)
+    res.send('OK')
+})
+
+app.ws('/listen', (ws, req) => {
+    ws.send(state.toString())
+})
+
+let state = new State(leftArm, rightArm)
+
+state.on('state_change', function(state) {
+    if (stateCallbackUrl != null) {
+        request({
+            method: 'post',
+            url: stateCallbackUrl,
+            json: state
+        }, function(err, resp, body) {
+            if (err) {
+                console.error(`${arm.config.name}: rosLib failed callback: ${err}`)
+            }
+        })
+    }
+})
+
+state.on('state_change', function(state) {
+    let aWss = expressWs.getWss('/listen')
+    aWss.clients.forEach(function(client) {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(state))
+        }
+    });
 })
 
 let pos1 = {
@@ -98,13 +202,13 @@ let pos2 = {
     yaw: 1.67
 }
 
-let po2 = { ...pos1 }
+let po2 = {...pos1}
 let left = true
 
 app.get('/move', (req, res) => {
     left_arm.move_pose(pos1)
     console.info(`started move!`)
-    
+
     console.info(`po2: ${JSON.stringify(po2)}`)
 
     left_arm.move_pose(po2)
@@ -118,4 +222,4 @@ app.get('/move', (req, res) => {
 
 console.log(`All app routes: ${JSON.stringify(app._router.stack)}`)
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(port, "0.0.0.0", () => console.log(`Example app listening on port ${port}!`))
