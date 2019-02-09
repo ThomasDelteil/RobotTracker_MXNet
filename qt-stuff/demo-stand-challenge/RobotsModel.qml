@@ -36,24 +36,54 @@ Item {
         }
     }
 
-    function calibrate() {
-        sendRequest("/calibrate")
+    function open(arm) {
+        sendRequest(arm.name + "/open")
     }
 
-    function move(arm) {
-        var postData = {
-            y: arm.data.y,
-            z: arm.data.z
+    function close() {
+        sendRequest(arm.name + "/close")
+    }
+
+    function calibrate(arm) {
+        sendRequest(arm.name + "/calibrate")
+    }
+
+    function getPosition(arm, relativeY, relativeZ) {
+        return {
+            "x": arm.minX,
+            "y": arm.minY + (arm.maxY - arm.minY) * relativeY,
+            "z": arm.minZ + (arm.maxZ - arm.minZ) * relativeZ
         }
-        sendRequest(arm.name + "/move", data)
+    }
+
+    function move(arm, relativeY, relativeZ) {
+        sendRequest(arm.name + "/move", getPosition(arm, relativeY, relativeZ))
     }
 
     RobotArm {
         id: left
+
+        property real minX: 0.225
+        property real maxX: 0.225
+
+        property real minY: -0.220
+        property real maxY: 0.220
+
+        property real minZ: -0.220
+        property real maxZ: 0.220
     }
 
     RobotArm {
         id: right
+
+        property real minX: 0.225
+        property real maxX: 0.225
+
+        property real minY: -0.220
+        property real maxY: 0.220
+
+        property real minZ: -0.220
+        property real maxZ: 0.220
     }
 
     Timer {
