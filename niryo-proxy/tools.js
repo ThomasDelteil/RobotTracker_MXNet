@@ -17,44 +17,60 @@ class ArmConfig {
     }
 }
 
-class RobotState {
-    constructor(name, armStateMsg) {
-        this.name = name
-        this.x = armStateMsg.position.x
-        this.y = armStateMsg.position.y
-        this.z = armStateMsg.position.z
-        this.yaw = armStateMsg.rpy.yaw
-        this.pitch = armStateMsg.rpy.pitch
-        this.roll = armStateMsg.rpy.roll
+class ArmState {
+    
+    constructor() {
+        this.x = null
+        this.y = null
+        this.z = null
+        this.yaw = null
+        this.pitch = null
+        this.roll = null
+        this.calibrationNeeded = null
+        this.open = null
+        this.learningMode = null
     }
 
-    equals(other) {
+    updatePosition(positionMessage) {
+        let updatedRpy = this.updateAndSignal(positionMessage.rpy)
+        let updatesPos = this.updateAndSignal(positionMessage.position)
+        return updatedRpy || updatesPos
+    }
+
+    updateHardwareStatus(hardwareStatusMessage) {
+        if (hardwareStatusMessage.calibration_needed != this.calibrationNeeded) {
+            this.calibrationNeeded = hardwareStatusMessage.calibration_needed
+            return true
+        }
+        return false
+    }
+
+    updateLearningMode(learningMode) {
+        if(this.updateLearningMode != learningMode) {
+            this.learningMode = learningMode
+            return true
+        }
+        return false
+    }
+
+    updateAndSignal(other) {
 
         if (other == null) {
             return false
         }
 
         // Create arrays of property names
-        var aProps = Object.getOwnPropertyNames(this);
-        var bProps = Object.getOwnPropertyNames(other);
+        let objectUpdated = false
+        var otherProps = Object.getOwnPropertyNames(other);
 
-        // If number of properties is different,
-        // objects are not equivalent
-        if (aProps.length != bProps.length) {
-            return false;
-        }
-
-        for (let propName of aProps) {
-            // If values of same property are not equal,
-            // objects are not equivalent
+        for (let propName of otherProps) {
             if (this[propName] !== other[propName]) {
-                return false;
+                this[propName] = other[propName]
+                objectUpdated = true
             }
         }
 
-        // If we made it this far, objects
-        // are considered equivalent
-        return true;
+        return objectUpdated
     }
 }
 
@@ -62,7 +78,7 @@ class Arm extends EventEmitter {
     constructor(config) {
         super()
         this.config = config
-        this.state = null
+        this.state = new ArmState()
     }
 
     init() {
@@ -79,7 +95,7 @@ class Arm extends EventEmitter {
         // If there is an error on the backend, an 'error' emit will be emitted.
         this.ros.on('error', function(error) {
             console.log(`${that.config.name}: error: ${error}`)
-                //that.emit('error', error)
+            //that.emit('error', error)
         })
 
         // Find out exactly when we made a connection.
@@ -90,7 +106,7 @@ class Arm extends EventEmitter {
 
         this.ros.on('close', function() {
             console.log(`${that.config.name}: disconnected`)
-                //that.emit('close')
+            //that.emit('close')
         })
 
         this.client = new rosLib.ActionClient({
@@ -99,17 +115,39 @@ class Arm extends EventEmitter {
             actionName: this.config.action_name
         })
 
-        this.robotStateSubscriber = new rosLib.Topic({
+        let robotState = new rosLib.Topic({
             ros: this.ros,
             name: '/niryo_one/robot_state',
             messageType: 'niryo_one_msgs/RobotState',
         })
 
-        this.robotStateSubscriber.subscribe(function(message) {
-            let newState = new RobotState(that.config.name, message)
-            if (!newState.equals(that.state)) {
-                that.state = newState
-                that.emit('position_change', that.state)
+        robotState.subscribe(function(message) {
+            if(that.state.updatePosition(message)) {
+                that.emit('state_change', that.state)
+            }
+        })
+
+        let hardwareStatus = new rosLib.Topic({
+          ros: this.ros,
+          name: '/niryo_one/hardware_status',
+          messageType: 'niryo_one_msgs/HardwareStatus',
+        })
+
+        hardwareStatus.subscribe(function(message) {
+            if(that.state.updateHardwareStatus(message)) {
+                that.emit('state_change', that.state)
+            }
+        })
+
+        let learningModelStatus = new rosLib.Topic({
+          ros: this.ros,
+          name: '/niryo_one/learning_mode',
+          messageType: 'std_msgs/Bool',
+        })
+
+        learningModelStatus.subscribe(function(message) {
+            if(that.state.updateLearningMode(message.data)) {
+                that.emit('state_change', that.state)
             }
         })
     }

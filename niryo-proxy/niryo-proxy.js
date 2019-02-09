@@ -1,6 +1,7 @@
 "use strict";
 
 /* const eventemitter2 = require('eventemitter2') */
+const EventEmitter = require('events');
 const config = require('./config.js')
 const tools = require('./tools.js')
 const rosLib = require('roslib')
@@ -21,6 +22,40 @@ const port = 3000
 
 let stateCallbackUrl = null
 
+class State extends EventEmitter {
+    constructor(leftArm, rightArm) {
+        super()
+        this.left = {}
+        this.right = {}
+
+        let that = this
+
+        leftArm.on('state_change', function(state) {
+            that.left = state
+            that.emitStateChange()
+        })
+
+        rightArm.on('state_change', function(state) {
+            that.right = state
+            that.emitStateChange()
+        })
+    }
+
+    emitStateChange() {
+        this.emit('state_change', {
+            "left": this.left,
+            "right": this.right
+        })
+    }
+
+    toString() {
+        return JSON.stringify({
+            "left": this.left,
+            "right": this.right
+        })
+    }
+}
+
 const make_arm = (config) => {
     const arm = new tools.Arm(config);
     arm.describe();
@@ -28,29 +63,6 @@ const make_arm = (config) => {
     let ready = false
     arm.on('connection', () => ready = true)
     arm.init();
-
-    arm.on('position_change', function(state) {
-        if (stateCallbackUrl != null) {
-            request({
-                method: 'post',
-                url: stateCallbackUrl,
-                json: state
-            }, function(err, resp, body) {
-                if (err) {
-                    console.error(`${arm.config.name}: rosLib failed callback: ${error}`)
-                }
-            })
-        }
-    })
-
-    arm.on('position_change', function(state) {
-        let aWss = expressWs.getWss('/listen')
-        aWss.clients.forEach(function(client) {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify(state))
-            }
-        });
-    })
 
     const failed_callback = (error) => {
         console.error(`${arm.config.name}: rosLib failed callback: ${error}`)
@@ -104,10 +116,12 @@ const make_arm = (config) => {
         }
         res.send(arm.state)
     })
+
+    return arm
 }
 
-let left_arm = make_arm(left_config)
-let right_arm = make_arm(right_config)
+let leftArm = make_arm(left_config)
+let rightArm = make_arm(right_config)
 
 app.use(express.json())
 
@@ -141,9 +155,32 @@ app.post('/devnull', (req, res) => {
 })
 
 app.ws('/listen', (ws, req) => {
-    /*arm.on('position_change', function(state) {
-        ws.send(JSON.stringify(state))
-    })*/
+    ws.send(state.toString())
+})
+
+let state = new State(leftArm, rightArm)
+
+state.on('state_change', function(state) {
+    if (stateCallbackUrl != null) {
+        request({
+            method: 'post',
+            url: stateCallbackUrl,
+            json: state
+        }, function(err, resp, body) {
+            if (err) {
+                console.error(`${arm.config.name}: rosLib failed callback: ${err}`)
+            }
+        })
+    }
+})
+
+state.on('state_change', function(state) {
+    let aWss = expressWs.getWss('/listen')
+    aWss.clients.forEach(function(client) {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(state))
+        }
+    });
 })
 
 let pos1 = {
@@ -165,8 +202,7 @@ let pos2 = {
     yaw: 1.67
 }
 
-let po2 = {...pos1
-}
+let po2 = {...pos1}
 let left = true
 
 app.get('/move', (req, res) => {
@@ -186,4 +222,4 @@ app.get('/move', (req, res) => {
 
 console.log(`All app routes: ${JSON.stringify(app._router.stack)}`)
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(port, "0.0.0.0", () => console.log(`Example app listening on port ${port}!`))
