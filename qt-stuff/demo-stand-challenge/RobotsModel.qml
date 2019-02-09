@@ -52,7 +52,10 @@ Item {
         return {
             "x": arm.minX,
             "y": arm.minY + (arm.maxY - arm.minY) * relativeY,
-            "z": arm.minZ + (arm.maxZ - arm.minZ) * relativeZ
+            "z": arm.minZ + (arm.maxZ - arm.minZ) * relativeZ,
+            "roll": arm.minRoll,
+            "pitch": arm.minPitch,
+            "yaw": arm.minYaw
         }
     }
 
@@ -63,27 +66,45 @@ Item {
     RobotArm {
         id: left
 
-        property real minX: 0.225
-        property real maxX: 0.225
+        property real minX: 0.253
+        property real maxX: 0.253
 
-        property real minY: -0.220
-        property real maxY: 0.220
+        property real minY: -0.25
+        property real maxY: 0.25
 
-        property real minZ: -0.220
-        property real maxZ: 0.220
+        property real minZ: 0.1
+        property real maxZ: 0.37
+
+        property real minRoll: 0
+        property real maxRoll: 0
+
+        property real minPitch: Math.PI / 2
+        property real maxPitch: Math.PI / 2
+
+        property real minYaw: -Math.PI / 2
+        property real maxYaw: -Math.PI / 2
     }
 
     RobotArm {
         id: right
 
-        property real minX: 0.225
-        property real maxX: 0.225
+        property real minX: 0.253
+        property real maxX: 0.253
 
-        property real minY: -0.220
-        property real maxY: 0.220
+        property real minY: -0.25
+        property real maxY: 0.25
 
-        property real minZ: -0.220
-        property real maxZ: 0.220
+        property real minZ: 0.1
+        property real maxZ: 0.37
+
+        property real minRoll: 0
+        property real maxRoll: 0
+
+        property real minPitch: Math.PI / 2
+        property real maxPitch: Math.PI / 2
+
+        property real minYaw: -Math.PI / 2
+        property real maxYaw: -Math.PI / 2
     }
 
     Timer {

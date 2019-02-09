@@ -73,6 +73,10 @@ ApplicationWindow {
                 loader.source = "qrc:/" + windowName
             }
         }
+
+        onItemChanged: {
+            item.robotsModel = robotsModel
+        }
     }
 
     MessageBox {

@@ -6,6 +6,8 @@ import QtMultimedia 5.12
 Item {
     id: chllng
 
+    property var robotsModel
+
     property int currentFPSvalue_camera: 0
     property int currentFPSvalue_trackers: 0
 
@@ -158,6 +160,18 @@ Item {
                             }
                         }
                         */
+
+                        MouseArea {
+                            anchors.fill: parent
+                            drag.target: parent
+                        }
+
+                        function updatePosition() {
+                            robotsModel.move({ name: "right" }, x / chllng.width. y / chllng.height)
+                        }
+
+                        onXChanged: updatePosition()
+                        onYChanged: updatePosition()
                     }
 
                     Text {
