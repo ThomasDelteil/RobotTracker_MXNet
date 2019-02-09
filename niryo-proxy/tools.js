@@ -28,45 +28,33 @@ class RobotState {
         this.roll = armStateMsg.rpy.roll
     }
 
-equals(other) {
-    // Create arrays of property names
-    var aProps = Object.getOwnPropertyNames(a);
-    var bProps = Object.getOwnPropertyNames(b);
+    equals(other) {
 
-    // If number of properties is different,
-    // objects are not equivalent
-    if (aProps.length != bProps.length) {
-        return false;
-    }
-
-    for (var i = 0; i < aProps.length; i++) {
-        var propName = aProps[i];
-
-        // If values of same property are not equal,
-        // objects are not equivalent
-        if (a[propName] !== b[propName]) {
-            return false;
-        }
-    }
-
-    // If we made it this far, objects
-    // are considered equivalent
-    return true;
-}
         if (other == null) {
             return false
         }
 
-        if (this.x != other.x ||
-            this.y != other.y ||
-            this.z != other.z ||
-            this.yaw != other.yaw ||
-            this.roll != other.roll ||
-            this.pitch != other.pitch) {
-            return false
+        // Create arrays of property names
+        var aProps = Object.getOwnPropertyNames(this);
+        var bProps = Object.getOwnPropertyNames(other);
+
+        // If number of properties is different,
+        // objects are not equivalent
+        if (aProps.length != bProps.length) {
+            return false;
         }
 
-        return true
+        for (let propName of aProps) {
+            // If values of same property are not equal,
+            // objects are not equivalent
+            if (this[propName] !== other[propName]) {
+                return false;
+            }
+        }
+
+        // If we made it this far, objects
+        // are considered equivalent
+        return true;
     }
 }
 
@@ -89,20 +77,20 @@ class Arm extends EventEmitter {
         let that = this
 
         // If there is an error on the backend, an 'error' emit will be emitted.
-        this.ros.on('error', function (error) {
+        this.ros.on('error', function(error) {
             console.log(`${that.config.name}: error: ${error}`)
-            //that.emit('error', error)
+                //that.emit('error', error)
         })
 
         // Find out exactly when we made a connection.
-        this.ros.on('connection', function () {
+        this.ros.on('connection', function() {
             console.log(`${that.config.name}: connected`)
             that.emit('connection')
         })
 
-        this.ros.on('close', function () {
+        this.ros.on('close', function() {
             console.log(`${that.config.name}: disconnected`)
-            //that.emit('close')
+                //that.emit('close')
         })
 
         this.client = new rosLib.ActionClient({
@@ -112,14 +100,14 @@ class Arm extends EventEmitter {
         })
 
         this.robotStateSubscriber = new rosLib.Topic({
-          ros: this.ros,
-          name: '/niryo_one/robot_state',
-          messageType: 'niryo_one_msgs/RobotState',
+            ros: this.ros,
+            name: '/niryo_one/robot_state',
+            messageType: 'niryo_one_msgs/RobotState',
         })
 
-        this.robotStateSubscriber.subscribe(function (message) {
+        this.robotStateSubscriber.subscribe(function(message) {
             let newState = new RobotState(that.config.name, message)
-            if(!newState.equals(that.state)) {
+            if (!newState.equals(that.state)) {
                 that.state = newState
                 that.emit('position_change', that.state)
             }
@@ -191,8 +179,8 @@ class Arm extends EventEmitter {
 
         this.move_topic = new rosLib.Topic({
             ros: this.ros,
-			name: '/niryo_one/commander/trajectory',
-			messageType: 'niryo_one_msgs/RobotMoveCommand'
+            name: '/niryo_one/commander/trajectory',
+            messageType: 'niryo_one_msgs/RobotMoveCommand'
         })
 
         console.log(`${this.config.name}: move_pose: this.move_topic: ${this.move_topic}`)

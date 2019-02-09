@@ -11,8 +11,11 @@ let right_config = new tools.ArmConfig(...Object.values(config.arms.right))
 const express = require('express')
 const timeout = require('connect-timeout')
 const request = require('request')
+const WebSocket = require('ws')
 
 const app = express()
+const expressWs = require('express-ws')(app)
+
 app.use(timeout('1s'))
 const port = 3000
 
@@ -33,9 +36,20 @@ const make_arm = (config) => {
                 url: stateCallbackUrl,
                 json: state
             }, function(err, resp, body) {
-                if (err) console.log(err)
+                if (err) {
+                    console.error(`${arm.config.name}: rosLib failed callback: ${error}`)
+                }
             })
         }
+    })
+
+    arm.on('position_change', function(state) {
+        let aWss = expressWs.getWss('/listen')
+        aWss.clients.forEach(function(client) {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify(state))
+            }
+        });
     })
 
     const failed_callback = (error) => {
@@ -59,8 +73,8 @@ const make_arm = (config) => {
                 return
             }
 
-            // const func = arm.ros['getTopics'].bind(this)
-            arm.ros[action]((result) => {
+            const func = arm.ros[action].bind(arm.ros)
+            func((result) => {
                 console.log(`${arm.config.name}: ${action}: ${result}`)
                 res.send(result)
             }, failed_callback)
@@ -76,7 +90,8 @@ const make_arm = (config) => {
             }
 
             const param = req.param('param')
-            arm.ros[action](param, (result) => {
+            const func = arm.ros[action].bind(arm.ros)
+            func(param, (result) => {
                 console.log(`${arm.config.name}: ${action} (param: ${param}): ${result}`)
                 res.send(result)
             }, failed_callback)
@@ -123,6 +138,12 @@ app.post('/devnull', (req, res) => {
     console.log('devnull')
     console.log(req.body)
     res.send('OK')
+})
+
+app.ws('/listen', (ws, req) => {
+    /*arm.on('position_change', function(state) {
+        ws.send(JSON.stringify(state))
+    })*/
 })
 
 let pos1 = {
