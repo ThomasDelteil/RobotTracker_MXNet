@@ -1,16 +1,16 @@
-import QtQuick 2.0
+import QtQuick 2.12
 
 QtObject {
     id: root
 
-    enum State {
-        Disconnected,
-        Connecting,
-        Connected,
-        Error
+    enum ConnectionStatus {
+        Disconnected = 0,
+        Connecting = 1,
+        Connected = 2,
+        Error = 3
     }
 
-    property int state: RobotArm.State.Disconnected
+    property int connectionStatus: RobotArm.ConnectionStatus.Connecting
 
     property real x
     property real y
@@ -22,7 +22,8 @@ QtObject {
 
     property bool open
 
-    function parse(object) {
+    function parse(object)
+    {
         root.x = object.x
         root.y = object.y
         root.z = object.z
@@ -30,5 +31,16 @@ QtObject {
         root.pitch = object.pitch
         root.yaw = object.yaw
         root.open = object.open
+    }
+
+    function getConnectionStatusColor()
+    {
+        switch (connectionStatus)
+        {
+            case 0: return "red";
+            case 1: return "lightblue";
+            case 2: return "green";
+            case 3: return "yellow";
+        }
     }
 }

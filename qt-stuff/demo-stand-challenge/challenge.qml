@@ -6,13 +6,11 @@ import QtMultimedia 5.12
 Item {
     id: chllng
 
-    property var robotsModel
-
     property int currentFPSvalue_camera: 0
     property int currentFPSvalue_trackers: 0
 
     property real trackerOneX: cameraBackground.width / 4
-    property real trackerOneY: cameraBackground.height / 4
+    property real trackerOneY: cameraBackground.height / 1.3
     property real trackerTwoX: cameraBackground.width / 1.3
     property real trackerTwoY: cameraBackground.height / 1.3
 
@@ -135,20 +133,14 @@ Item {
                         DragHandler {
                             enabled: root.manualTrackers
                             onActiveChanged: {
-                                if (active) // dragging started
+                                if (!active) // dragging stopped
                                 {
-                                    chllng.trackerOneX = trackerOne.x;
-                                    chllng.trackerOneY = trackerOne.y;
-                                }
-                                else // dragging stopped
-                                {
-                                    var xMovement = checkXmovement(translation.x, trackerOne),
-                                        yMovement = checkYmovement(translation.y, trackerOne);
+                                    var xCoordinate = checkXcoordinate(translation.x, trackerOne, true),
+                                        yCoordinate = checkYcoordinate(translation.y, trackerOne);
 
-                                    if (xMovement === 0) { trackerOne.x = chllng.trackerOneX; }
-                                    if (yMovement === 0) { trackerOne.y = chllng.trackerOneY; }
+                                    appendToOutput("Left arm movement: ".concat(xCoordinate, " | ", yCoordinate), true);
 
-                                    appendToOutput("Left arm movement: ".concat(xMovement, " | ", yMovement), true);
+                                    moveTheArm("left", xCoordinate, yCoordinate);
                                 }
                             }
                             //onTranslationChanged: {
@@ -187,20 +179,14 @@ Item {
                         DragHandler {
                             enabled: root.manualTrackers
                             onActiveChanged: {
-                                if (active) // dragging started
+                                if (!active) // dragging stopped
                                 {
-                                    chllng.trackerTwoX = trackerTwo.x;
-                                    chllng.trackerTwoY = trackerTwo.y;
-                                }
-                                else // dragging stopped
-                                {
-                                    var xMovement = checkXmovement(translation.x, trackerTwo),
-                                        yMovement = checkYmovement(translation.y, trackerTwo);
+                                    var xCoordinate = checkXcoordinate(translation.x, trackerTwo, false),
+                                        yCoordinate = checkYcoordinate(translation.y, trackerTwo);
 
-                                    if (xMovement === 0) { trackerTwo.x = chllng.trackerTwoX; }
-                                    if (yMovement === 0) { trackerTwo.y = chllng.trackerTwoY; }
+                                    appendToOutput("Right arm movement: ".concat(xCoordinate, " | ", yCoordinate), true);
 
-                                    appendToOutput("Right arm movement: ".concat(xMovement, " | ", yMovement), true);
+                                    moveTheArm("right", xCoordinate, yCoordinate);
                                 }
                             }
                             //onTranslationChanged: {
@@ -222,20 +208,9 @@ Item {
                             }
                         }
                         */
-
-                        MouseArea {
-                            anchors.fill: parent
-                            drag.target: parent
-                        }
-
-                        function updatePosition() {
-                            robotsModel.move({ name: "right" }, x / chllng.width. y / chllng.height)
-                        }
-
-                        onXChanged: updatePosition()
-                        onYChanged: updatePosition()
                     }
 
+                    // FPS counters
                     Text {
                         id: fpsCounter_camera
                         anchors.top: parent.top
@@ -256,6 +231,29 @@ Item {
                         color: "red"
                         //visible: btn_stop.enabled
                         visible: root.fpsCounters
+                    }
+
+                    // screen divider, just for convenience
+                    RowLayout {
+                        anchors.fill: parent
+                        spacing: 0
+                        visible: root.manualTrackers
+
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            border.width: 1
+                            border.color: "blue"
+                            color: "transparent"
+                        }
+
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            border.width: 1
+                            border.color: "green"
+                            color: "transparent"
+                        }
                     }
                 }
 
@@ -382,45 +380,57 @@ Item {
         currentFPSvalue_trackers = 0;
     }
 
-    function checkXmovement(val, tracker)
+    function checkXcoordinate(val, tracker, leftTracker)
     {
-        /*
-        if (tracker.x < cameraBackground.x)
+        if (leftTracker === true)
         {
-            tracker.x = cameraBackground.x;
-            return 0;
+            if (tracker.x + tracker.width/2 < cameraBackground.x)
+            {
+                tracker.x = 0;
+                return 0;
+            }
+            if (tracker.x + tracker.width/2  > cameraBackground.width/2)
+            {
+                tracker.x = cameraBackground.width/2 - tracker.width;
+                return 1;
+            }
+            return ((tracker.x + tracker.width/2) / (cameraBackground.width/2)).toFixed(3);
         }
-        if (tracker.x > cameraBackground.width)
+        else
         {
-            tracker.x = cameraBackground.width - tracker.width;
-            return 1;
+            if (tracker.x + tracker.width/2 < cameraBackground.width/2)
+            {
+                tracker.x = cameraBackground.width/2;
+                return 0;
+            }
+            if (tracker.x + tracker.width/2 > cameraBackground.width)
+            {
+                tracker.x = cameraBackground.width - tracker.width;
+                return 1;
+            }
+            return ((tracker.x + tracker.width/2 - cameraBackground.width/2) / (cameraBackground.width / 2)).toFixed(3);
         }
-        */
-        if (tracker.x + tracker.width / 2 < cameraBackground.x || tracker.x - tracker.width / 2 > cameraBackground.width)
-        {
-            return 0;
-        }
-        return (val / cameraBackground.width).toFixed(3);
+
     }
 
-    function checkYmovement(val, tracker)
+    function checkYcoordinate(val, tracker)
     {
-        /*
-        if (tracker.y < cameraBackground.y)
+
+        if (tracker.y + tracker.height / 2 < cameraBackground.y)
         {
-            tracker.y = cameraBackground.y;
+            tracker.y = 0;
             return 0;
         }
-        if (tracker.y > cameraBackground.height)
+        if (tracker.y - tracker.height / 2 > cameraBackground.height)
         {
             tracker.y = cameraBackground.height - tracker.height;
             return 1;
         }
-        */
-        if (tracker.y + tracker.height / 2 < cameraBackground.y || tracker.y - tracker.height / 2 > cameraBackground.height)
-        {
-            return 0;
-        }
-        return (val / cameraBackground.height).toFixed(3);
+        return ((tracker.y + tracker.height/2) / cameraBackground.height).toFixed(3);
+    }
+
+    function moveTheArm(armName, xCoordinate, yCoordinate)
+    {
+        robotsModel.move({ name: armName }, xCoordinate, yCoordinate)
     }
 }

@@ -44,9 +44,7 @@ ApplicationWindow {
         }
     }
 
-    RobotsModel {
-        id: robotsModel
-    }
+    RobotsModel { id: robotsModel }
 
     Binding {
         target: VirtualKeyboardSettings
@@ -74,10 +72,6 @@ ApplicationWindow {
             onNextWindow: {
                 loader.source = "qrc:/" + windowName
             }
-        }
-
-        onItemChanged: {
-            item.robotsModel = robotsModel
         }
     }
 

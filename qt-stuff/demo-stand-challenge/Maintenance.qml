@@ -81,20 +81,20 @@ Item {
                                     Layout.fillWidth: true
                                     Layout.alignment: Qt.AlignHCenter
 
-                                    statusLeft: "red"
-                                    statusRight: "red"
-                                    xLeft: "0"
-                                    xRight: "0"
-                                    yLeft: "0"
-                                    yRight: "0"
-                                    zLeft: "0"
-                                    zRight: "0"
-                                    yawLeft: "0"
-                                    yawRight: "0"
-                                    pitchLeft: "0"
-                                    pitchRight: "0"
-                                    rollLeft: "0"
-                                    rollRight: "0"
+                                    statusLeft: robotsModel.leftArm.getConnectionStatusColor()
+                                    statusRight: robotsModel.rightArm.getConnectionStatusColor()
+                                    xLeft: robotsModel.leftArm.x
+                                    xRight: robotsModel.rightArm.x
+                                    yLeft: robotsModel.leftArm.y
+                                    yRight: robotsModel.rightArm.y
+                                    zLeft: robotsModel.leftArm.z
+                                    zRight: robotsModel.rightArm.z
+                                    yawLeft: robotsModel.leftArm.yaw
+                                    yawRight: robotsModel.rightArm.yaw
+                                    pitchLeft: robotsModel.leftArm.pitch
+                                    pitchRight: robotsModel.rightArm.pitch
+                                    rollLeft: robotsModel.leftArm.roll
+                                    rollRight: robotsModel.rightArm.roll
                                 }
                             }
                         }
