@@ -117,13 +117,55 @@ const make_arm = (config) => {
         res.send(arm.state)
     })
 
+    app.get(`/${arm.config.name}/tools`, (req, res) => {
+        if (not_ready(res)) {
+            return
+        }
+        res.send(arm.toolList)
+    })
+
+    app.post(`/${arm.config.name}/tools`, (req, res) => {
+        if (not_ready(res)) {
+            return
+        }
+        arm.changeTool(req.body.toolId)
+        res.send()
+    })
+
+    app.get(`/${arm.config.name}/open`, (req, res) => {
+        if (not_ready(res)) {
+            return
+        }
+        arm.openGrip()
+        res.send()
+    })
+
+    app.get(`/${arm.config.name}/close`, (req, res) => {
+        if (not_ready(res)) {
+            return
+        }
+        arm.closeGrip()
+        res.send()
+    })
+
+    app.post(`/${arm.config.name}/move`, (req, res) => {
+        if (not_ready(res)) {
+            console.log('not ready')
+            return
+        }
+        console.log(`${arm.config.name}: move: ${JSON.stringify(req.body)}`)
+        arm.move_pose(req.body)
+        res.send('OK')
+    })
+
     return arm
 }
 
+app.use(express.json())
+
 let leftArm = make_arm(left_config)
 let rightArm = make_arm(right_config)
-
-app.use(express.json())
+let state = new State(leftArm, rightArm)
 
 app.get('/', (req, res) => {
     res.send('Hello World!')
@@ -149,16 +191,12 @@ app.post('/devnull', (req, res) => {
     if (not_ready(res)) {
         return
     }
-    console.log('devnull')
-    console.log(req.body)
     res.send('OK')
 })
 
 app.ws('/listen', (ws, req) => {
     ws.send(state.toString())
 })
-
-let state = new State(leftArm, rightArm)
 
 state.on('state_change', function(state) {
     if (stateCallbackUrl != null) {
@@ -202,8 +240,11 @@ let pos2 = {
     yaw: 1.67
 }
 
-let po2 = {...pos1}
+let po2 = {...pos1
+}
 let left = true
+
+
 
 app.get('/move', (req, res) => {
     left_arm.move_pose(pos1)
