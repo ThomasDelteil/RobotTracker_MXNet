@@ -153,8 +153,11 @@ const make_arm = (config) => {
             console.log('not ready')
             return
         }
-        console.log(`${arm.config.name}: move: ${JSON.stringify(req.body)}`)
-        arm.move_pose(req.body)
+
+        let obj = JSON.parse(req.body)
+
+        console.log(`${arm.config.name}: move: req: ${JSON.stringify(req)} : ${req.body}`)
+        arm.move_pose(obj)
         res.send('OK')
     })
 
