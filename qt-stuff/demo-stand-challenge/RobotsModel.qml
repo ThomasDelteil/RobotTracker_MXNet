@@ -10,7 +10,8 @@ Item {
     QtObject {
         id: proxy
 
-        property string ip: "10.78.144.127"
+        //property string ip: "10.78.144.127"
+        property string ip: "localhost"
         property string port: "3000"
 
         property url httpUrl: "http://" + ip + ":" + port
@@ -18,21 +19,42 @@ Item {
     }
 
     function sendRequest(route, data, callback) {
-        console.log("Sending: " + route)
+        let url = proxy.httpUrl + "/" + route
+        let dataString = !!data ? JSON.stringify(data) : null
+        console.log("Sending: " + url + 'with data: ' + dataString)
 
         var doc = new XMLHttpRequest()
         doc.onreadystatechange = function () {
             if (doc.readyState === XMLHttpRequest.DONE) {
                 console.log(route + " succeeded, calling callback")
-                callback(doc)
+                if (!!callback) {
+                    callback(doc)
+                }
+            }
+
+            if (doc.readyState === XMLHttpRequest.UNSENT) {
+                console.log(route + "  XMLHttpRequest.UNSENT")
+            }
+
+            if (doc.readyState === XMLHttpRequest.OPENED) {
+                console.log(route + " XMLHttpRequest.OPENED")
+            }
+
+            if (doc.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
+                console.log(route + " XMLHttpRequest.HEADERS_RECEIVED")
+            }
+
+            if (doc.readyState === XMLHttpRequest.LOADING) {
+                console.log(route + " XMLHttpRequest.LOADING")
             }
         }
 
-        doc.open("GET", proxy.httpUrl + route)
-        if (!!data) {
-            doc.send(data)
+        if (!!dataString) {
+            doc.open("POST", url)
+            doc.send(dataString)
         } else {
-            doc.send(data)
+            doc.open("GET", url)
+            doc.send()
         }
     }
 
@@ -60,11 +82,21 @@ Item {
     }
 
     function move(arm, relativeY, relativeZ) {
+        if (arm.name === 'left') {
+            arm = left
+        }
+
+        if (arm.name === 'right') {
+            arm = right
+        }
+
         sendRequest(arm.name + "/move", getPosition(arm, relativeY, relativeZ))
     }
 
     RobotArm {
         id: left
+
+        property string name: 'left'
 
         property real minX: 0.253
         property real maxX: 0.253
@@ -87,6 +119,8 @@ Item {
 
     RobotArm {
         id: right
+
+        property string name: 'right'
 
         property real minX: 0.253
         property real maxX: 0.253
@@ -130,8 +164,17 @@ Item {
             console.log('Message received: ' + message)
 
             var obj = JSON.parse(message)
-            left.parse(obj.left)
-            right.parse(obj.right)
+            if (!!obj.left) {
+                left.parse(obj.left)
+            } else {
+                console.log("No position for left")
+            }
+
+            if (!!obj.right) {
+                right.parse(obj.right)
+            } else {
+                console.log("No position for right")
+            }
         }
 
         onActiveChanged: {
