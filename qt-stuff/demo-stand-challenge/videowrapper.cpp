@@ -18,7 +18,9 @@ bool VideoWrapper::present(const QVideoFrame &frame)
 
         //qDebug() << "got frame:" << frameCopy.mappedBytes() << frameCopy.size() << frameCopy.width() << "x" << frameCopy.height();
         QImage shot = qt_imageFromVideoFrame(frameCopy);
-        //bool shotSaved = shot.save(QString("%1-some.jpg").arg(QDateTime::currentDateTime().toString("hh-mm-ss-zzz")));
+
+        shot = shot.scaled(384, 288);
+        //qDebug() << shot.save(QString("%1-some.jpg").arg(QDateTime::currentDateTime().toString("hh-mm-ss-zzz")));
 
         QBuffer *imgBuffer = new QBuffer();
         //QImageWriter iw(imgBuffer, "JPG");

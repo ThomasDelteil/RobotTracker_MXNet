@@ -6,7 +6,7 @@
 #include <QVideoFrame>
 #include <QVideoSurfaceFormat>
 #include <QCamera>
-//#include <QDateTime>
+#include <QDateTime>
 #include <QBuffer>
 //#include <QImageWriter>
 #include "private/qvideoframe_p.h"

@@ -105,8 +105,9 @@ Item {
                             //console.log("camera orientation:", camera.orientation);
                             //console.log("camera state:", camera.cameraState);
                             //console.log("camera status:", camera.cameraStatus);
+
+                            //console.log("camera supported IC resolutions:", imageCapture.supportedResolutions);
                             /*
-                            console.log("camera supported IC resolutions:", imageCapture.supportedResolutions);
                             console.log("camera supported VF resolutions:");
                             var supRezes = camera.supportedViewfinderResolutions();
                             for (var rez in supRezes)
@@ -232,7 +233,7 @@ Item {
                         height: root.cropRegionWidth
                         color: "blue"
                         opacity: 0.3
-                        visible: root.manualTrackers || btn_stop.enabled
+                        visible: btn_stop.enabled
                     }
                     // crop region for the right hand
                     Rectangle {
@@ -243,7 +244,7 @@ Item {
                         height: root.cropRegionWidth
                         color: "green"
                         opacity: 0.3
-                        visible: root.manualTrackers || btn_stop.enabled
+                        visible: btn_stop.enabled
                     }
 
                     // FPS counters
