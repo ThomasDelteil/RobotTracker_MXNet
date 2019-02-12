@@ -34,10 +34,14 @@ Item {
             {
                 cropRegionRight.x = cameraBackground.width * (jsn["rw_x"] + (jsn["rw_x"] - jsn["skeleton"][i]["x"]) / 2) - root.cropRegionWidth/2;
                 cropRegionRight.y = cameraBackground.height * (jsn["rw_y"] + (jsn["rw_y"] - jsn["skeleton"][i]["y"]) / 2) - root.cropRegionWidth/2;
+
+
             }
         }
 
         //crop_pos = wrist_pos + (wrist_pos - elbow_pos) / 2
+        moveTheArm("left", trackerLeft.x, trackerLeft.y)
+        moveTheArm("right", trackerRight.x, trackerRight.y)
     }
 
     //function appendToOutput(msg, panelAsWell = false)
