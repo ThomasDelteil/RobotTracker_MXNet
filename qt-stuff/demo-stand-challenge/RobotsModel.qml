@@ -32,21 +32,21 @@ Item {
                 }
             }
 
-//            if (doc.readyState === XMLHttpRequest.UNSENT) {
-//                console.log(route + "  XMLHttpRequest.UNSENT")
-//            }
+            //            if (doc.readyState === XMLHttpRequest.UNSENT) {
+            //                console.log(route + "  XMLHttpRequest.UNSENT")
+            //            }
 
-//            if (doc.readyState === XMLHttpRequest.OPENED) {
-//                console.log(route + " XMLHttpRequest.OPENED")
-//            }
+            //            if (doc.readyState === XMLHttpRequest.OPENED) {
+            //                console.log(route + " XMLHttpRequest.OPENED")
+            //            }
 
-//            if (doc.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
-//                console.log(route + " XMLHttpRequest.HEADERS_RECEIVED")
-//            }
+            //            if (doc.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
+            //                console.log(route + " XMLHttpRequest.HEADERS_RECEIVED")
+            //            }
 
-//            if (doc.readyState === XMLHttpRequest.LOADING) {
-//                console.log(route + " XMLHttpRequest.LOADING")
-//            }
+            //            if (doc.readyState === XMLHttpRequest.LOADING) {
+            //                console.log(route + " XMLHttpRequest.LOADING")
+            //            }
         }
 
         if (!!dataString) {
@@ -82,16 +82,31 @@ Item {
         }
     }
 
+    property var leftLastPosition: null
+    property var rightLastPosition: null
+
+    Timer {
+        interval: 1000
+        repeat: true
+        running: true
+        triggeredOnStart: true
+
+        onTriggered: {
+            if (!!leftLastPosition)
+                sendRequest("left/move", leftLastPosition)
+            if (!!rightLastPosition)
+                sendRequest("right/move", rightLastPosition)
+        }
+    }
+
     function move(arm, relativeY, relativeZ) {
         if (arm.name === 'left') {
-            arm = left
+            leftLastPosition = getPosition(left, relativeY, relativeZ)
         }
 
         if (arm.name === 'right') {
-            arm = right
+            rightLastPosition = getPosition(right, relativeY, relativeZ)
         }
-
-        sendRequest(arm.name + "/move", getPosition(arm, relativeY, relativeZ))
     }
 
     RobotArm {
