@@ -41,8 +41,8 @@ Item {
             }
         }
 
-        var xCoordinate = checkXcoordinate(translation.x, trackerLeft, true)
-        var yCoordinate = checkYcoordinate(translation.y, trackerLeft)
+        var xCoordinate = checkXcoordinate(trackerLeft.x, trackerLeft, true)
+        var yCoordinate = checkYcoordinate(trackerLeft.y, trackerLeft)
 
         moveTheArm("left", xCoordinate, yCoordinate)
 
