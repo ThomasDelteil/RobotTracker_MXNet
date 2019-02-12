@@ -6,13 +6,10 @@ import QtMultimedia 5.12
 Item {
     id: chllng
 
+    property var robotsModel
+
     property int currentFPSvalue_camera: 0
     property int currentFPSvalue_trackers: 0
-
-    property real trackerOneX: cameraBackground.width / 4
-    property real trackerOneY: cameraBackground.height / 1.3
-    property real trackerTwoX: cameraBackground.width / 1.3
-    property real trackerTwoY: cameraBackground.height / 1.3
 
     signal nextWindow(string windowName)
 
@@ -21,10 +18,26 @@ Item {
         appendToOutput(result, false);
 
         var jsn = JSON.parse(result);
-        trackerOne.x = cameraBackground.width * jsn["lw_x"];
-        trackerOne.y = cameraBackground.height * jsn["lw_y"];
-        trackerTwo.x = cameraBackground.width * jsn["rw_x"];
-        trackerTwo.y = cameraBackground.height * jsn["rw_y"];
+        trackerLeft.x = cameraBackground.width * jsn["lw_x"] - root.trackerWidth/2;
+        trackerLeft.y = cameraBackground.height * jsn["lw_y"] - root.trackerWidth/2;
+        trackerRight.x = cameraBackground.width * jsn["rw_x"] - root.trackerWidth/2;
+        trackerRight.y = cameraBackground.height * jsn["rw_y"] - root.trackerWidth/2;
+
+        for (var i in jsn["skeleton"])
+        {
+            if (jsn["skeleton"][i]["name"] === "left_elbow")
+            {
+                cropRegionLeft.x = cameraBackground.width * (jsn["lw_x"] + (jsn["lw_x"] - jsn["skeleton"][i]["x"]) / 2) - root.cropRegionWidth/2;
+                cropRegionLeft.y = cameraBackground.height * (jsn["lw_y"] + (jsn["lw_y"] - jsn["skeleton"][i]["y"]) / 2) - root.cropRegionWidth/2;
+            }
+            if (jsn["skeleton"][i]["name"] === "right_elbow")
+            {
+                cropRegionRight.x = cameraBackground.width * (jsn["rw_x"] + (jsn["rw_x"] - jsn["skeleton"][i]["x"]) / 2) - root.cropRegionWidth/2;
+                cropRegionRight.y = cameraBackground.height * (jsn["rw_y"] + (jsn["rw_y"] - jsn["skeleton"][i]["y"]) / 2) - root.cropRegionWidth/2;
+            }
+        }
+
+        //crop_pos = wrist_pos + (wrist_pos - elbow_pos) / 2
     }
 
     //function appendToOutput(msg, panelAsWell = false)
@@ -117,17 +130,17 @@ Item {
                         source: backend.videoWrapper
                     }
 
-                    // tracker #1
+                    // tracker #1 (left hand)
                     Rectangle {
-                        id: trackerOne
-                        x: trackerOneX
-                        y: trackerOneY
-                        width: 40
-                        height: 40
+                        id: trackerLeft
+                        x: cameraBackground.width/4 - width/2
+                        y: cameraBackground.height/1.3 - height/2
+                        width: root.trackerWidth
+                        height: width
                         color: "blue"
-                        radius: 20
+                        radius: width * 0.5
                         visible: root.manualTrackers || btn_stop.enabled
-                        border.width: 3
+                        border.width: 2
                         border.color: "white"
 
                         DragHandler {
@@ -135,8 +148,8 @@ Item {
                             onActiveChanged: {
                                 if (!active) // dragging stopped
                                 {
-                                    var xCoordinate = checkXcoordinate(translation.x, trackerOne, true),
-                                        yCoordinate = checkYcoordinate(translation.y, trackerOne);
+                                    var xCoordinate = checkXcoordinate(translation.x, trackerLeft, true),
+                                        yCoordinate = checkYcoordinate(translation.y, trackerLeft);
 
                                     appendToOutput("Left arm movement: ".concat(xCoordinate, " | ", yCoordinate), true);
 
@@ -163,17 +176,17 @@ Item {
                         }
                         */
                     }
-                    // tracker #2
+                    // tracker #2 (right hand)
                     Rectangle {
-                        id: trackerTwo
-                        x: trackerTwoX
-                        y: trackerTwoY
-                        width: 40
-                        height: 40
+                        id: trackerRight
+                        x: cameraBackground.width/1.3 - width/2
+                        y: cameraBackground.height/1.3 - height/2
+                        width: root.trackerWidth
+                        height: width
                         color: "green"
-                        radius: 20
+                        radius: width * 0.5
                         visible: root.manualTrackers || btn_stop.enabled
-                        border.width: 3
+                        border.width: 2
                         border.color: "white"
 
                         DragHandler {
@@ -181,8 +194,8 @@ Item {
                             onActiveChanged: {
                                 if (!active) // dragging stopped
                                 {
-                                    var xCoordinate = checkXcoordinate(translation.x, trackerTwo, false),
-                                        yCoordinate = checkYcoordinate(translation.y, trackerTwo);
+                                    var xCoordinate = checkXcoordinate(translation.x, trackerRight, false),
+                                        yCoordinate = checkYcoordinate(translation.y, trackerRight);
 
                                     appendToOutput("Right arm movement: ".concat(xCoordinate, " | ", yCoordinate), true);
 
@@ -208,6 +221,29 @@ Item {
                             }
                         }
                         */
+                    }
+
+                    // crop region for the left hand
+                    Rectangle {
+                        id: cropRegionLeft
+                        x: trackerLeft.x - width/2
+                        y: trackerLeft.y - height/2
+                        width: root.cropRegionWidth
+                        height: root.cropRegionWidth
+                        color: "blue"
+                        opacity: 0.3
+                        visible: root.manualTrackers || btn_stop.enabled
+                    }
+                    // crop region for the right hand
+                    Rectangle {
+                        id: cropRegionRight
+                        x: trackerRight.x - width/2
+                        y: trackerRight.y - height/2
+                        width: root.cropRegionWidth
+                        height: root.cropRegionWidth
+                        color: "green"
+                        opacity: 0.3
+                        visible: root.manualTrackers || btn_stop.enabled
                     }
 
                     // FPS counters
