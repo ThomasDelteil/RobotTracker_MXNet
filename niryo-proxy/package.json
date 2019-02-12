@@ -5,6 +5,7 @@
     "start": "node niryo-proxy.js"
   },
   "dependencies": {
+    "body-parser": "^1.18.3",
     "connect-timeout": "^1.9.0",
     "express": "^4.16.4",
     "express-ws": "^4.0.0",

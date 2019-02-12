@@ -4,7 +4,6 @@
 const EventEmitter = require('events');
 const config = require('./config.js')
 const tools = require('./tools.js')
-const rosLib = require('roslib')
 
 let left_config = new tools.ArmConfig(...Object.values(config.arms.left))
 let right_config = new tools.ArmConfig(...Object.values(config.arms.right))
@@ -18,6 +17,8 @@ const app = express()
 const expressWs = require('express-ws')(app)
 
 app.use(timeout('1s'))
+app.use(express.json())
+
 const port = 3000
 
 let stateCallbackUrl = null
@@ -30,12 +31,12 @@ class State extends EventEmitter {
 
         let that = this
 
-        leftArm.on('state_change', function(state) {
+        leftArm.on('state_change', function (state) {
             that.left = state
             that.emitStateChange()
         })
 
-        rightArm.on('state_change', function(state) {
+        rightArm.on('state_change', function (state) {
             that.right = state
             that.emitStateChange()
         })
@@ -80,15 +81,15 @@ const make_arm = (config) => {
     const actions = ['getActionServers', 'getTopics', 'getServices', 'getNodes', 'getParams']
 
     for (let action of actions) {
-        app.get(`/${arm.config.name}/${action}`, (req, res) => {
-            if (not_ready(res)) {
+        app.get(`/${arm.config.name}/${action}`, (req, result) => {
+            if (not_ready(result)) {
                 return
             }
 
             const func = arm.ros[action].bind(arm.ros)
             func((result) => {
                 console.log(`${arm.config.name}: ${action}: ${result}`)
-                res.send(result)
+                result.send(result)
             }, failed_callback)
         })
     }
@@ -96,75 +97,70 @@ const make_arm = (config) => {
     const actions_with_parameter = ['getTopicsForType', 'getServicesForType']
 
     for (let action of actions) {
-        app.get(`/${arm.config.name}/${action}`, (req, res) => {
-            if (not_ready(res)) {
+        app.get(`/${arm.config.name}/${action}`, (request, result) => {
+            if (not_ready(result)) {
                 return
             }
 
-            const param = req.param('param')
+            const param = request.param('param')
             const func = arm.ros[action].bind(arm.ros)
             func(param, (result) => {
                 console.log(`${arm.config.name}: ${action} (param: ${param}): ${result}`)
-                res.send(result)
+                result.send(result)
             }, failed_callback)
         })
     }
 
-    app.get(`/${arm.config.name}/state`, (req, res) => {
-        if (not_ready(res)) {
+    app.get(`/${arm.config.name}/state`, (request, result) => {
+        if (not_ready(result)) {
             return
         }
-        res.send(arm.state)
+        result.send(arm.state)
     })
 
-    app.get(`/${arm.config.name}/tools`, (req, res) => {
-        if (not_ready(res)) {
+    app.get(`/${arm.config.name}/tools`, (request, result) => {
+        if (not_ready(result)) {
             return
         }
-        res.send(arm.toolList)
+        result.send(arm.toolList)
     })
 
-    app.post(`/${arm.config.name}/tools`, (req, res) => {
-        if (not_ready(res)) {
+    app.post(`/${arm.config.name}/tools`, (request, result) => {
+        if (not_ready(result)) {
             return
         }
-        arm.changeTool(req.body.toolId)
-        res.send()
+        arm.changeTool(request.body.toolId)
+        result.send()
     })
 
-    app.get(`/${arm.config.name}/open`, (req, res) => {
-        if (not_ready(res)) {
+    app.get(`/${arm.config.name}/open`, (request, result) => {
+        if (not_ready(result)) {
             return
         }
         arm.openGrip()
-        res.send()
+        result.send()
     })
 
-    app.get(`/${arm.config.name}/close`, (req, res) => {
-        if (not_ready(res)) {
+    app.get(`/${arm.config.name}/close`, (request, result) => {
+        if (not_ready(result)) {
             return
         }
         arm.closeGrip()
-        res.send()
+        result.send()
     })
 
-    app.post(`/${arm.config.name}/move`, (req, res) => {
-        if (not_ready(res)) {
+    app.post(`/${arm.config.name}/move`, (request, result) => {
+        if (not_ready(result)) {
             console.log('not ready')
             return
         }
 
-        let obj = JSON.parse(req.body)
-
-        console.log(`${arm.config.name}: move: req: ${JSON.stringify(req)} : ${req.body}`)
-        arm.move_pose(obj)
-        res.send('OK')
+        arm.move_pose(request.body)
+        result.send('OK')
     })
 
     return arm
 }
-
-app.use(express.json())
 
 let leftArm = make_arm(left_config)
 let rightArm = make_arm(right_config)
@@ -201,13 +197,13 @@ app.ws('/listen', (ws, req) => {
     ws.send(state.toString())
 })
 
-state.on('state_change', function(state) {
+state.on('state_change', function (state) {
     if (stateCallbackUrl != null) {
         request({
             method: 'post',
             url: stateCallbackUrl,
             json: state
-        }, function(err, resp, body) {
+        }, function (err, resp, body) {
             if (err) {
                 console.error(`${arm.config.name}: rosLib failed callback: ${err}`)
             }
@@ -215,55 +211,15 @@ state.on('state_change', function(state) {
     }
 })
 
-state.on('state_change', function(state) {
+state.on('state_change', function (state) {
     let aWss = expressWs.getWss('/listen')
-    aWss.clients.forEach(function(client) {
+    aWss.clients.forEach(function (client) {
         if (client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify(state))
         }
     });
 })
 
-let pos1 = {
-    x: 0.225,
-    y: -0.220,
-    z: 0.1,
-    roll: 0.0,
-    pitch: 1.57,
-    yaw: 1.67
-}
-
-let pos2 = {
-    x: 0.225,
-    //    y: 0.220,
-    y: 0.0,
-    z: 0.1,
-    roll: 0.0,
-    pitch: 1.57,
-    yaw: 1.67
-}
-
-let po2 = {...pos1
-}
-let left = true
-
-
-
-app.get('/move', (req, res) => {
-    left_arm.move_pose(pos1)
-    console.info(`started move!`)
-
-    console.info(`po2: ${JSON.stringify(po2)}`)
-
-    left_arm.move_pose(po2)
-
-    po2.y += 0.05
-
-    console.info(`started second move!`)
-    left = !left
-})
-
-
-console.log(`All app routes: ${JSON.stringify(app._router.stack)}`)
+console.log(`All app routes: \n${JSON.stringify(app._router.stack, null, 4)}`)
 
 app.listen(port, "0.0.0.0", () => console.log(`Example app listening on port ${port}!`))

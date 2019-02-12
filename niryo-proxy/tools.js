@@ -152,6 +152,12 @@ class Arm extends EventEmitter {
             name: '/niryo_one/change_tool',
             serviceType: 'niryo_one_msgs/SetInt',
         })
+
+        this.moveTopic = new rosLib.Topic({
+            ros: this.ros,
+            name: '/niryo_one/commander/trajectory',
+            messageType: 'niryo_one_msgs/RobotMoveCommand'
+        })
     }
 
     onconnect() {
@@ -344,16 +350,7 @@ class Arm extends EventEmitter {
             }
         }
 
-        this.move_topic = new rosLib.Topic({
-            ros: this.ros,
-            name: '/niryo_one/commander/trajectory',
-            messageType: 'niryo_one_msgs/RobotMoveCommand'
-        })
-
-        console.log(`${this.config.name}: move_pose: this.move_topic: ${this.move_topic}`)
-
-        this.move_topic.publish(new rosLib.Message(command))
-
+        this.moveTopic.publish(new rosLib.Message(command))
         console.log(`${this.config.name}: move_pose: move sent`)
     }
 

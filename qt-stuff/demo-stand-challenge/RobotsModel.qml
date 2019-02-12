@@ -19,38 +19,39 @@ Item {
     }
 
     function sendRequest(route, data, callback) {
-        let url = proxy.httpUrl + "/" + route
-        let dataString = !!data ? JSON.stringify(data) : null
+        var url = proxy.httpUrl + "/" + route
+        var dataString = !!data ? JSON.stringify(data) : null
         console.log("Sending: " + url + 'with data: ' + dataString)
 
         var doc = new XMLHttpRequest()
         doc.onreadystatechange = function () {
             if (doc.readyState === XMLHttpRequest.DONE) {
-                console.log(route + " succeeded, calling callback")
+                console.log(route + " succeeded")
                 if (!!callback) {
                     callback(doc)
                 }
             }
 
-            if (doc.readyState === XMLHttpRequest.UNSENT) {
-                console.log(route + "  XMLHttpRequest.UNSENT")
-            }
+//            if (doc.readyState === XMLHttpRequest.UNSENT) {
+//                console.log(route + "  XMLHttpRequest.UNSENT")
+//            }
 
-            if (doc.readyState === XMLHttpRequest.OPENED) {
-                console.log(route + " XMLHttpRequest.OPENED")
-            }
+//            if (doc.readyState === XMLHttpRequest.OPENED) {
+//                console.log(route + " XMLHttpRequest.OPENED")
+//            }
 
-            if (doc.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
-                console.log(route + " XMLHttpRequest.HEADERS_RECEIVED")
-            }
+//            if (doc.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
+//                console.log(route + " XMLHttpRequest.HEADERS_RECEIVED")
+//            }
 
-            if (doc.readyState === XMLHttpRequest.LOADING) {
-                console.log(route + " XMLHttpRequest.LOADING")
-            }
+//            if (doc.readyState === XMLHttpRequest.LOADING) {
+//                console.log(route + " XMLHttpRequest.LOADING")
+//            }
         }
 
         if (!!dataString) {
             doc.open("POST", url)
+            doc.setRequestHeader("Content-type", "application/json")
             doc.send(dataString)
         } else {
             doc.open("GET", url)
@@ -74,7 +75,7 @@ Item {
         return {
             "x": arm.minX,
             "y": arm.minY + (arm.maxY - arm.minY) * relativeY,
-            "z": arm.minZ + (arm.maxZ - arm.minZ) * relativeZ,
+            "z": arm.maxZ - (arm.maxZ - arm.minZ) * relativeZ,
             "roll": arm.minRoll,
             "pitch": arm.minPitch,
             "yaw": arm.minYaw
