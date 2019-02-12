@@ -9,17 +9,19 @@ QList<QVideoFrame::PixelFormat> VideoWrapper::supportedPixelFormats(QAbstractVid
 bool VideoWrapper::present(const QVideoFrame &frame)
 {
     if (surf) { surf->present(frame); }
-    QVideoFrame frameCopy = frame;
 
     if (_sendingEnabled)
     {
         _sendingEnabled = false;
+
+        QVideoFrame frameCopy = frame;
         frameCopy.map(QAbstractVideoBuffer::ReadOnly);
 
         //qDebug() << "got frame:" << frameCopy.mappedBytes() << frameCopy.size() << frameCopy.width() << "x" << frameCopy.height();
         QImage shot = qt_imageFromVideoFrame(frameCopy);
-
+        // apparently, 384x288 is enough for MXNet
         shot = shot.scaled(384, 288);
+        //shot = shot.mirrored(true, false);
         //qDebug() << shot.save(QString("%1-some.jpg").arg(QDateTime::currentDateTime().toString("hh-mm-ss-zzz")));
 
         QBuffer *imgBuffer = new QBuffer();
