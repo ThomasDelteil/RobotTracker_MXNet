@@ -149,6 +149,22 @@ const make_arm = (config) => {
         result.send()
     })
 
+    app.get(`/${arm.config.name}/calibrate`, (request, result) => {
+        if (not_ready(result)) {
+            return
+        }
+        arm.calibrate()
+        result.send()
+    })
+
+    app.post(`/${arm.config.name}/learningMode`, (request, result) => {
+        if (not_ready(result)) {
+            return
+        }
+        arm.learningMode(request.body.isOn)
+        result.send()
+    })
+
     app.post(`/${arm.config.name}/move`, (request, result) => {
         if (not_ready(result)) {
             console.log('not ready')
@@ -194,7 +210,7 @@ app.post('/devnull', (req, res) => {
 })
 
 app.ws('/listen', (ws, req) => {
-    ws.send(state.toString())
+    state.emitStateChange()
 })
 
 state.on('state_change', function (state) {

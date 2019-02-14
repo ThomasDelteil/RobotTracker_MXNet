@@ -22,6 +22,29 @@ QtObject {
 
     property bool open
 
+    property string name
+
+    property real minX: 0.253
+    property real maxX: 0.253
+
+    property real minY: -0.25
+    property real maxY: 0.25
+
+    property real minZ: 0.1
+    property real maxZ: 0.37
+
+    property real minRoll: 0
+    property real maxRoll: 0
+
+    property real minPitch: Math.PI / 2
+    property real maxPitch: Math.PI / 2
+
+    property real minYaw: -Math.PI / 2
+    property real maxYaw: -Math.PI / 2
+
+    property bool calibrationNeeded
+    property bool learningMode
+
     function parse(object)
     {
         root.x = object.x
@@ -31,6 +54,8 @@ QtObject {
         root.pitch = object.pitch
         root.yaw = object.yaw
         root.open = object.open
+        root.calibrationNeeded = object.calibrationNeeded
+        root.learningMode = object.learningMode
     }
 
     function getConnectionStatusColor()

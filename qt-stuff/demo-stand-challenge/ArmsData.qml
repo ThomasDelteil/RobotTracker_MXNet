@@ -3,6 +3,8 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
 
 GridLayout {
+    id: lalalala
+
     property alias statusLeft: statusLeft.color
     property alias statusRight: statusRight.color
     property alias xLeft: xLeft.text
@@ -17,6 +19,8 @@ GridLayout {
     property alias pitchRight: pitchRight.text
     property alias rollLeft: rollLeft.text
     property alias rollRight: rollRight.text
+    property bool calibrationNeededLeft: true
+    property bool calibrationNeededRight: true
 
     rows: 8
     columns: 3
@@ -48,7 +52,6 @@ GridLayout {
     }
 
     // status
-
     Rectangle {
         id: statusLeft
         Layout.row: 2
@@ -81,7 +84,6 @@ GridLayout {
     }
 
     // x
-
     Text {
         id: xLeft
         Layout.row: 3
@@ -110,7 +112,6 @@ GridLayout {
     }
 
     // y
-
     Text {
         id: yLeft
         Layout.row: 4
@@ -139,7 +140,6 @@ GridLayout {
     }
 
     // z
-
     Text {
         id: zLeft
         Layout.row: 5
@@ -168,7 +168,6 @@ GridLayout {
     }
 
     // yaw
-
     Text {
         id: yawLeft
         Layout.row: 6
@@ -197,7 +196,6 @@ GridLayout {
     }
 
     // pitch
-
     Text {
         id: pitchLeft
         Layout.row: 7
@@ -226,7 +224,6 @@ GridLayout {
     }
 
     // roll
-
     Text {
         id: rollLeft
         Layout.row: 8
@@ -252,5 +249,34 @@ GridLayout {
         font.pointSize: root.secondaryFontSize
         font.family: "Courier New"
         text: "0"
+    }
+
+    // calibration
+    Text {
+        id: calibrationNeededLeft
+
+        Layout.row: 9
+        Layout.column: 1
+        Layout.alignment: Qt.AlignRight
+        font.pointSize: root.secondaryFontSize
+        font.family: "Courier New"
+        text: lalalala.calibrationNeededLeft ? "yes" : "no"
+    }
+    Text {
+        Layout.row: 9
+        Layout.column: 2
+        Layout.alignment: Qt.AlignHCenter
+        font.pointSize: root.secondaryFontSize
+        font.bold: true
+        text: "calibNeed"
+    }
+    Text {
+        id: calibrationNeededRight
+        Layout.row: 9
+        Layout.column: 3
+        Layout.alignment: Qt.AlignLeft
+        font.pointSize: root.secondaryFontSize
+        font.family: "Courier New"
+        text: lalalala.calibrationNeededRight ? "yes" : "no"
     }
 }

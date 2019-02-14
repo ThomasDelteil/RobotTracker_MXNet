@@ -150,7 +150,7 @@ class Arm extends EventEmitter {
         this.changeToolClient = new rosLib.Service({
             ros: this.ros,
             name: '/niryo_one/change_tool',
-            serviceType: 'niryo_one_msgs/SetInt',
+            serviceType: 'niryo_one_msgs/SetInt'
         })
 
         this.moveTopic = new rosLib.Topic({
@@ -158,6 +158,18 @@ class Arm extends EventEmitter {
             name: '/niryo_one/commander/trajectory',
             messageType: 'niryo_one_msgs/RobotMoveCommand'
         })
+
+        this.calibrateClient = new rosLib.Service({
+            ros: this.ros,
+            name: '/niryo_one/calibrate_motors',
+            serviceType: 'niryo_one_msgs/SetInt'
+        })
+
+        this.activateLearningModeClient = new rosLib.Service({
+            ros: this.ros,
+            name: '/niryo_one/activate_learning_mode',
+            serviceType: 'niryo_one_msgs/SetInt',
+          });
     }
 
     onconnect() {
@@ -286,7 +298,41 @@ class Arm extends EventEmitter {
 
         goal.send(1000);
     }
-    
+
+    calibrate() {
+        let that = this
+        let request = new rosLib.ServiceRequest({
+            value: 2
+        })
+
+        this.calibrateClient.callService(request, function(response) {
+            if (response.status === 200) {
+                console.log(`${that.config.name}: calibrate: succeeded`)
+            } else {
+                console.log(`${that.config.name}: calibrate: error ${response.message}`)
+            }
+        }, function(error) {
+            console.log(`${that.config.name}: calibrate: ${error}`)
+        })
+    }
+
+    learningMode(isOn) {
+        let that = this
+        let request = new rosLib.ServiceRequest({
+            value: isOn ? 1 : 0
+        })
+
+        this.activateLearningModeClient.callService(request, function(response) {
+            if (response.status === 200) {
+                console.log(`${that.config.name}: activateLearningModeClient: succeeded: ${isOn}`)
+            } else {
+                console.log(`${that.config.name}: activateLearningModeClient: error ${response.message}`)
+            }
+        }, function(error) {
+            console.log(`${that.config.name}: calibrate: ${error}`)
+        })
+    }
+
     // move_pose(pos) {
     //     console.log(`${this.config.name}: move_pose`)
 

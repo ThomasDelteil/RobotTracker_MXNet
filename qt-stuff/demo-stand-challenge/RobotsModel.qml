@@ -63,12 +63,18 @@ Item {
         sendRequest(arm.name + "/open")
     }
 
-    function close() {
+    function close(arm) {
         sendRequest(arm.name + "/close")
     }
 
     function calibrate(arm) {
         sendRequest(arm.name + "/calibrate")
+    }
+
+    function setLearningMode(arm, isOn) {
+        sendRequest(arm.name + "/learningMode", {
+                        "isOn": isOn
+                    })
     }
 
     function getPosition(arm, relativeY, relativeZ) {
@@ -82,6 +88,8 @@ Item {
         }
     }
 
+    property real threshold: 0.01
+
     property var leftLastPosition: null
     property var rightLastPosition: null
 
@@ -92,10 +100,20 @@ Item {
         triggeredOnStart: true
 
         onTriggered: {
-            if (!!leftLastPosition)
-                sendRequest("left/move", leftLastPosition)
-            if (!!rightLastPosition)
-                sendRequest("right/move", rightLastPosition)
+            if (!!leftLastPosition) {
+                if (Math.abs(leftLastPosition.y - leftArm.y) > threshold
+                        || Math.abs(
+                            leftLastPosition.z - leftArm.z) > threshold) {
+                    sendRequest("left/move", leftLastPosition)
+                }
+            }
+            if (!!rightLastPosition) {
+                if (Math.abs(rightLastPosition.y - rightArm.y) > threshold
+                        || Math.abs(
+                            rightLastPosition.z - rightArm.z) > threshold) {
+                    sendRequest("right/move", rightLastPosition)
+                }
+            }
         }
     }
 
@@ -112,49 +130,13 @@ Item {
     RobotArm {
         id: left
 
-        property string name: 'left'
-
-        property real minX: 0.253
-        property real maxX: 0.253
-
-        property real minY: -0.25
-        property real maxY: 0.25
-
-        property real minZ: 0.1
-        property real maxZ: 0.37
-
-        property real minRoll: 0
-        property real maxRoll: 0
-
-        property real minPitch: Math.PI / 2
-        property real maxPitch: Math.PI / 2
-
-        property real minYaw: -Math.PI / 2
-        property real maxYaw: -Math.PI / 2
+        name: 'left'
     }
 
     RobotArm {
         id: right
 
-        property string name: 'right'
-
-        property real minX: 0.253
-        property real maxX: 0.253
-
-        property real minY: -0.25
-        property real maxY: 0.25
-
-        property real minZ: 0.1
-        property real maxZ: 0.37
-
-        property real minRoll: 0
-        property real maxRoll: 0
-
-        property real minPitch: Math.PI / 2
-        property real maxPitch: Math.PI / 2
-
-        property real minYaw: -Math.PI / 2
-        property real maxYaw: -Math.PI / 2
+        name: 'right'
     }
 
     Timer {
@@ -221,7 +203,6 @@ Item {
             if (status === WebSocket.Closed) {
                 console.log("WebSocket.Closed")
                 root.state = "disconnected"
-                active = false
                 reconnectTimer.start()
                 return
             }
