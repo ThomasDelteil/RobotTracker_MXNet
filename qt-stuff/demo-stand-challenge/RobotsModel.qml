@@ -88,7 +88,7 @@ Item {
     Timer {
         interval: 1000
         repeat: true
-        running: true
+        running: root.state == "connected"
         triggeredOnStart: true
 
         onTriggered: {
@@ -245,4 +245,6 @@ Item {
             name: "disconnected"
         }
     ]
+
+    state: "disconnected"
 }

@@ -19,11 +19,11 @@ Item {
 
         trackerLeft.x = originalFrame.width * jsn["lw_x"] - root.trackerWidth/2;
         trackerLeft.y = originalFrame.height * jsn["lw_y"] - root.trackerWidth/2;
-        //gotNewCoordinates(trackerLeft);
+        gotNewCoordinates(trackerLeft);
 
         trackerRight.x = originalFrame.width * jsn["rw_x"] - root.trackerWidth/2;
         trackerRight.y = originalFrame.height * jsn["rw_y"] - root.trackerWidth/2;
-        //gotNewCoordinates(trackerRight);
+        gotNewCoordinates(trackerRight);
 
         for (var i in jsn["skeleton"])
         {
