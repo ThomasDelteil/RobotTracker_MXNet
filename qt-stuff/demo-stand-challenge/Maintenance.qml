@@ -23,7 +23,7 @@ Item {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: parent.height * 0.6
+                    Layout.preferredHeight: parent.height * 0.7
                     color: "transparent"
                     border.width: 1
 
@@ -62,46 +62,45 @@ Item {
                                 anchors.margins: 15
                                 spacing: 10
 
-                                RowLayout {
-                                    Layout.fillWidth: true
-                                    spacing: 10
+                                StatusRow {
+                                    text: "Algorithm:"
+                                    color: "red"
+                                }
 
-                                    StatusRow {
-                                        text: "Algorithm:"
-                                        color: "red"
-                                    }
-
-                                    StatusRow {
-                                        text: "Proxy:"
-                                        color: "red"
-                                    }
+                                StatusRow {
+                                    text: "Proxy:"
+                                    color: "red"
                                 }
 
                                 Item {
                                     Layout.fillWidth: true
-                                    Layout.fillHeight: true
+                                    Layout.preferredHeight: 5
                                 }
 
-                                ArmsData {
-                                    Layout.fillWidth: true
+                                ScrollView {
                                     Layout.alignment: Qt.AlignHCenter
+                                    Layout.fillHeight: true
+                                    clip: true
 
-                                    statusLeft: robotsModel.leftArm.getConnectionStatusColor()
-                                    statusRight: robotsModel.rightArm.getConnectionStatusColor()
-                                    xLeft: robotsModel.leftArm.x
-                                    xRight: robotsModel.rightArm.x
-                                    yLeft: robotsModel.leftArm.y
-                                    yRight: robotsModel.rightArm.y
-                                    zLeft: robotsModel.leftArm.z
-                                    zRight: robotsModel.rightArm.z
-                                    yawLeft: robotsModel.leftArm.yaw
-                                    yawRight: robotsModel.rightArm.yaw
-                                    pitchLeft: robotsModel.leftArm.pitch
-                                    pitchRight: robotsModel.rightArm.pitch
-                                    rollLeft: robotsModel.leftArm.roll
-                                    rollRight: robotsModel.rightArm.roll
-                                    calibrationNeededLeft: robotsModel.leftArm.calibrationNeeded
-                                    calibrationNeededRight: robotsModel.rightArm.calibrationNeeded
+                                    ArmsData {
+                                        id: armsdata
+                                        statusLeft: robotsModel.leftArm.getConnectionStatusColor()
+                                        statusRight: robotsModel.rightArm.getConnectionStatusColor()
+                                        xLeft: robotsModel.leftArm.x
+                                        xRight: robotsModel.rightArm.x
+                                        yLeft: robotsModel.leftArm.y
+                                        yRight: robotsModel.rightArm.y
+                                        zLeft: robotsModel.leftArm.z
+                                        zRight: robotsModel.rightArm.z
+                                        yawLeft: robotsModel.leftArm.yaw
+                                        yawRight: robotsModel.rightArm.yaw
+                                        pitchLeft: robotsModel.leftArm.pitch
+                                        pitchRight: robotsModel.rightArm.pitch
+                                        rollLeft: robotsModel.leftArm.roll
+                                        rollRight: robotsModel.rightArm.roll
+                                        calibrationNeededLeft: robotsModel.leftArm.calibrationNeeded ? "yes" : "no"
+                                        calibrationNeededRight: robotsModel.rightArm.calibrationNeeded ? "yes" : "no"
+                                    }
                                 }
                             }
                         }
@@ -118,76 +117,9 @@ Item {
                         anchors.margins: 15
                         spacing: 15
 
-                        //                        GridLayout {
-                        //                            rows: 3
-                        //                            columns: 3
-                        //                            rowSpacing: 10
-                        //                            columnSpacing: 10
-
-                        //                            FancyButton {
-                        //                                Layout.row: 1
-                        //                                Layout.column: 1
-                        //                                Layout.alignment: Qt.AlignHCenter
-                        //                                font.pointSize: root.secondaryFontSize
-                        //                                unpressedColor: "#0096FF"
-                        //                                pressedColor: "#3679CC"
-                        //                                text: "Up"
-                        //                                onClicked: {
-                        //                                    appendToMaintenanceOutput("up");
-                        //                                }
-                        //                            }
-
-                        //                            FancyButton {
-                        //                                Layout.row: 2
-                        //                                Layout.column: 0
-                        //                                font.pointSize: root.secondaryFontSize
-                        //                                unpressedColor: "#0096FF"
-                        //                                pressedColor: "#3679CC"
-                        //                                text: "Left"
-                        //                                onClicked: {
-                        //                                    appendToMaintenanceOutput("left");
-                        //                                }
-                        //                            }
-
-                        //                            FancyButton {
-                        //                                Layout.row: 2
-                        //                                Layout.column: 1
-                        //                                font.pointSize: root.secondaryFontSize * 1.5
-                        //                                unpressedColor: "#FF2600"
-                        //                                pressedColor: "#B5331E"
-                        //                                text: "RESET"
-                        //                                onClicked: {
-                        //                                    appendToMaintenanceOutput("RESET");
-                        //                                }
-                        //                            }
-
-                        //                            FancyButton {
-                        //                                Layout.row: 2
-                        //                                Layout.column: 2
-                        //                                font.pointSize: root.secondaryFontSize
-                        //                                unpressedColor: "#0096FF"
-                        //                                pressedColor: "#3679CC"
-                        //                                text: "Right"
-                        //                                onClicked: {
-                        //                                    appendToMaintenanceOutput("right");
-                        //                                }
-                        //                            }
-
-                        //                            FancyButton {
-                        //                                Layout.row: 3
-                        //                                Layout.column: 1
-                        //                                Layout.alignment: Qt.AlignHCenter
-                        //                                font.pointSize: root.secondaryFontSize
-                        //                                unpressedColor: "#0096FF"
-                        //                                pressedColor: "#3679CC"
-                        //                                text: "Down"
-                        //                                onClicked: {
-                        //                                    appendToMaintenanceOutput("down");
-                        //                                }
-                        //                            }
-                        //                        }
                         ColumnLayout {
                             Layout.fillHeight: true
+                            spacing: 15
 
                             Text {
                                 text: "left"
@@ -196,63 +128,30 @@ Item {
                                 Layout.alignment: Qt.AlignHCenter
                             }
 
-                            GridLayout {
-                                rows: 3
-                                columns: 3
-                                rowSpacing: 10
-                                columnSpacing: 10
+                            Switch {
+                                text: "Learning mode"
+                                checked: robotsModel.leftArm.learningMode
+                                onClicked: {
+                                    let isOn = !robotsModel.leftArm.learningMode
+                                    appendToMaintenanceOutput("setLearningMode left: " + isOn)
 
-                                Switch {
-                                    Layout.row: 1
-                                    Layout.column: 1
-                                    text: "Learning mode"
-                                    checked: robotsModel.leftArm.learningMode
-                                    onClicked: {
-                                        let isOn = !robotsModel.leftArm.learningMode
-                                        appendToMaintenanceOutput("setLearningMode left: " + isOn)
-
-                                        robotsModel.setLearningMode({ name: "left" }, isOn)
-                                    }
-                                }
-
-//                                FancyButton {
-//                                    Layout.row: 1
-//                                    Layout.column: 1
-//                                    Layout.alignment: Qt.AlignHCenter
-//                                    font.pointSize: root.secondaryFontSize
-//                                    unpressedColor: "#0096FF"
-//                                    pressedColor: "#3679CC"
-//                                    text: "Learning mode"
-//                                    checkable: true
-//                                    checked: robotsModel.leftArm.learningMode
-//                                    onClicked: {
-//                                        let isOn = !robotsModel.leftArm.learningMode
-//                                        appendToMaintenanceOutput("setLearningMode left: " + isOn)
-
-//                                        robotsModel.setLearningMode({ name: "left" }, isOn)
-//                                    }
-//                                }
-
-                                FancyButton {
-                                    Layout.row: 2
-                                    Layout.column: 2
-                                    Layout.alignment: Qt.AlignHCenter
-                                    font.pointSize: root.secondaryFontSize
-                                    unpressedColor: "#0096FF"
-                                    pressedColor: "#3679CC"
-                                    text: "Calibrate"
-                                    onClicked: {
-                                        appendToMaintenanceOutput("calibrate left")
-
-                                        robotsModel.calibrate({ name: "left" })
-                                    }
+                                    robotsModel.setLearningMode({ name: "left" }, isOn)
                                 }
                             }
 
-                            Item {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
+                            FancyButton {
+                                Layout.alignment: Qt.AlignHCenter
+                                font.pointSize: root.secondaryFontSize
+                                unpressedColor: "#0096FF"
+                                pressedColor: "#3679CC"
+                                text: "Calibrate"
+                                onClicked: {
+                                    appendToMaintenanceOutput("calibrate left")
+
+                                    robotsModel.calibrate({ name: "left" })
+                                }
                             }
+
                         }
 
                         Rectangle {
@@ -263,6 +162,7 @@ Item {
 
                         ColumnLayout {
                             Layout.fillHeight: true
+                            spacing: 15
 
                             Text {
                                 text: "right"
@@ -271,84 +171,28 @@ Item {
                                 Layout.alignment: Qt.AlignHCenter
                             }
 
-                            GridLayout {
-                                rows: 3
-                                columns: 3
-                                rowSpacing: 10
-                                columnSpacing: 10
+                            Switch {
+                                text: "Learning mode"
+                                checked: robotsModel.rightArm.learningMode
+                                onClicked: {
+                                    let isOn = !robotsModel.rightArm.learningMode
+                                    appendToMaintenanceOutput("setLearningMode right: " + isOn)
 
-                                Switch {
-                                    Layout.row: 1
-                                    Layout.column: 1
-                                    text: "Learning mode"
-                                    checked: robotsModel.rightArm.learningMode
-                                    onClicked: {
-                                        let isOn = !robotsModel.rightArm.learningMode
-                                        appendToMaintenanceOutput("setLearningMode right: " + isOn)
-
-                                        robotsModel.setLearningMode({ name: "right" }, isOn)
-                                    }
-                                }
-
-//                                FancyButton {
-//                                    Layout.row: 1
-//                                    Layout.column: 1
-//                                    Layout.alignment: Qt.AlignHCenter
-//                                    font.pointSize: root.secondaryFontSize
-//                                    unpressedColor: "#0096FF"
-//                                    pressedColor: "#3679CC"
-//                                    text: "Learning mode"
-//                                    checkable: true
-//                                    checked: robotsModel.rightArm.learningMode
-//                                    onClicked: {
-//                                        let isOn = !robotsModel.rightArm.learningMode
-//                                        appendToMaintenanceOutput("setLearningMode right: " + isOn)
-
-//                                        robotsModel.setLearningMode({ name: "right" }, isOn)
-//                                    }
-//                                }
-
-                                FancyButton {
-                                    Layout.row: 2
-                                    Layout.column: 2
-                                    Layout.alignment: Qt.AlignHCenter
-                                    font.pointSize: root.secondaryFontSize
-                                    unpressedColor: "#0096FF"
-                                    pressedColor: "#3679CC"
-                                    text: "Calibrate"
-                                    onClicked: {
-                                        appendToMaintenanceOutput("calibrate right")
-
-                                        robotsModel.calibrate({ name: "right" })
-                                    }
+                                    robotsModel.setLearningMode({ name: "right" }, isOn)
                                 }
                             }
 
-                            Item {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                            }
-                        }
+                            FancyButton {
+                                Layout.alignment: Qt.AlignHCenter
+                                font.pointSize: root.secondaryFontSize
+                                unpressedColor: "#0096FF"
+                                pressedColor: "#3679CC"
+                                text: "Calibrate"
+                                onClicked: {
+                                    appendToMaintenanceOutput("calibrate right")
 
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                        }
-
-/*
-                        Rectangle {
-                            Layout.fillHeight: true
-                            width: 1
-                            color: "black"
-                        }
-
-                        FancyButton {
-                            font.pointSize: root.secondaryFontSize
-                            unpressedColor: "#0096FF"
-                            pressedColor: "#3679CC"
-                            text: "Some"
-                            onClicked: {
-                                appendToMaintenanceOutput("some")
+                                    robotsModel.calibrate({ name: "right" })
+                                }
                             }
                         }
 
@@ -358,32 +202,10 @@ Item {
                             color: "black"
                         }
 
-                        FancyButton {
-                            font.pointSize: root.secondaryFontSize
-                            unpressedColor: "#0096FF"
-                            pressedColor: "#3679CC"
-                            text: "Another"
-                            onClicked: {
-                                appendToMaintenanceOutput("another")
-                            }
-                        }
-
                         Item {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                         }
-
-                        FancyButton {
-                            Layout.row: 2
-                            Layout.column: 1
-                            font.pointSize: root.secondaryFontSize * 1.5
-                            unpressedColor: "#FF2600"
-                            pressedColor: "#B5331E"
-                            text: "EMERGENCY\nSTOP"
-                            onClicked: {
-                                appendToMaintenanceOutput("EMERGENCY STOP")
-                            }
-                        }*/
                     }
                 }
             }

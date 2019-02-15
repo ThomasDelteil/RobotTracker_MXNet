@@ -3,8 +3,6 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
 
 GridLayout {
-    id: lalalala
-
     property alias statusLeft: statusLeft.color
     property alias statusRight: statusRight.color
     property alias xLeft: xLeft.text
@@ -260,7 +258,7 @@ GridLayout {
         Layout.alignment: Qt.AlignRight
         font.pointSize: root.secondaryFontSize
         font.family: "Courier New"
-        text: lalalala.calibrationNeededLeft ? "yes" : "no"
+        text: "-"
     }
     Text {
         Layout.row: 9
@@ -277,6 +275,6 @@ GridLayout {
         Layout.alignment: Qt.AlignLeft
         font.pointSize: root.secondaryFontSize
         font.family: "Courier New"
-        text: lalalala.calibrationNeededRight ? "yes" : "no"
+        text: "-"
     }
 }

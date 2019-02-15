@@ -17,29 +17,28 @@ Item {
 
         var jsn = JSON.parse(result);
 
-        trackerLeft.x = originalFrame.width * jsn["lw_x"] - root.trackerWidth/2;
-        trackerLeft.y = originalFrame.height * jsn["lw_y"] - root.trackerWidth/2;
+        var re_x = jsn["skeleton"]["left_elbow"]["x"],
+            re_y = jsn["skeleton"]["left_elbow"]["y"],
+            rw_x = jsn["skeleton"]["left_wrist"]["x"],
+            rw_y = jsn["skeleton"]["left_wrist"]["y"],
+            le_x = jsn["skeleton"]["right_elbow"]["x"],
+            le_y = jsn["skeleton"]["right_elbow"]["y"],
+            lw_x = jsn["skeleton"]["right_wrist"]["x"],
+            lw_y = jsn["skeleton"]["right_wrist"]["y"];
+
+        trackerLeft.x = originalFrame.width * lw_x - root.trackerWidth/2;
+        trackerLeft.y = originalFrame.height * lw_y - root.trackerWidth/2;
         gotNewCoordinates(trackerLeft);
 
-        trackerRight.x = originalFrame.width * jsn["rw_x"] - root.trackerWidth/2;
-        trackerRight.y = originalFrame.height * jsn["rw_y"] - root.trackerWidth/2;
+        trackerRight.x = originalFrame.width * rw_x - root.trackerWidth/2;
+        trackerRight.y = originalFrame.height * rw_y - root.trackerWidth/2;
         gotNewCoordinates(trackerRight);
 
-        for (var i in jsn["skeleton"])
-        {
-            if (jsn["skeleton"][i]["name"] === "left_elbow")
-            {
-                cropRegionLeft.x = originalFrame.width * (jsn["lw_x"] + (jsn["lw_x"] - jsn["skeleton"][i]["x"]) / 2) - root.cropRegionWidth/2;
-                cropRegionLeft.y = originalFrame.height * (jsn["lw_y"] + (jsn["lw_y"] - jsn["skeleton"][i]["y"]) / 2) - root.cropRegionWidth/2;
-            }
-            if (jsn["skeleton"][i]["name"] === "right_elbow")
-            {
-                cropRegionRight.x = originalFrame.width * (jsn["rw_x"] + (jsn["rw_x"] - jsn["skeleton"][i]["x"]) / 2) - root.cropRegionWidth/2;
-                cropRegionRight.y = originalFrame.height * (jsn["rw_y"] + (jsn["rw_y"] - jsn["skeleton"][i]["y"]) / 2) - root.cropRegionWidth/2;
-            }
-        }
+        cropRegionLeft.x = originalFrame.width * (lw_x + (lw_x - le_x) / 2) - root.cropRegionWidth/2;
+        cropRegionLeft.y = originalFrame.height * (lw_y + (lw_y - le_y) / 2) - root.cropRegionWidth/2;
 
-        //crop_pos = wrist_pos + (wrist_pos - elbow_pos) / 2
+        cropRegionRight.x = originalFrame.width * (rw_x + (rw_x - re_x) / 2) - root.cropRegionWidth/2;
+        cropRegionRight.y = originalFrame.height * (rw_y + (rw_y - re_y) / 2) - root.cropRegionWidth/2;
     }
 
     //function appendToOutput(msg, panelAsWell = false)
@@ -90,6 +89,7 @@ Item {
                         id: camera
                         deviceId: "/dev/video0" // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
                         viewfinder.resolution: Qt.size(640, 480) // picture quality
+                        //position: Camera.FrontFace
                         metaData.orientation: root.cameraUpsideDown ? 180 : 0
 
                         //focus {
@@ -473,7 +473,7 @@ Item {
         var xCoordinate = checkXcoordinate(tracker),
             yCoordinate = checkYcoordinate(tracker);
 
-        appendToOutput("".concat(tracker.name, " movement: ", xCoordinate, " | ", yCoordinate), true);
+        //appendToOutput("".concat(tracker.name, " movement: ", xCoordinate, " | ", yCoordinate), true);
 
         moveTheArm(tracker.name, xCoordinate, yCoordinate);
     }

@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QCameraInfo>
 #include "backend.h"
 
 QString getBasePath(QString applicationDirPath)
@@ -18,6 +19,15 @@ QString getBasePath(QString applicationDirPath)
 int main(int argc, char *argv[])
 {
     qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
+
+    /*
+    qDebug() << "cameras found:";
+    QListIterator<QCameraInfo> cameras(QCameraInfo::availableCameras());
+    while(cameras.hasNext())
+    {
+        qDebug() << "-" << cameras.next();
+    }
+    */
 
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
