@@ -55,10 +55,14 @@ bool Backend::requestFinished(QNetworkReply *reply)
             errorMessage = QString("QNetworkReply::NetworkError code: %1").arg(QString::number(err));
         }
         emit requestFailed(QString("Code %1 | %2").arg(status).arg(errorMessage));
+        _connected = false;
+        emit connectedChanged(_connected);
         return false;
     }
 
     emit requestDone(QString(data));
+    _connected = true;
+    emit connectedChanged(_connected);
     return true;
 }
 

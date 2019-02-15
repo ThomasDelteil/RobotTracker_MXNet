@@ -21,7 +21,7 @@ Item {
     function sendRequest(route, data, callback) {
         var url = proxy.httpUrl + "/" + route
         var dataString = !!data ? JSON.stringify(data) : null
-        console.log("Sending: " + url + 'with data: ' + dataString)
+        console.log("Sending: " + url + ' with data: ' + dataString)
 
         var doc = new XMLHttpRequest()
         doc.onreadystatechange = function () {
@@ -91,28 +91,45 @@ Item {
     property real threshold: 0.01
 
     property var leftLastPosition: null
+    property var leftLastSentPosition: null
     property var rightLastPosition: null
+    property var rightLastSentPosition: null
+
+    function positionChanged(position, sentPosition) {
+        if (!position) {
+            return false
+        }
+
+        if (!sentPosition) {
+            return true
+        }
+
+        if (Math.abs(position.y - sentPosition.y) > threshold) {
+            return true
+        }
+
+        if (Math.abs(position.z - sentPosition.z) > threshold) {
+            return true
+        }
+
+        return false
+    }
 
     Timer {
-        interval: 1000
+        interval: 500
         repeat: true
-        running: root.state == "connected"
+        running: true
         triggeredOnStart: true
 
         onTriggered: {
-            if (!!leftLastPosition) {
-                if (Math.abs(leftLastPosition.y - leftArm.y) > threshold
-                        || Math.abs(
-                            leftLastPosition.z - leftArm.z) > threshold) {
-                    sendRequest("left/move", leftLastPosition)
-                }
+            if (positionChanged(leftLastPosition, leftLastSentPosition)) {
+                sendRequest("left/move", leftLastPosition)
+                leftLastSentPosition = leftLastPosition
             }
-            if (!!rightLastPosition) {
-                if (Math.abs(rightLastPosition.y - rightArm.y) > threshold
-                        || Math.abs(
-                            rightLastPosition.z - rightArm.z) > threshold) {
-                    sendRequest("right/move", rightLastPosition)
-                }
+
+            if (positionChanged(rightLastPosition, rightLastSentPosition)) {
+                sendRequest("right/move", rightLastPosition)
+                rightLastSentPosition = rightLastPosition
             }
         }
     }
@@ -157,7 +174,6 @@ Item {
             console.log('UrlChanged: ' + url)
         }
 
-        //url: server.url
         onTextMessageReceived: {
             console.log('Message received: ' + message)
 
