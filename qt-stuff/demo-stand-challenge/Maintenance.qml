@@ -62,14 +62,19 @@ Item {
                                 anchors.margins: 15
                                 spacing: 10
 
-                                StatusRow {
-                                    text: "Algorithm:"
-                                    color: "red"
-                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 10
 
-                                StatusRow {
-                                    text: "Proxy:"
-                                    color: "red"
+                                    StatusRow {
+                                        text: "Algorithm:"
+                                        color: backend.connected ? "green" : "red"
+                                    }
+
+                                    StatusRow {
+                                        text: "Proxy:"
+                                        color: robotsModel.state === "connected" ? "green" : "red"
+                                    }
                                 }
 
                                 Item {

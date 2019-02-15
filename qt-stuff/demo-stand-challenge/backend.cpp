@@ -73,6 +73,8 @@ void Backend::requestPoseFinished(QNetworkReply *reply)
         emit requestFailed(QString("Code %1 | %2").arg(status).arg(errorMessage));
     }
 
+    _connected = true;
+    emit connectedChanged(true);
     emit requestDone(QString(data));
 }
 
