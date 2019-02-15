@@ -110,6 +110,7 @@ class Arm extends EventEmitter {
         super()
         this.config = config
         this.state = new ArmState()
+        this.connected = false
     }
 
     init() {
@@ -124,21 +125,34 @@ class Arm extends EventEmitter {
         let that = this
 
         // If there is an error on the backend, an 'error' emit will be emitted.
-        this.ros.on('error', function(error) {
+        this.ros.on('error', function (error) {
             console.log(`${that.config.name}: error: ${error}`)
-                //that.emit('error', error)
+            //that.emit('error', error)
+            this.connected = false
         })
 
         // Find out exactly when we made a connection.
-        this.ros.on('connection', function() {
+        this.ros.on('connection', function () {
             console.log(`${that.config.name}: connected`)
             that.emit('connection')
             that.onconnect()
         })
 
-        this.ros.on('close', function() {
-            console.log(`${that.config.name}: disconnected`)
-                //that.emit('close')
+        this.ros.on('close', function () {
+            if (that.connected) {
+                console.log(`${that.config.name}: disconnected`)
+                that.connected = false
+            }
+            //that.emit('close')
+            let reconnect = function () {
+                if (that.connected) {
+                    return
+                }
+
+                that.ros.connect(url)
+            }
+
+            setTimeout(reconnect, 1000)
         })
 
         this.client = new rosLib.ActionClient({
@@ -169,7 +183,7 @@ class Arm extends EventEmitter {
             ros: this.ros,
             name: '/niryo_one/activate_learning_mode',
             serviceType: 'niryo_one_msgs/SetInt',
-          });
+        });
     }
 
     onconnect() {
@@ -181,7 +195,7 @@ class Arm extends EventEmitter {
             name: '/niryo_one_tools/tool_list',
         })
 
-        toolParam.get(function(message) {
+        toolParam.get(function (message) {
             that.toolList = message
         })
 
@@ -191,7 +205,7 @@ class Arm extends EventEmitter {
             messageType: 'niryo_one_msgs/RobotState',
         })
 
-        robotState.subscribe(function(message) {
+        robotState.subscribe(function (message) {
             if (that.state.updatePosition(message)) {
                 that.emit('state_change', that.state)
             }
@@ -203,7 +217,7 @@ class Arm extends EventEmitter {
             messageType: 'niryo_one_msgs/HardwareStatus',
         })
 
-        hardwareStatus.subscribe(function(message) {
+        hardwareStatus.subscribe(function (message) {
             if (that.state.updateHardwareStatus(message)) {
                 that.emit('state_change', that.state)
             }
@@ -215,7 +229,7 @@ class Arm extends EventEmitter {
             messageType: 'std_msgs/Bool',
         })
 
-        learningModelStatus.subscribe(function(message) {
+        learningModelStatus.subscribe(function (message) {
             if (that.state.updateLearningMode(message.data)) {
                 that.emit('state_change', that.state)
             }
@@ -228,11 +242,13 @@ class Arm extends EventEmitter {
             messageType: 'std_msgs/Int32',
         });
 
-        currentTool.subscribe(function(message) {
+        currentTool.subscribe(function (message) {
             if (that.state.updateToolId(message.data)) {
                 that.emit('state_change', that.state)
             }
         })
+
+        this.connected = true
     }
 
     changeTool(toolId) {
@@ -241,13 +257,13 @@ class Arm extends EventEmitter {
             value: toolId
         })
 
-        this.changeToolClient.callService(request, function(response) {
+        this.changeToolClient.callService(request, function (response) {
             if (response.status === 200) {
                 console.log(`${that.config.name}: changeTool: changed to tool ${toolId}`)
             } else {
                 console.log(`${that.config.name}: changeTool: error ${response.message}`)
             }
-        }, function(error) {
+        }, function (error) {
             console.log(`${that.config.name}: changeTool: ${error}`)
         })
     }
@@ -281,18 +297,18 @@ class Arm extends EventEmitter {
             })
         })
 
-        goal.on('feedback', function(feedback) {
+        goal.on('feedback', function (feedback) {
             console.log(`${that.config.name}: feedback: ${JSON.stringify(feedback)}`)
         })
 
-        goal.on('result', function(result) {
+        goal.on('result', function (result) {
             console.log(`${that.config.name}: result: ${JSON.stringify(result)}`)
             if (result.status == 1) {
                 that.state.updateGripOpen(toolCmd == GRIP_COMMAND.OPEN)
             }
         })
 
-        goal.on('timeout', function() {
+        goal.on('timeout', function () {
             console.log(`${that.config.name}: timeout`)
         })
 
@@ -305,13 +321,13 @@ class Arm extends EventEmitter {
             value: 2
         })
 
-        this.calibrateClient.callService(request, function(response) {
+        this.calibrateClient.callService(request, function (response) {
             if (response.status === 200) {
                 console.log(`${that.config.name}: calibrate: succeeded`)
             } else {
                 console.log(`${that.config.name}: calibrate: error ${response.message}`)
             }
-        }, function(error) {
+        }, function (error) {
             console.log(`${that.config.name}: calibrate: ${error}`)
         })
     }
@@ -322,13 +338,13 @@ class Arm extends EventEmitter {
             value: isOn ? 1 : 0
         })
 
-        this.activateLearningModeClient.callService(request, function(response) {
+        this.activateLearningModeClient.callService(request, function (response) {
             if (response.status === 200) {
                 console.log(`${that.config.name}: activateLearningModeClient: succeeded: ${isOn}`)
             } else {
                 console.log(`${that.config.name}: activateLearningModeClient: error ${response.message}`)
             }
-        }, function(error) {
+        }, function (error) {
             console.log(`${that.config.name}: calibrate: ${error}`)
         })
     }
