@@ -21,7 +21,7 @@ bool VideoWrapper::present(const QVideoFrame &frame)
         QImage shot = qt_imageFromVideoFrame(frameCopy);
         // apparently, 384x288 is enough for MXNet
         shot = shot.scaled(384, 288);
-        //shot = shot.mirrored(true, false);
+        shot = shot.mirrored(true, false);
         //qDebug() << shot.save(QString("%1-some.jpg").arg(QDateTime::currentDateTime().toString("hh-mm-ss-zzz")));
 
         QBuffer *imgBuffer = new QBuffer();
@@ -44,16 +44,18 @@ bool VideoWrapper::present(const QVideoFrame &frame)
 
 bool VideoWrapper::start(const QVideoSurfaceFormat &format)
 {
-    if(supportedPixelFormats().count(format.pixelFormat()) == 0)
-    { return false; }
-
-    if(!QAbstractVideoSurface::start(format))
-    { return false; }
-
-    if( surf && !surf->start(format) )
-    { return false; }
-
     m_format = format;
+    m_format.setMirrored(true);
+
+    if(supportedPixelFormats().count(m_format.pixelFormat()) == 0)
+        { return false; }
+
+    if(!QAbstractVideoSurface::start(m_format))
+        { return false; }
+
+    if( surf && !surf->start(m_format) )
+        { return false; }
+
     return true;
 }
 
@@ -69,16 +71,13 @@ QAbstractVideoSurface *VideoWrapper::get_videoSurface() const
 
 void VideoWrapper::set_videoSurface(QAbstractVideoSurface *m)
 {
-    if (surf == m)
-        return;
+    if (surf == m) { return; }
 
-    if (surf && surf->isActive())
-        surf->stop();
+    if (surf && surf->isActive()) { surf->stop(); }
 
     surf = m;
 
-    if (surf && isActive())
-        surf->start(m_format);
+    if (surf && isActive()) { surf->start(m_format); }
 }
 
 QObject *VideoWrapper::get_source()

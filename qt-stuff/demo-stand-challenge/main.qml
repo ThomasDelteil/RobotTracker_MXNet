@@ -22,7 +22,7 @@ ApplicationWindow {
     property bool cameraUpsideDown: false // if you need to rotate viewfinder to 180
     property double timerRate: 0.05 * 1000 // ms, the rate of grabbing frames (0.05 * 1000 = 20 FPS)
     property int trackerWidth: 40 // trackers width (and height)
-    property int cropRegionWidth: 120 // crop region width (and height) for the hands
+    property int cropRegionWidth: 130 // crop region width (and height) for the hands
 
     property bool debugOutput: false // show debug panel (can really kill the performance)
     property bool fpsCounters: true // show FPS counters

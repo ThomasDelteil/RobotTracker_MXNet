@@ -5,17 +5,23 @@ Backend::Backend(QObject *parent) : QObject(parent)
     videoWrapper = new VideoWrapper();
     connect(
             videoWrapper, &VideoWrapper::gotNewShotBytes,
-            this, &Backend::uploadBuffer
+            this, &Backend::uploadPose
             );
     connect(
             videoWrapper, &VideoWrapper::gotNewFrame,
             this, [=](){ this->counterIncreased(); }
             );
 
-    manager = new QNetworkAccessManager(this);
+    managerPose = new QNetworkAccessManager(this);
     connect(
-            manager, &QNetworkAccessManager::finished,
-            this, &Backend::requestFinished
+            managerPose, &QNetworkAccessManager::finished,
+            this, &Backend::requestPoseFinished
+            );
+
+    managerHand = new QNetworkAccessManager(this);
+    connect(
+            managerHand, &QNetworkAccessManager::finished,
+            this, &Backend::requestHandFinished
             );
 
     // for debugging with HTTP proxy
@@ -26,19 +32,29 @@ Backend::Backend(QObject *parent) : QObject(parent)
     //manager->setProxy(proxy);
 }
 
-void Backend::uploadBuffer(QBuffer *imgBuffer)
+void Backend::uploadPose(QBuffer *imgBuffer)
 {
     //qDebug() << "uploading" << imgBuffer->size() << "bytes";
-    QNetworkRequest request = QNetworkRequest(QUrl(_endpoint));
+    QNetworkRequest request = QNetworkRequest(QUrl(_endpointPose));
     request.setRawHeader("Content-Type", "multipart/form-data;");
 
     imgBuffer->open(QIODevice::ReadOnly);
-    auto reply = manager->post(request, imgBuffer);
-    //imgBuffer->close();
-    connect(reply, &QNetworkReply::finished, imgBuffer, &QBuffer::deleteLater);
+    managerPose->post(request, imgBuffer);
+    //connect(reply, &QNetworkReply::finished, imgBuffer, &QBuffer::deleteLater);
 }
 
-bool Backend::requestFinished(QNetworkReply *reply)
+void Backend::uploadHand(QBuffer *imgBuffer)
+{
+    //qDebug() << "uploading" << imgBuffer->size() << "bytes";
+    QNetworkRequest request = QNetworkRequest(QUrl(_endpointPose));
+    request.setRawHeader("Content-Type", "multipart/form-data;");
+
+    imgBuffer->open(QIODevice::ReadOnly);
+    managerHand->post(request, imgBuffer);
+    //connect(reply, &QNetworkReply::finished, imgBuffer, &QBuffer::deleteLater);
+}
+
+void Backend::requestPoseFinished(QNetworkReply *reply)
 {
     int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     QByteArray data = reply->readAll();
@@ -55,11 +71,31 @@ bool Backend::requestFinished(QNetworkReply *reply)
             errorMessage = QString("QNetworkReply::NetworkError code: %1").arg(QString::number(err));
         }
         emit requestFailed(QString("Code %1 | %2").arg(status).arg(errorMessage));
-        return false;
     }
 
     emit requestDone(QString(data));
-    return true;
+}
+
+void Backend::requestHandFinished(QNetworkReply *reply)
+{
+    int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    QByteArray data = reply->readAll();
+
+    //qDebug() << status << "|" << data;
+
+    if (status != 200)
+    {
+        QString errorMessage = QString(data);
+        QNetworkReply::NetworkError err = reply->error();
+        if (status == 0)
+        {
+            // dictionary: http://doc.qt.io/qt-5/qnetworkreply.html#NetworkError-enum
+            errorMessage = QString("QNetworkReply::NetworkError code: %1").arg(QString::number(err));
+        }
+        emit requestFailed(QString("Code %1 | %2").arg(status).arg(errorMessage));
+    }
+
+    emit requestDone(QString(data));
 }
 
 void Backend::set_currentProfile(QString profileName)

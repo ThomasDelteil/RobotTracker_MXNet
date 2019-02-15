@@ -22,7 +22,8 @@ signals:
     void counterIncreased();
 
 public slots:
-    void uploadBuffer(QBuffer *imgBuffer);
+    void uploadPose(QBuffer *imgBuffer);
+    void uploadHand(QBuffer *imgBuffer);
 
     void set_currentProfile(QString profileName);
     QString get_currentProfile();
@@ -32,12 +33,15 @@ public slots:
     void enableSendingToMXNet(bool sendingEnabled);
 
 private slots:
-    bool requestFinished(QNetworkReply *reply);
+    void requestPoseFinished(QNetworkReply *reply);
+    void requestHandFinished(QNetworkReply *reply);
 
 private:
     VideoWrapper *videoWrapper;
-    QNetworkAccessManager *manager;
-    QString _endpoint = "http://localhost:8080/predictions/pose";
+    QNetworkAccessManager *managerPose;
+    QNetworkAccessManager *managerHand;
+    QString _endpointPose = "http://localhost:8080/predictions/pose";
+    QString _endpointHand = "http://localhost:8080/predictions/hand";
     QString _currentProfile;
 };
 
