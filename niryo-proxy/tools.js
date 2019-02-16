@@ -157,8 +157,8 @@ class Arm extends EventEmitter {
 
         this.client = new rosLib.ActionClient({
             ros: this.ros,
-            serverName: this.config.server_name,
-            actionName: this.config.action_name
+            serverName: '/niryo_one/commander/robot_action',
+            actionName: 'niryo_one_msgs/RobotMoveAction'
         })
 
         this.changeToolClient = new rosLib.Service({
@@ -348,52 +348,53 @@ class Arm extends EventEmitter {
             console.log(`${that.config.name}: calibrate: ${error}`)
         })
     }
+/*
+    move_pose(pos) {
+        console.log(`${this.config.name}: move_pose`)
 
-    // move_pose(pos) {
-    //     console.log(`${this.config.name}: move_pose`)
+        const command = {
+            'cmd_type': 2,
+            'position': {
+                'x': pos.x,
+                'y': pos.y,
+                'z': pos.z,
+            },
+            'rpy': {
+                'roll': pos.roll,
+                'pitch': pos.pitch,
+                'yaw': pos.yaw,
+            }
+        }
 
-    //     const command = {
-    //         'cmd_type': 2,
-    //         'position': {
-    //             'x': pos.x,
-    //             'y': pos.y,
-    //             'z': pos.z,
-    //         },
-    //         'rpy': {
-    //             'roll': pos.roll,
-    //             'pitch': pos.pitch,
-    //             'yaw': pos.yaw,
-    //         }
-    //     }
+        let that = this
 
-    //     let that = this
+        // Create a goal.
+        var goal = new rosLib.Goal({
+            actionClient: this.client,
+            goalMessage: new rosLib.Message({ 'cmd': command })
+        });
 
-    //     // Create a goal.
-    //     var goal = new rosLib.Goal({
-    //         actionClient: this.client,
-    //         goalMessage: new rosLib.Message({ 'cmd': command })
-    //     });
+        goal.on('feedback', function (feedback) {
+            console.log(`${that.config.name}: feedback: ${feedback.sequence}`)
+            that.emit('feedback', feedback)
+        });
 
-    //     goal.on('feedback', function (feedback) {
-    //         console.log(`${that.config.name}: feedback: ${feedback.sequence}`)
-    //         that.emit('feedback', feedback)
-    //     });
+        goal.on('result', function (result) {
+            console.log(`${that.config.name}: result: ${result.sequence}`)
+            that.emit('result', result)
+        });
 
-    //     goal.on('result', function (result) {
-    //         console.log(`${that.config.name}: result: ${result.sequence}`)
-    //         that.emit('result', result)
-    //     });
+        goal.on('timeout', function () {
+            console.log(`${that.config.name}: timeout`)
+            that.emit('timeout')
+        });
 
-    //     goal.on('timeout', function () {
-    //         console.log(`${that.config.name}: timeout`)
-    //         that.emit('timeout')
-    //     });
+        // Send the goal to the action server.
+        goal.send(1000);
 
-    //     // Send the goal to the action server.
-    //     goal.send(1000);
-
-    //     console.log(`${this.config.name}: move_pose: goal sent`)
-    // }
+        console.log(`${this.config.name}: move_pose: goal sent`)
+    }
+*/
 
     move_pose(pos) {
         console.log(`${this.config.name}: move_pose: ${JSON.stringify(pos)}`)
