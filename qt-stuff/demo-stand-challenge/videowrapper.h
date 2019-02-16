@@ -38,7 +38,7 @@ public:
 
 signals:
     void sourceChanged();
-    void gotNewShotBytes(QBuffer *imgBuffer);
+    void gotNewFrameImage(QImage img);
     void gotNewFrame();
 
 private:

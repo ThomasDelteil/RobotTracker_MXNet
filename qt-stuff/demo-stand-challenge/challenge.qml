@@ -11,9 +11,9 @@ Item {
 
     signal nextWindow(string windowName)
 
-    function processResults(result)
+    function processPoseResults(result)
     {
-        appendToOutput(result, false);
+        //appendToOutput(result, false);
 
         var jsn = JSON.parse(result);
 
@@ -28,17 +28,27 @@ Item {
 
         trackerLeft.x = originalFrame.width * lw_x - root.trackerWidth/2;
         trackerLeft.y = originalFrame.height * lw_y - root.trackerWidth/2;
-        gotNewCoordinates(trackerLeft);
+        //gotNewCoordinates(trackerLeft);
 
         trackerRight.x = originalFrame.width * rw_x - root.trackerWidth/2;
         trackerRight.y = originalFrame.height * rw_y - root.trackerWidth/2;
-        gotNewCoordinates(trackerRight);
+        //gotNewCoordinates(trackerRight);
 
-        cropRegionLeft.x = originalFrame.width * (lw_x + (lw_x - le_x) / 2) - root.cropRegionWidth/2;
-        cropRegionLeft.y = originalFrame.height * (lw_y + (lw_y - le_y) / 2) - root.cropRegionWidth/2;
+        cropRegionLeft.x = originalFrame.width * (lw_x + (lw_x - le_x) / 2) - backend.cropRegionWidth()/2;
+        cropRegionLeft.y = originalFrame.height * (lw_y + (lw_y - le_y) / 2) - backend.cropRegionWidth()/2;
+        //console.log("qml rect:", cropRegionLeft.x, cropRegionLeft.y, backend.cropRegionWidth());
 
-        cropRegionRight.x = originalFrame.width * (rw_x + (rw_x - re_x) / 2) - root.cropRegionWidth/2;
-        cropRegionRight.y = originalFrame.height * (rw_y + (rw_y - re_y) / 2) - root.cropRegionWidth/2;
+        cropRegionRight.x = originalFrame.width * (rw_x + (rw_x - re_x) / 2) - backend.cropRegionWidth()/2;
+        cropRegionRight.y = originalFrame.height * (rw_y + (rw_y - re_y) / 2) - backend.cropRegionWidth()/2;
+    }
+
+    function processLeftHandResults(result)
+    {
+        palmLeft.text = result;
+    }
+    function processRightHandResults(result)
+    {
+        palmRight.text = result;
     }
 
     //function appendToOutput(msg, panelAsWell = false)
@@ -88,7 +98,7 @@ Item {
                     Camera {
                         id: camera
                         deviceId: "/dev/video0" // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
-                        viewfinder.resolution: Qt.size(640, 480) // picture quality
+                        viewfinder.resolution: Qt.size(backend.frameWidth(), backend.frameHeight()) // picture quality
                         //position: Camera.FrontFace
                         metaData.orientation: root.cameraUpsideDown ? 180 : 0
 
@@ -230,22 +240,40 @@ Item {
                                 id: cropRegionLeft
                                 x: trackerLeft.x - width/2
                                 y: trackerLeft.y - height/2
-                                width: root.cropRegionWidth
-                                height: root.cropRegionWidth
+                                width: backend.cropRegionWidth()
+                                height: backend.cropRegionWidth()
                                 color: "blue"
-                                opacity: 0.3
+                                opacity: 0.6
                                 visible: btn_stop.enabled
+
+                                Text {
+                                    id: palmLeft
+                                    anchors.centerIn: parent
+                                    font.pointSize: root.primaryFontSize * 3
+                                    font.bold: true
+                                    color: "white"
+                                    text: "2"
+                                }
                             }
                             // crop region for the right hand
                             Rectangle {
                                 id: cropRegionRight
                                 x: trackerRight.x - width/2
                                 y: trackerRight.y - height/2
-                                width: root.cropRegionWidth
-                                height: root.cropRegionWidth
+                                width: backend.cropRegionWidth()
+                                height: backend.cropRegionWidth()
                                 color: "green"
-                                opacity: 0.3
+                                opacity: 0.6
                                 visible: btn_stop.enabled
+
+                                Text {
+                                    id: palmRight
+                                    anchors.centerIn: parent
+                                    font.pointSize: root.primaryFontSize * 3
+                                    font.bold: true
+                                    color: "white"
+                                    text: "2"
+                                }
                             }
 
                             // FPS counters
@@ -271,7 +299,7 @@ Item {
                                 visible: root.fpsCounters
                             }
 
-                            // screen divider, just for convenience
+                            // screen divider, for convenience
                             RowLayout {
                                 anchors.fill: parent
                                 spacing: 0

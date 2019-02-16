@@ -16,25 +16,11 @@ bool VideoWrapper::present(const QVideoFrame &frame)
 
         QVideoFrame frameCopy = frame;
         frameCopy.map(QAbstractVideoBuffer::ReadOnly);
-
         //qDebug() << "got frame:" << frameCopy.mappedBytes() << frameCopy.size() << frameCopy.width() << "x" << frameCopy.height();
-        QImage shot = qt_imageFromVideoFrame(frameCopy);
-        // apparently, 384x288 is enough for MXNet
-        shot = shot.scaled(384, 288);
-        shot = shot.mirrored(true, false);
-        //qDebug() << shot.save(QString("%1-some.jpg").arg(QDateTime::currentDateTime().toString("hh-mm-ss-zzz")));
-
-        QBuffer *imgBuffer = new QBuffer();
-        //QImageWriter iw(imgBuffer, "JPG");
-        //bool shotSaved = iw.write(shot);
-        bool shotSaved = shot.save(imgBuffer, "JPG");
-        if (!shotSaved) { qDebug() << "[error saving shot]" << imgBuffer->errorString(); }
-        else
-        {
-            emit gotNewShotBytes(imgBuffer);
-        }
-
+        QImage shot = QImage(qt_imageFromVideoFrame(frameCopy));
         frameCopy.unmap();
+
+        emit gotNewFrameImage(shot);
     }
 
     emit gotNewFrame();

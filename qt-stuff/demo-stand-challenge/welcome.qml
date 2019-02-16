@@ -28,18 +28,18 @@ Item {
             spacing: 15
 
             Text {
-                text: "Your e-mail:"
+                text: "Your nickname:"
                 //horizontalAlignment: Text.AlignRight
                 font.pointSize: root.primaryFontSize
             }
             Rectangle {
                 Layout.fillWidth: true
-                Layout.preferredHeight: text_email.height * 2
+                Layout.preferredHeight: text_username.height * 2
                 radius: 5
                 border.width: 1
 
                 TextInput {
-                    id: text_email
+                    id: text_username
                     anchors.verticalCenter: parent.verticalCenter
                     width: parent.width
                     font.pointSize: root.primaryFontSize
@@ -48,7 +48,7 @@ Item {
                     rightPadding: leftPadding
                     clip: true
                     color: "blue"
-                    text: "some@example.org"
+                    text: "veryqtperson"
                     //font.family: "Courier New"
                 }
             }
@@ -85,10 +85,10 @@ Item {
             font.pointSize: root.primaryFontSize
             enabled: checkbox_consent.checkState == 2
             onClicked: {
-                if (root.checkEmail(text_email.text))
+                if (root.userExists(text_username.text))
                 {
                     // TODO actually create the profile (new record in DB and whatnot)
-                    backend.set_currentProfile(text_email.text);
+                    backend.set_currentProfile(text_username.text);
                     nextWindow("challenge.qml");
                 }
                 else
