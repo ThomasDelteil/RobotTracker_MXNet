@@ -15,10 +15,13 @@
 class Backend : public QObject
 {
     Q_OBJECT
-public:
-    explicit Backend(QObject *parent = nullptr);
+
     Q_PROPERTY(QObject *videoWrapper READ get_videoWrapper CONSTANT)
     Q_PROPERTY(bool connected MEMBER _connected NOTIFY connectedChanged)
+
+public:
+    explicit Backend(QObject *parent = nullptr);
+    ~Backend();
 
 signals:
     QString requestPoseDone(QString result);
@@ -43,6 +46,8 @@ public slots:
 
     void enableSendingToMXNet(bool sendingEnabled);
 
+    QString dbServer();
+
 private slots:
     void requestPoseFinished(QNetworkReply *reply);
     void requestHandFinished(QNetworkReply *reply);
@@ -63,6 +68,8 @@ private:
     const int _frameHeight = 480;
     // crop region width (and height) for the palms crop regions
     const int _cropRegionWidth = 130;
+    const QString _dbServerHost = "localhost";
+    const quint16 _dbServerPort = 6547;
 };
 
 #endif // BACKEND_H

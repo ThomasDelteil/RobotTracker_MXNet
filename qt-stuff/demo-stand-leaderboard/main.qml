@@ -18,27 +18,21 @@ ApplicationWindow {
 
     Backend { id: backend }
 
-    //color: root.backgroundColor
-
-    ListModel { id: scoreModel }
-
-
     ColumnLayout {
         anchors.fill: parent
 
         Text {
             Layout.fillWidth: true
-            Layout.preferredHeight: parent.height * 0.15
+            Layout.preferredHeight: 100
             Layout.alignment: Qt.AlignCenter
-            text: "Total participants: " + scoreModel.count
+            text: "Total participants: " + backend.scores.rowCount()
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             font.pixelSize: root.primaryFontSize * 2
         }
 
         ListView {
-            id: score
-            model: scoreModel
+            model: backend.scores
 
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -73,17 +67,6 @@ ApplicationWindow {
                     }
                 }
                 highlighted: hovered
-            }
-        }
-
-        Component.onCompleted: {
-            for (var i = 1; i < 19; i++)
-            {
-                scoreModel.append({
-                    "position": i,
-                    "player": i % 2 === 0 ? (i % 3 === 0 ? "sidorov@rambler.ru" : "ivanov@yandex.ru") : "petrov@mail.ru",
-                    "score": Math.floor((Math.random() * 100) + 1)
-                });
             }
         }
     }

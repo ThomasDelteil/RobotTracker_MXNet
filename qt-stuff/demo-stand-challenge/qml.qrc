@@ -4,7 +4,6 @@
         <file>welcome.qml</file>
         <file>challenge.qml</file>
         <file>FancyButton.qml</file>
-        <file>MessageBox.qml</file>
         <file>img/under-construction.png</file>
         <file>Maintenance.qml</file>
         <file>StatusRow.qml</file>

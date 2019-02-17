@@ -28,7 +28,6 @@ ApplicationWindow {
     property bool manualTrackers: false // move trackers manually
     property bool maintenance: true // enable maintenance window
 
-
     Backend {
         id: backend
 
@@ -83,52 +82,23 @@ ApplicationWindow {
         }
     }
 
-    MessageBox {
-        id: dialogError
-        title: "Some error"
-        textMain: "Some error"
-    }
 
-    Dialog {
-        id: dialogTerms
-        anchors.centerIn: parent
-        modal: true
-        title: "Terms and conditions"
-        width: parent.width * 0.6
-        height: parent.height * 0.4
-
-        ColumnLayout {
-            anchors.fill: parent
-
-            ScrollView {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                TextArea {
-                    font.pointSize: root.secondaryFontSize
-                    text: "We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything."
-                    wrapMode: Text.WordWrap
-                }
-            }
-
-            Button {
-                Layout.alignment: Qt.AlignRight
-                text: "Okay, Google"
-                onClicked: {
-                    dialogTerms.close();
-                }
-            }
-        }
-    }
-
-    function userExists(username)
-    {
-        // TODO implement the actual checking for existing users and ask for confirmation
-        return true;
-    }
 
     function getCurrentDateTime()
     {
         return new Date().toISOString().replace(/[:|.|T]/g, "-").replace("Z", "");
+    }
+
+    // HTTP-request to the URL
+    function request(url, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = (function(myxhr) {
+            return function() {
+                if(myxhr.readyState === 4) { callback(myxhr); }
+            }
+        })(xhr);
+
+        xhr.open("GET", url);
+        xhr.send();
     }
 }

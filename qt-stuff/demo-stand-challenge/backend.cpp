@@ -32,6 +32,11 @@ Backend::Backend(QObject *parent) : QObject(parent)
     //manager->setProxy(proxy);
 }
 
+Backend::~Backend()
+{
+    // close connections or whatever
+}
+
 void Backend::uploadPose(QImage img)
 {
     // apparently, 384x288 is enough for MXNet
@@ -246,4 +251,9 @@ int Backend::cropRegionWidth() const
 void Backend::enableSendingToMXNet(bool sendingEnabled)
 {
     videoWrapper->enableSending(sendingEnabled);
+}
+
+QString Backend::dbServer()
+{
+    return QString("%1:%2").arg(_dbServerHost).arg(_dbServerPort);
 }

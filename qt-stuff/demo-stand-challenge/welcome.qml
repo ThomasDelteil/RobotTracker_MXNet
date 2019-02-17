@@ -83,19 +83,34 @@ Item {
             Layout.topMargin: 20
             Layout.alignment: Qt.AlignHCenter
             font.pointSize: root.primaryFontSize
-            enabled: checkbox_consent.checkState == 2
+            enabled: checkbox_consent.checkState == 2 && text_username.text.length !== 0
             onClicked: {
-                if (root.userExists(text_username.text))
+                enabled = false;
+                text = "checking...";
+
+                request("http://".concat(backend.dbServer(), "/user/exists/", text_username.text), function (o)
                 {
-                    // TODO actually create the profile (new record in DB and whatnot)
-                    backend.set_currentProfile(text_username.text);
-                    nextWindow("challenge.qml");
-                }
-                else
-                {
-                    dialogError.textMain = "That is not a correct e-mail address.\n...Or not a valid RegExp, oopsie!";
-                    dialogError.show();
-                }
+                    enabled = true;
+                    text = "Register";
+
+                    if (o.status === 200)
+                    {
+                        if (o.responseText === "0")
+                        {
+                            registrationComplete();
+                        }
+                        else
+                        {
+                            dialogUserError.text = "There is already a user with this name. Your score will go to this user. Continue?";
+                            dialogUserError.open();
+                        }
+                    }
+                    else
+                    {
+                        dialogUserError.text = "Database connection error. Your results might not be saved. Continue?";
+                        dialogUserError.open();
+                    }
+                });
             }
         }
 
@@ -104,5 +119,90 @@ Item {
             Layout.fillHeight: true
         }
 
+    }
+
+    Dialog {
+        id: dialogUserError
+        x: (parent.width - width) / 2
+        y: 0
+        width: 400
+        height: 250
+        standardButtons: Dialog.Ok | Dialog.Cancel
+
+        property alias text: dialogText.text
+
+        title: "User registration"
+
+        Rectangle {
+            anchors.fill: parent
+            //color: Styles.regionBackground
+            //border.color: Styles.mainBackground
+            //border.width: 3
+
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: 0
+
+                ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    //Layout.topMargin: 10
+                    //Layout.leftMargin: 15
+                    //Layout.rightMargin: 15
+
+                    TextArea {
+                        id: dialogText
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        text: dialogUserError.text
+                        font.family: "Courier New"
+                        font.pointSize: root.secondaryFontSize
+                        wrapMode: Text.WordWrap
+                    }
+                }
+            }
+        }
+
+        onAccepted: {
+            registrationComplete();
+        }
+    }
+
+    Dialog {
+        id: dialogTerms
+        anchors.centerIn: parent
+        modal: true
+        title: "Terms and conditions"
+        width: parent.width * 0.6
+        height: parent.height * 0.4
+
+        ColumnLayout {
+            anchors.fill: parent
+
+            ScrollView {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                TextArea {
+                    font.pointSize: root.secondaryFontSize
+                    text: "We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything."
+                    wrapMode: Text.WordWrap
+                }
+            }
+
+            Button {
+                Layout.alignment: Qt.AlignRight
+                text: "Okay, Google"
+                onClicked: {
+                    dialogTerms.close();
+                }
+            }
+        }
+    }
+
+    function registrationComplete()
+    {
+        backend.set_currentProfile(text_username.text);
+        nextWindow("challenge.qml");
     }
 }
