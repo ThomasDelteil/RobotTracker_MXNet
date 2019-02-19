@@ -21,11 +21,11 @@ Item {
         trackerLeft.x = originalFrame.width * lw_x - root.trackerWidth / 2
         trackerLeft.y = originalFrame.height * lw_y - root.trackerWidth / 2
 
-        //gotNewCoordinates(trackerLeft);
+        gotNewCoordinates(trackerLeft);
         trackerRight.x = originalFrame.width * rw_x - root.trackerWidth / 2
         trackerRight.y = originalFrame.height * rw_y - root.trackerWidth / 2
 
-        //gotNewCoordinates(trackerRight);
+        gotNewCoordinates(trackerRight);
         cropRegionLeft.x = originalFrame.width * (lw_x + (lw_x - le_x) / 2)
                 - backend.cropRegionWidth() / 2
         cropRegionLeft.y = originalFrame.height * (lw_y + (lw_y - le_y) / 2)
