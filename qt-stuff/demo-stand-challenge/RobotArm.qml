@@ -94,7 +94,7 @@ QtObject {
 
     function sendChanges() {
         if (impl.positionChanged()) {
-            impl.move(lastPosition)
+            impl.move(impl.lastPosition)
             impl.lastSentPosition = impl.lastPosition
         }
 

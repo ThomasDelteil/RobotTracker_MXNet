@@ -495,8 +495,14 @@ Item {
     }
 
     function moveTheArm(armName, xCoordinate, yCoordinate) {
-        var arm = armName === 'left' ? robotsModel.leftArm : null
-        arm = armName === 'right' ? robotsModel.rightArm : null
+        var arm = null
+        if (armName === 'left') {
+            arm = robotsModel.leftArm
+        }
+        if (armName === 'right') {
+            arm = robotsModel.rightArm
+        }
+
         arm.move(xCoordinate, yCoordinate)
     }
 
