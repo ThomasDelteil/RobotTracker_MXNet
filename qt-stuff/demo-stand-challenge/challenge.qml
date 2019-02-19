@@ -438,11 +438,13 @@ Item {
 
     function startChallenge() {
         btn_start.enabled = false
+        robotsModel.sendChanges = true
         tm_sendFrame.start()
     }
 
     function stopChallenge() {
         btn_start.enabled = true
+        robotsModel.sendChanges = false
         tm_sendFrame.stop()
         currentFPSvalue_trackers = 0
     }

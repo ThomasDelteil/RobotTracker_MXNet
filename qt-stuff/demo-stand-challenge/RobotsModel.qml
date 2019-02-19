@@ -4,6 +4,8 @@ import QtWebSockets 1.1
 Item {
     id: root
 
+    property bool sendChanges: false
+
     property alias leftArm: left
     property alias rightArm: right
 
@@ -21,7 +23,7 @@ Item {
     Timer {
         interval: 1000
         repeat: true
-        running: true
+        running: root.sendChanges
         triggeredOnStart: true
 
         onTriggered: {
