@@ -116,7 +116,7 @@ QtObject {
 
     function mapYFromRobot(frame) {
         // root.z = root.maxZ - (root.maxZ - root.minZ) * relativeZ
-        return frame.height * (root.z - root.minZ) / (root.minZ - root.maxZ)
+        return frame.height * (root.z - root.minZ) / (root.minZ - root.maxZ) * -1
     }
 
     property var impl: QtObject {
