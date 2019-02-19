@@ -21,11 +21,11 @@ Item {
         trackerLeft.x = originalFrame.width * lw_x - root.trackerWidth / 2
         trackerLeft.y = originalFrame.height * lw_y - root.trackerWidth / 2
 
-        gotNewCoordinates(trackerLeft);
+        gotNewCoordinates(trackerLeft)
         trackerRight.x = originalFrame.width * rw_x - root.trackerWidth / 2
         trackerRight.y = originalFrame.height * rw_y - root.trackerWidth / 2
 
-        gotNewCoordinates(trackerRight);
+        gotNewCoordinates(trackerRight)
         cropRegionLeft.x = originalFrame.width * (lw_x + (lw_x - le_x) / 2)
                 - backend.cropRegionWidth() / 2
         cropRegionLeft.y = originalFrame.height * (lw_y + (lw_y - le_y) / 2)
@@ -96,9 +96,9 @@ Item {
                     Camera {
                         id: camera
                         deviceId: "/dev/video0" // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
-//                        viewfinder.resolution: Qt.size(backend.frameWidth(),
-//                                                       backend.frameHeight(
-//                                                           )) // picture quality
+                        //                        viewfinder.resolution: Qt.size(backend.frameWidth(),
+                        //                                                       backend.frameHeight(
+                        //                                                           )) // picture quality
                         //position: Camera.FrontFace
                         metaData.orientation: root.cameraUpsideDown ? 180 : 0
 
@@ -151,6 +151,68 @@ Item {
                             height: parent.contentRect.height
                             color: "transparent"
 
+                            /* left robot position */
+                            Rectangle {
+                                id: robotLeft
+
+                                x: robotsModel.leftArm.mapXFromRobot(
+                                       originalFrame) - width / 2
+                                y: robotsModel.leftArm.mapYFromRobot(
+                                       originalFrame) - height / 2
+                                width: root.trackerWidth
+                                height: width
+                                color: "blue"
+                                radius: width * 0.5
+                                border.width: 2
+                                border.color: "white"
+                                opacity: 0.3
+
+//                                // animation
+//                                Behavior on x {
+//                                    NumberAnimation {
+//                                        //duration: 10
+//                                        easing.type: Easing.OutQuart
+//                                    }
+//                                }
+//                                Behavior on y {
+//                                    NumberAnimation {
+//                                        //duration: 10
+//                                        easing.type: Easing.OutQuart
+//                                    }
+//                                }
+                            }
+
+                            /* right robot position */
+                            Rectangle {
+                                id: robotRight
+
+                                x: robotsModel.rightArm.mapXFromRobot(
+                                       originalFrame) - width / 2
+                                y: robotsModel.rightArm.mapYFromRobot(
+                                       originalFrame) - height / 2
+                                width: root.trackerWidth
+                                height: width
+                                color: "green"
+                                radius: width * 0.5
+                                border.width: 2
+                                border.color: "white"
+                                opacity: 0.3
+
+//                                // animation
+//                                Behavior on x {
+//                                    NumberAnimation {
+//                                        //duration: 10
+//                                        easing.type: Easing.OutQuart
+//                                    }
+//                                }
+//                                Behavior on y {
+//                                    NumberAnimation {
+//                                        //duration: 10
+//                                        easing.type: Easing.OutQuart
+//                                    }
+//                                }
+                            }
+
                             // tracker #1 (left hand)
                             Rectangle {
                                 id: trackerLeft
@@ -194,6 +256,7 @@ Item {
                             }
                             */
                             }
+
                             // tracker #2 (right hand)
                             Rectangle {
                                 id: trackerRight

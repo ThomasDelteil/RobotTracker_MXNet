@@ -12,15 +12,15 @@ QtObject {
 
     property int connectionStatus: RobotArm.ConnectionStatus.Connecting
 
-    property real x
-    property real y
-    property real z
+    property real x: minX
+    property real y: minY
+    property real z: minZ
 
-    property real roll
-    property real pitch
-    property real yaw
+    property real roll: minRoll
+    property real pitch: minPitch
+    property real yaw: minYaw
 
-    property bool isOpen
+    property bool isOpen: false
 
     property string name
 
@@ -42,8 +42,8 @@ QtObject {
     property real minYaw: -Math.PI / 2
     property real maxYaw: -Math.PI / 2
 
-    property bool calibrationNeeded
-    property bool learningMode
+    property bool calibrationNeeded: true
+    property bool learningMode: true
 
     property var proxy
 
@@ -107,6 +107,16 @@ QtObject {
 
             impl.lastSentOpen = impl.lastOpen
         }
+    }
+
+    function mapXFromRobot(frame) {
+        // root.y = root.minY + (root.maxY - root.minY) * relativeY
+        return frame.width * (root.y - root.minY) / (root.maxY - root.minY)
+    }
+
+    function mapYFromRobot(frame) {
+        // root.z = root.maxZ - (root.maxZ - root.minZ) * relativeZ
+        return frame.height * (root.z - root.minZ) / (root.minZ - root.maxZ)
     }
 
     property var impl: QtObject {
