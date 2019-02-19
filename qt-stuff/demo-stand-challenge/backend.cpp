@@ -187,7 +187,7 @@ void Backend::requestHandFinished(QNetworkReply *reply)
             else { predicted = "1"; }
         }
 
-        if (!isRight) { emit requestLeftHandDone(predicted); }
+        if (isRight) { emit requestLeftHandDone(predicted); }
         else { emit requestRightHandDone(predicted); }
     }
     else
