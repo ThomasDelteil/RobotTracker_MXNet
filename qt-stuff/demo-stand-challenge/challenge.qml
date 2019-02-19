@@ -11,56 +11,54 @@ Item {
 
     signal nextWindow(string windowName)
 
-    function processPoseResults(result)
-    {
+    function processPoseResults(result) {
+
         //appendToOutput(result, false);
+        var jsn = JSON.parse(result)
 
-        var jsn = JSON.parse(result);
+        var re_x = jsn["skeleton"]["left_elbow"]["x"], re_y = jsn["skeleton"]["left_elbow"]["y"], rw_x = jsn["skeleton"]["left_wrist"]["x"], rw_y = jsn["skeleton"]["left_wrist"]["y"], le_x = jsn["skeleton"]["right_elbow"]["x"], le_y = jsn["skeleton"]["right_elbow"]["y"], lw_x = jsn["skeleton"]["right_wrist"]["x"], lw_y = jsn["skeleton"]["right_wrist"]["y"]
 
-        var re_x = jsn["skeleton"]["left_elbow"]["x"],
-            re_y = jsn["skeleton"]["left_elbow"]["y"],
-            rw_x = jsn["skeleton"]["left_wrist"]["x"],
-            rw_y = jsn["skeleton"]["left_wrist"]["y"],
-            le_x = jsn["skeleton"]["right_elbow"]["x"],
-            le_y = jsn["skeleton"]["right_elbow"]["y"],
-            lw_x = jsn["skeleton"]["right_wrist"]["x"],
-            lw_y = jsn["skeleton"]["right_wrist"]["y"];
+        trackerLeft.x = originalFrame.width * lw_x - root.trackerWidth / 2
+        trackerLeft.y = originalFrame.height * lw_y - root.trackerWidth / 2
 
-        trackerLeft.x = originalFrame.width * lw_x - root.trackerWidth/2;
-        trackerLeft.y = originalFrame.height * lw_y - root.trackerWidth/2;
         //gotNewCoordinates(trackerLeft);
+        trackerRight.x = originalFrame.width * rw_x - root.trackerWidth / 2
+        trackerRight.y = originalFrame.height * rw_y - root.trackerWidth / 2
 
-        trackerRight.x = originalFrame.width * rw_x - root.trackerWidth/2;
-        trackerRight.y = originalFrame.height * rw_y - root.trackerWidth/2;
         //gotNewCoordinates(trackerRight);
+        cropRegionLeft.x = originalFrame.width * (lw_x + (lw_x - le_x) / 2)
+                - backend.cropRegionWidth() / 2
+        cropRegionLeft.y = originalFrame.height * (lw_y + (lw_y - le_y) / 2)
+                - backend.cropRegionWidth() / 2
 
-        cropRegionLeft.x = originalFrame.width * (lw_x + (lw_x - le_x) / 2) - backend.cropRegionWidth()/2;
-        cropRegionLeft.y = originalFrame.height * (lw_y + (lw_y - le_y) / 2) - backend.cropRegionWidth()/2;
         //console.log("qml rect:", cropRegionLeft.x, cropRegionLeft.y, backend.cropRegionWidth());
-
-        cropRegionRight.x = originalFrame.width * (rw_x + (rw_x - re_x) / 2) - backend.cropRegionWidth()/2;
-        cropRegionRight.y = originalFrame.height * (rw_y + (rw_y - re_y) / 2) - backend.cropRegionWidth()/2;
+        cropRegionRight.x = originalFrame.width * (rw_x + (rw_x - re_x) / 2)
+                - backend.cropRegionWidth() / 2
+        cropRegionRight.y = originalFrame.height * (rw_y + (rw_y - re_y) / 2)
+                - backend.cropRegionWidth() / 2
     }
 
-    function processLeftHandResults(result)
-    {
-        palmLeft.text = result;
+    function processLeftHandResults(result) {
+        palmLeft.text = result
+        processGrip('left', result)
     }
-    function processRightHandResults(result)
-    {
-        palmRight.text = result;
+    function processRightHandResults(result) {
+        palmRight.text = result
+        processGrip('right', result)
     }
 
     //function appendToOutput(msg, panelAsWell = false)
-    function appendToOutput(msg, panelAsWell)
-    {
+    function appendToOutput(msg, panelAsWell) {
         // https://bugreports.qt.io/browse/QTCREATORBUG-21884
-        if (panelAsWell === undefined) { panelAsWell = false; }
+        if (panelAsWell === undefined) {
+            panelAsWell = false
+        }
 
-        if (root.debugOutput === true)
-        {
-            console.log(msg);
-            if (panelAsWell === true) { ta_mxnetOutput.append(msg + "\n---"); }
+        if (root.debugOutput === true) {
+            console.log(msg)
+            if (panelAsWell === true) {
+                ta_mxnetOutput.append(msg + "\n---")
+            }
         }
     }
 
@@ -98,7 +96,9 @@ Item {
                     Camera {
                         id: camera
                         deviceId: "/dev/video0" // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
-                        viewfinder.resolution: Qt.size(backend.frameWidth(), backend.frameHeight()) // picture quality
+                        viewfinder.resolution: Qt.size(backend.frameWidth(),
+                                                       backend.frameHeight(
+                                                           )) // picture quality
                         //position: Camera.FrontFace
                         metaData.orientation: root.cameraUpsideDown ? 180 : 0
 
@@ -106,19 +106,20 @@ Item {
                         //    focusMode: Camera.FocusMacro
                         //    focusPointMode: Camera.FocusPointCenter
                         //}
-
                         onError: {
-                            cameraStatus.text = qsTr("Error: ") + errorString;
-                            console.log(errorCode, errorString);
+                            cameraStatus.text = qsTr("Error: ") + errorString
+                            console.log(errorCode, errorString)
                         }
 
-
                         Component.onCompleted: {
+
                             //console.log("camera orientation:", camera.orientation);
                             //console.log("camera state:", camera.cameraState);
                             //console.log("camera status:", camera.cameraStatus);
 
                             //console.log("camera supported IC resolutions:", imageCapture.supportedResolutions);
+
+
                             /*
                             console.log("camera supported VF resolutions:");
                             var supRezes = camera.supportedViewfinderResolutions();
@@ -140,7 +141,7 @@ Item {
                         id: vo
                         anchors.fill: parent
                         orientation: root.cameraUpsideDown ? 180 : 0
-                        fillMode: VideoOutput.PreserveAspectFit//PreserveAspectCrop
+                        fillMode: VideoOutput.PreserveAspectFit //PreserveAspectCrop
                         source: backend.videoWrapper
 
                         Rectangle {
@@ -154,8 +155,8 @@ Item {
                             Rectangle {
                                 id: trackerLeft
                                 property string name: "left"
-                                x: originalFrame.width/4 - width/2
-                                y: originalFrame.height/1.3 - height/2
+                                x: originalFrame.width / 4 - width / 2
+                                y: originalFrame.height / 1.3 - height / 2
                                 width: root.trackerWidth
                                 height: width
                                 color: "blue"
@@ -169,13 +170,14 @@ Item {
                                     onActiveChanged: {
                                         if (!active) // dragging stopped
                                         {
-                                            gotNewCoordinates(parent);
+                                            gotNewCoordinates(parent)
                                         }
                                     }
                                     //onTranslationChanged: {
                                     //    console.log(translation)
                                     //}
                                 }
+
 
                                 /* // animation
                             Behavior on x {
@@ -196,8 +198,8 @@ Item {
                             Rectangle {
                                 id: trackerRight
                                 property string name: "right"
-                                x: originalFrame.width/1.3 - width/2
-                                y: originalFrame.height/1.3 - height/2
+                                x: originalFrame.width / 1.3 - width / 2
+                                y: originalFrame.height / 1.3 - height / 2
                                 width: root.trackerWidth
                                 height: width
                                 color: "green"
@@ -211,13 +213,14 @@ Item {
                                     onActiveChanged: {
                                         if (!active) // dragging stopped
                                         {
-                                            gotNewCoordinates(parent);
+                                            gotNewCoordinates(parent)
                                         }
                                     }
                                     //onTranslationChanged: {
                                     //    console.log(translation)
                                     //}
                                 }
+
 
                                 /* // animation
                             Behavior on x {
@@ -238,8 +241,8 @@ Item {
                             // crop region for the left hand
                             Rectangle {
                                 id: cropRegionLeft
-                                x: trackerLeft.x - width/2
-                                y: trackerLeft.y - height/2
+                                x: trackerLeft.x - width / 2
+                                y: trackerLeft.y - height / 2
                                 width: backend.cropRegionWidth()
                                 height: backend.cropRegionWidth()
                                 color: "blue"
@@ -258,8 +261,8 @@ Item {
                             // crop region for the right hand
                             Rectangle {
                                 id: cropRegionRight
-                                x: trackerRight.x - width/2
-                                y: trackerRight.y - height/2
+                                x: trackerRight.x - width / 2
+                                y: trackerRight.y - height / 2
                                 width: backend.cropRegionWidth()
                                 height: backend.cropRegionWidth()
                                 color: "green"
@@ -364,7 +367,7 @@ Item {
                 font.pointSize: root.primaryFontSize * 1.5
                 visible: enabled
                 onClicked: {
-                    startChallenge();
+                    startChallenge()
                 }
             }
 
@@ -377,7 +380,7 @@ Item {
                 enabled: !btn_start.enabled
                 visible: enabled
                 onClicked: {
-                    stopChallenge();
+                    stopChallenge()
                 }
             }
 
@@ -386,18 +389,17 @@ Item {
                 Layout.fillHeight: true
             }
 
-//            FancyButton {
-//                id: btn_play
-//                unpressedColor: "#0096FF"
-//                pressedColor: "#3679CC"
-//                text: "Playback"
-//                font.pointSize: root.primaryFontSize * 1.5
-//                enabled: btn_start.enabled
-//                onClicked: {
-//                    btn_start.enabled = false;
-//                }
-//            }
-
+            //            FancyButton {
+            //                id: btn_play
+            //                unpressedColor: "#0096FF"
+            //                pressedColor: "#3679CC"
+            //                text: "Playback"
+            //                font.pointSize: root.primaryFontSize * 1.5
+            //                enabled: btn_start.enabled
+            //                onClicked: {
+            //                    btn_start.enabled = false;
+            //                }
+            //            }
             FancyButton {
                 unpressedColor: "#008F00"
                 pressedColor: "#2C641B"
@@ -405,10 +407,9 @@ Item {
                 font.pointSize: root.primaryFontSize * 2.5
                 enabled: !btn_stop.enabled
                 onClicked: {
-                    nextWindow("welcome.qml");
+                    nextWindow("welcome.qml")
                 }
             }
-
         }
     }
 
@@ -417,7 +418,7 @@ Item {
         repeat: true
         interval: root.timerRate
         onTriggered: {
-            backend.enableSendingToMXNet(true);
+            backend.enableSendingToMXNet(true)
         }
     }
 
@@ -427,87 +428,95 @@ Item {
         repeat: true
         interval: 1000
         onTriggered: {
-            fpsCounter_camera.text = currentFPSvalue_camera;
-            currentFPSvalue_camera = 0;
+            fpsCounter_camera.text = currentFPSvalue_camera
+            currentFPSvalue_camera = 0
 
-            fpsCounter_trackers.text = currentFPSvalue_trackers;
-            currentFPSvalue_trackers = 0;
+            fpsCounter_trackers.text = currentFPSvalue_trackers
+            currentFPSvalue_trackers = 0
         }
     }
 
-    function startChallenge()
-    {
-        btn_start.enabled = false;
-        tm_sendFrame.start();
+    function startChallenge() {
+        btn_start.enabled = false
+        tm_sendFrame.start()
     }
 
-    function stopChallenge()
-    {
-        btn_start.enabled = true;
-        tm_sendFrame.stop();
-        currentFPSvalue_trackers = 0;
+    function stopChallenge() {
+        btn_start.enabled = true
+        tm_sendFrame.stop()
+        currentFPSvalue_trackers = 0
     }
 
-    function checkXcoordinate(tracker)
-    {
-        if (tracker.name === "left")
-        {
-            if (tracker.x + tracker.width/2 < 0)
-            {
-                tracker.x = 0;
-                return 0;
+    function checkXcoordinate(tracker) {
+        if (tracker.name === "left") {
+            if (tracker.x + tracker.width / 2 < 0) {
+                tracker.x = 0
+                return 0
             }
-            if (tracker.x + tracker.width/2  > originalFrame.width/2)
-            {
-                tracker.x = originalFrame.width/2 - tracker.width;
-                return 1;
+            if (tracker.x + tracker.width / 2 > originalFrame.width / 2) {
+                tracker.x = originalFrame.width / 2 - tracker.width
+                return 1
             }
-            return ((tracker.x + tracker.width/2) / (originalFrame.width/2)).toFixed(3);
+            return ((tracker.x + tracker.width / 2) / (originalFrame.width / 2)).toFixed(
+                        3)
+        } else {
+            if (tracker.x + tracker.width / 2 < originalFrame.width / 2) {
+                tracker.x = originalFrame.width / 2
+                return 0
+            }
+            if (tracker.x + tracker.width / 2 > originalFrame.width) {
+                tracker.x = originalFrame.width - tracker.width
+                return 1
+            }
+            return ((tracker.x + tracker.width / 2 - originalFrame.width / 2)
+                    / (originalFrame.width / 2)).toFixed(3)
         }
-        else
-        {
-            if (tracker.x + tracker.width/2 < originalFrame.width/2)
-            {
-                tracker.x = originalFrame.width/2;
-                return 0;
-            }
-            if (tracker.x + tracker.width/2 > originalFrame.width)
-            {
-                tracker.x = originalFrame.width - tracker.width;
-                return 1;
-            }
-            return ((tracker.x + tracker.width/2 - originalFrame.width/2) / (originalFrame.width / 2)).toFixed(3);
-        }
-
     }
 
-    function checkYcoordinate(tracker)
-    {
-        if (tracker.y + tracker.height/2 < 0)
-        {
-            tracker.y = 0;
-            return 0;
+    function checkYcoordinate(tracker) {
+        if (tracker.y + tracker.height / 2 < 0) {
+            tracker.y = 0
+            return 0
         }
-        if (tracker.y + tracker.height/2 > originalFrame.height)
-        {
-            tracker.y = originalFrame.height - tracker.height;
-            return 1;
+        if (tracker.y + tracker.height / 2 > originalFrame.height) {
+            tracker.y = originalFrame.height - tracker.height
+            return 1
         }
-        return ((tracker.y + tracker.height/2) / originalFrame.height).toFixed(3);
+        return ((tracker.y + tracker.height / 2) / originalFrame.height).toFixed(
+                    3)
     }
 
-    function gotNewCoordinates(tracker)
-    {
-        var xCoordinate = checkXcoordinate(tracker),
-            yCoordinate = checkYcoordinate(tracker);
+    function gotNewCoordinates(tracker) {
+        var xCoordinate = checkXcoordinate(
+                    tracker), yCoordinate = checkYcoordinate(tracker)
 
         //appendToOutput("".concat(tracker.name, " movement: ", xCoordinate, " | ", yCoordinate), true);
-
-        moveTheArm(tracker.name, xCoordinate, yCoordinate);
+        moveTheArm(tracker.name, xCoordinate, yCoordinate)
     }
 
-    function moveTheArm(armName, xCoordinate, yCoordinate)
-    {
-        robotsModel.move({ name: armName }, xCoordinate, yCoordinate)
+    function moveTheArm(armName, xCoordinate, yCoordinate) {
+        var arm = armName === 'left' ? robotsModel.leftArm : null
+        arm = armName === 'right' ? robotsModel.rightArm : null
+        arm.move(xCoordinate, yCoordinate)
+    }
+
+    function processGrip(armName, result) {
+        var arm = null
+        if (armName === 'left') {
+            arm = robotsModel.leftArm
+        }
+        if (armName === 'right') {
+            arm = robotsModel.rightArm
+        }
+
+        // @disable-check M126
+        if (result == 2) {
+            arm.open()
+        }
+
+        // @disable-check M126
+        if (result == 1) {
+            arm.close()
+        }
     }
 }

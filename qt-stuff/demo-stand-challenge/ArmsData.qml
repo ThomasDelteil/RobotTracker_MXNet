@@ -17,8 +17,10 @@ GridLayout {
     property alias pitchRight: pitchRight.text
     property alias rollLeft: rollLeft.text
     property alias rollRight: rollRight.text
-    property bool calibrationNeededLeft: true
-    property bool calibrationNeededRight: true
+    property alias calibrationNeededLeft: calibrationNeededLeft.text
+    property alias calibrationNeededRight: calibrationNeededRight.text
+    property alias openRight: openRight.text
+    property alias openLeft: openLeft.text
 
     rows: 8
     columns: 3
@@ -249,9 +251,9 @@ GridLayout {
         text: "0"
     }
 
-    // calibration
+    // open
     Text {
-        id: calibrationNeededLeft
+        id: openLeft
 
         Layout.row: 9
         Layout.column: 1
@@ -266,11 +268,40 @@ GridLayout {
         Layout.alignment: Qt.AlignHCenter
         font.pointSize: root.secondaryFontSize
         font.bold: true
+        text: "open"
+    }
+    Text {
+        id: openRight
+        Layout.row: 9
+        Layout.column: 3
+        Layout.alignment: Qt.AlignLeft
+        font.pointSize: root.secondaryFontSize
+        font.family: "Courier New"
+        text: "-"
+    }
+
+    // calibration
+    Text {
+        id: calibrationNeededLeft
+
+        Layout.row: 10
+        Layout.column: 1
+        Layout.alignment: Qt.AlignRight
+        font.pointSize: root.secondaryFontSize
+        font.family: "Courier New"
+        text: "-"
+    }
+    Text {
+        Layout.row: 10
+        Layout.column: 2
+        Layout.alignment: Qt.AlignHCenter
+        font.pointSize: root.secondaryFontSize
+        font.bold: true
         text: "calibNeed"
     }
     Text {
         id: calibrationNeededRight
-        Layout.row: 9
+        Layout.row: 10
         Layout.column: 3
         Layout.alignment: Qt.AlignLeft
         font.pointSize: root.secondaryFontSize

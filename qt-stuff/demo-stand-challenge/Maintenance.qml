@@ -105,6 +105,8 @@ Item {
                                         rollRight: robotsModel.rightArm.roll
                                         calibrationNeededLeft: robotsModel.leftArm.calibrationNeeded ? "yes" : "no"
                                         calibrationNeededRight: robotsModel.rightArm.calibrationNeeded ? "yes" : "no"
+                                        openRight: robotsModel.rightArm.isOpen ? "yes" : "no"
+                                        openLeft: robotsModel.leftArm.isOpen ? "yes" : "no"
                                     }
                                 }
                             }
