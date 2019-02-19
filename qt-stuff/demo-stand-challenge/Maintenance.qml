@@ -142,7 +142,7 @@ Item {
                                     let isOn = !robotsModel.leftArm.learningMode
                                     appendToMaintenanceOutput("setLearningMode left: " + isOn)
 
-                                    robotsModel.setLearningMode({ name: "left" }, isOn)
+                                    robotsModel.leftArm.setLearningMode(isOn)
                                 }
                             }
 
@@ -155,7 +155,7 @@ Item {
                                 onClicked: {
                                     appendToMaintenanceOutput("calibrate left")
 
-                                    robotsModel.calibrate({ name: "left" })
+                                    robotsModel.leftArm.calibrate()
                                 }
                             }
 
@@ -185,7 +185,7 @@ Item {
                                     let isOn = !robotsModel.rightArm.learningMode
                                     appendToMaintenanceOutput("setLearningMode right: " + isOn)
 
-                                    robotsModel.setLearningMode({ name: "right" }, isOn)
+                                    robotsModel.rightArm.setLearningMode(isOn)
                                 }
                             }
 
@@ -198,7 +198,7 @@ Item {
                                 onClicked: {
                                     appendToMaintenanceOutput("calibrate right")
 
-                                    robotsModel.calibrate({ name: "right" })
+                                    robotsModel.rightArm.calibrate()
                                 }
                             }
                         }
