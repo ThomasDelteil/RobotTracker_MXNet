@@ -96,9 +96,9 @@ Item {
                     Camera {
                         id: camera
                         deviceId: "/dev/video0" // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
-                        viewfinder.resolution: Qt.size(backend.frameWidth(),
-                                                       backend.frameHeight(
-                                                           )) // picture quality
+//                        viewfinder.resolution: Qt.size(backend.frameWidth(),
+//                                                       backend.frameHeight(
+//                                                           )) // picture quality
                         //position: Camera.FrontFace
                         metaData.orientation: root.cameraUpsideDown ? 180 : 0
 
