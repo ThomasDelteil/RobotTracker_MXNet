@@ -63,9 +63,9 @@ private:
     bool _connected = false;
     QHash<QByteArray, QImage> _frames;
     // frame width for the camera's resolution
-    const int _frameWidth = 640;
+    const int _frameWidth = 640;//2592
     // frame height for the camera's resolution
-    const int _frameHeight = 480;
+    const int _frameHeight = 480;//1944
     // crop region width (and height) for the palms crop regions
     const int _cropRegionWidth = 130;
     const QString _dbServerHost = "localhost";

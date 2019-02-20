@@ -26,6 +26,9 @@ public:
     explicit Backend(QObject *parent = nullptr);
     ~Backend();
 
+signals:
+    void countChanged(int cnt);
+
 public slots:
     QStringList getAvailableDrivers();
     Scores *challengeScores();

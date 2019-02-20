@@ -16,12 +16,19 @@ ApplicationWindow {
     property int primaryFontSize: 34
     property string backgroundColor: "#ECECEC"
 
-    Backend { id: backend }
+    Backend {
+        id: backend
+
+        onCountChanged: {
+            plrsCnt.text = "Total participants: " + cnt;
+        }
+    }
 
     ColumnLayout {
         anchors.fill: parent
 
         Text {
+            id: plrsCnt
             Layout.fillWidth: true
             Layout.preferredHeight: 100
             Layout.alignment: Qt.AlignCenter
@@ -31,6 +38,7 @@ ApplicationWindow {
             font.pixelSize: root.primaryFontSize * 2
         }
 
+        // TODO perhaps, it's worth doing something to prevent list "jumping" on model updates
         ListView {
             model: backend.scores
 

@@ -105,11 +105,13 @@ Item {
 
                     Camera {
                         id: camera
-                        deviceId: "/dev/video0" // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
-                        //                        viewfinder.resolution: Qt.size(backend.frameWidth(),
-                        //                                                       backend.frameHeight(
-                        //                                                           )) // picture quality
-                        //position: Camera.FrontFace
+                        // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
+                        deviceId: "/dev/video0"
+                        // picture quality
+                        viewfinder.resolution: Qt.size(
+                                                   backend.frameWidth(),
+                                                   backend.frameHeight()
+                                                   )
                         metaData.orientation: root.cameraUpsideDown ? 180 : 0
 
                         //focus {
@@ -121,14 +123,11 @@ Item {
                             console.log(errorCode, errorString)
                         }
                         Component.onCompleted: {
-
-
                             //console.log("camera orientation:", camera.orientation);
                             //console.log("camera state:", camera.cameraState);
                             //console.log("camera status:", camera.cameraStatus);
 
                             //console.log("camera supported IC resolutions:", imageCapture.supportedResolutions);
-
 
                             /*
                             console.log("camera supported VF resolutions:");
@@ -513,28 +512,91 @@ Item {
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+
+                RowLayout {
+                    id: scoreLayout
+                    anchors.centerIn: parent
+                    spacing: 15
+                    visible: false
+
+                    FancyButton {
+                        topPadding: 10
+                        rightPadding: 15
+                        bottomPadding: 10
+                        leftPadding: 15
+                        unpressedColor: "#E0E0E0"
+                        pressedColor: "#C1C1C1"
+                        text: "-"
+                        font.pointSize: root.primaryFontSize
+                        onClicked: {
+                            var s = parseInt(score.text);
+                            if (s > 0) { score.text = s - 1; }
+                        }
+                    }
+
+                    Text {
+                        id: score
+                        text: "0"
+                        font.pointSize: root.primaryFontSize * 2
+                    }
+
+                    FancyButton {
+                        topPadding: 10
+                        rightPadding: 15
+                        bottomPadding: 10
+                        leftPadding: 15
+                        unpressedColor: "#E0E0E0"
+                        pressedColor: "#C1C1C1"
+                        text: "+"
+                        font.pointSize: root.primaryFontSize
+                        onClicked: {
+                            score.text = parseInt(score.text) + 1;
+                        }
+                    }
+                }
             }
 
-            //            FancyButton {
-            //                id: btn_play
-            //                unpressedColor: "#0096FF"
-            //                pressedColor: "#3679CC"
-            //                text: "Playback"
-            //                font.pointSize: root.primaryFontSize * 1.5
-            //                enabled: btn_start.enabled
-            //                onClicked: {
-            //                    btn_start.enabled = false;
-            //                }
-            //            }
             FancyButton {
                 unpressedColor: "#008F00"
                 pressedColor: "#2C641B"
                 text: "Done"
-                font.pointSize: root.primaryFontSize * 2.5
+                font.pointSize: root.primaryFontSize * 1.5
                 enabled: !btn_stop.enabled
                 onClicked: {
-                    backend.set_currentProfile(0);
-                    nextWindow("welcome.qml")
+                    enabled = false;
+                    text = "saving...";
+
+                    request(
+                            "http://".concat(backend.dbServer(), "/user/saveScore/", backend.get_currentProfile(), "/", score.text),
+                            "POST",
+                            function (o)
+                    {
+                        enabled = true;
+                        text = "Done";
+
+                        if (o.status === 200 || o.responseText === "0")
+                        {
+                            console.log(o.responseText);
+                        }
+                        else
+                        {
+                            console.log(
+                                        "[error] Couldn't save the score. Player ID:",
+                                        backend.get_currentProfile(),
+                                        "| score:",
+                                        score.text
+                                        );
+                            // FIXME dialog never opens
+                            dialogScoreError.open();
+                        }
+
+                        scoreLayout.visible = false;
+                        score.text = 0;
+
+                        backend.set_currentProfile(0);
+
+                        nextWindow("welcome.qml");
+                    });
                 }
             }
         }
@@ -563,7 +625,43 @@ Item {
         }
     }
 
+    Dialog {
+        id: dialogScoreError
+        x: (parent.width - width) / 2
+        y: 0
+        modal: true
+        width: 400
+        height: 250
+        standardButtons: Dialog.Close
+
+        title: "Score saving error"
+
+        Item {
+            anchors.fill: parent
+
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: 0
+
+                ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    TextArea {
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        text: "Couldn't save your score! Please, write it down, and we'll save it later"
+                        font.family: "Courier New"
+                        font.pointSize: root.secondaryFontSize
+                        wrapMode: Text.WordWrap
+                    }
+                }
+            }
+        }
+    }
+
     function startChallenge() {
+        scoreLayout.visible = true;
         btn_start.enabled = false
         robotsModel.sendChanges = true
         tm_sendFrame.start()

@@ -15,7 +15,7 @@ ApplicationWindow {
     title: qsTr("Challenge")
     color: root.backgroundColor
 
-    visibility: "FullScreen"
+    //visibility: "FullScreen"
 
     property int primaryFontSize: 24
     property int secondaryFontSize: 18

@@ -88,10 +88,27 @@ Backend::Backend(QObject *parent) : QObject(parent)
         return rez;
     });
 
-    _httpServer->route("/user/saveScore/<arg>/<arg>", [](const QString &username, int score)
+    _httpServer->route(
+                "/user/saveScore/<arg>/<arg>",
+                QHttpServerRequest::Method::Post,
+                [](int userID, int score)
     {
-        qDebug() << username << score;
-        return "Not implemented yet";
+        //qDebug() << userID << score;
+
+        QSqlQuery query;
+        query.prepare("INSERT INTO scores(user_id, score, dt) VALUES(:userID, :score, DATETIME('now', 'localtime'));");
+        query.bindValue(":userID", userID);
+        query.bindValue(":score", score);
+        if (!query.exec())
+        {
+            QString err = QString("Couldn't save the score. %1").arg(query.lastError().text());
+            qWarning() << "[error]" << err;
+            return "0";//err;
+        }
+        else
+        {
+            return "1";
+        }
     });
 
     if (_httpServer->listen(QHostAddress::Any, _port) == -1)
@@ -156,4 +173,5 @@ void Backend::fetchDataFromDB()
         _challengeScores->addScore(score);
         //qDebug() << _challengeScores->rowCount();
     }
+    emit countChanged(_challengeScores->rowCount());
 }
