@@ -37,15 +37,15 @@ Item {
         trackerRight.target = rightTarget
 
         leftHandCropRegion.x = originalFrame.width * (lw_x + (lw_x - le_x) / 2)
-                - backend.cropRegionWidth() / 2
+                - backend.cropRegionWidth / 2
         leftHandCropRegion.y = originalFrame.height * (lw_y + (lw_y - le_y) / 2)
-                - backend.cropRegionWidth() / 2
+                - backend.cropRegionWidth / 2
 
         //console.log("qml rect:", leftHandCropRegion.x, leftHandCropRegion.y, backend.cropRegionWidth());
         rightHandCropRegion.x = originalFrame.width * (rw_x + (rw_x - re_x) / 2)
-                - backend.cropRegionWidth() / 2
+                - backend.cropRegionWidth / 2
         rightHandCropRegion.y = originalFrame.height
-                * (rw_y + (rw_y - re_y) / 2) - backend.cropRegionWidth() / 2
+                * (rw_y + (rw_y - re_y) / 2) - backend.cropRegionWidth / 2
     }
 
     function processLeftHandResults(result) {
@@ -70,6 +70,21 @@ Item {
                 ta_mxnetOutput.append(msg + "\n---")
             }
         }
+    }
+
+    function updateLeftPalmDebug() {
+        leftPalmDebug.source = ""
+        leftPalmDebug.source = "image://palms/left"
+    }
+
+    function updateRightPalmDebug() {
+        rightPalmDebug.source = ""
+        rightPalmDebug.source = "image://palms/right"
+    }
+
+    function delay(cb) {
+        updateSourceTimer.triggered.connect(cb)
+        updateSourceTimer.start()
     }
 
     ColumnLayout {
@@ -390,11 +405,37 @@ Item {
                                 }
                             }
 
+                            Image {
+                                id: leftPalmDebug
+
+                                width: backend.cropRegionWidth
+                                height: width
+                                cache: false
+                                anchors {
+                                    top: parent.top
+                                    left: parent.left
+                                    margins: 10
+                                }
+                            }
+
+                            Image {
+                                id: rightPalmDebug
+
+                                width: backend.cropRegionWidth
+                                height: width
+                                cache: false
+                                anchors {
+                                    top: parent.top
+                                    right: parent.right
+                                    margins: 10
+                                }
+                            }
+
                             // crop region for the left hand
                             Rectangle {
                                 id: leftHandCropRegion
-                                width: backend.cropRegionWidth()
-                                height: backend.cropRegionWidth()
+                                width: backend.cropRegionWidth
+                                height: backend.cropRegionWidth
                                 color: "blue"
                                 opacity: 0.6
                                 visible: btn_stop.enabled
@@ -412,8 +453,8 @@ Item {
                             // crop region for the right hand
                             Rectangle {
                                 id: rightHandCropRegion
-                                width: backend.cropRegionWidth()
-                                height: backend.cropRegionWidth()
+                                width: backend.cropRegionWidth
+                                height: backend.cropRegionWidth
                                 color: "green"
                                 opacity: 0.6
                                 visible: btn_stop.enabled

@@ -51,6 +51,14 @@ ApplicationWindow {
         onCounterIncreased: {
             if (root.fpsCounters === true) { loader.item.currentFPSvalue_camera++; }
         }
+
+        onLeftPalmChanged: {
+            loader.item.updateLeftPalmDebug()
+        }
+
+        onRightPalmChanged: {
+            loader.item.updateRightPalmDebug()
+        }
     }
 
     RobotsModel { id: robotsModel }

@@ -41,8 +41,17 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<Backend>("io.qt.Backend", 1, 0, "Backend");
 
+    auto palmProvider = new PalmImageProvider;
+    engine.addImageProvider("palms", palmProvider);
+
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-    if (engine.rootObjects().isEmpty()) { return -1; }
+    auto rootObjects = engine.rootObjects();
+    if (rootObjects.isEmpty()) { return -1; }
+
+    auto parent = rootObjects.first();
+    auto backend = parent->findChild<Backend*>();
+
+    palmProvider->setProperty("backend", QVariant::fromValue(backend));
 
     return app.exec();
 }
