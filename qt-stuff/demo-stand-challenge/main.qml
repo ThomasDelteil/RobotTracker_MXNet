@@ -33,6 +33,8 @@ ApplicationWindow {
     Backend {
         id: backend
 
+        frameSize: loader.item.camera.viewfinder.resolution
+
         onRequestPoseDone: {
             if (root.fpsCounters === true) { loader.item.currentFPSvalue_trackers++; }
             loader.item.processPoseResults(result);
@@ -50,6 +52,14 @@ ApplicationWindow {
 
         onCounterIncreased: {
             if (root.fpsCounters === true) { loader.item.currentFPSvalue_camera++; }
+        }
+
+        onLeftPalmChanged: {
+            loader.item.updateLeftPalmDebug()
+        }
+
+        onRightPalmChanged: {
+            loader.item.updateRightPalmDebug()
         }
     }
 
