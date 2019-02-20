@@ -66,7 +66,7 @@ void Backend::uploadPose(QImage img)
 
 void Backend::uploadHand(QImage img, bool isRight)
 {
-    if (isRight) {
+    if (!isRight) {
         setRightPalm(img);
     } else {
         setLeftPalm(img);
@@ -200,8 +200,8 @@ QImage Backend::cropPalmRegion(QImage originalFrame, QVariantMap elbow, QVariant
     float e_y = elbow["y"].toFloat();
     float w_x = wrist["x"].toFloat();
     float w_y = wrist["y"].toFloat();
-    int x = qRound(_frameWidth * (w_x + (w_x - e_x) / 2) - _cropRegionWidth / 2);
-    int y = qRound(_frameHeight * (w_y + (w_y - e_y) / 2) - _cropRegionWidth / 2);
+    int x = qRound(_frameSize.width() * (w_x + (w_x - e_x) / 2) - _cropRegionWidth / 2);
+    int y = qRound(_frameSize.height() * (w_y + (w_y - e_y) / 2) - _cropRegionWidth / 2);
     //qDebug() << e_x << e_y << w_x << w_y << x << y;
 
     QRect cropRegionLeft(x, y, _cropRegionWidth, _cropRegionWidth);
@@ -243,14 +243,15 @@ VideoWrapper* Backend::get_videoWrapper()
     return videoWrapper;
 }
 
-int Backend::frameWidth() const
+QSize Backend::frameSize() const
 {
-    return _frameWidth;
+    return _frameSize;
 }
 
-int Backend::frameHeight() const
+void Backend::setFrameSize(QSize size)
 {
-    return _frameHeight;
+    _frameSize = size;
+    emit frameSizeChanged();
 }
 
 int Backend::cropRegionWidth() const

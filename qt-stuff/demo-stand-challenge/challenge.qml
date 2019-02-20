@@ -9,6 +9,8 @@ Item {
     property int currentFPSvalue_camera: 0
     property int currentFPSvalue_trackers: 0
 
+    property alias camera: camera
+
     signal nextWindow(string windowName)
 
     function processPoseResults(result) {
