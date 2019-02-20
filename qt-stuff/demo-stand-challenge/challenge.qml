@@ -173,9 +173,12 @@ Item {
 
                         Rectangle {
                             id: originalFrame
-                            anchors.centerIn: parent
-                            width: parent.contentRect.width
-                            height: parent.contentRect.height
+
+                            anchors.fill: parent
+
+//                            anchors.centerIn: parent
+//                            width: parent.contentRect.width
+//                            height: parent.contentRect.height
                             color: "transparent"
 
                             /* left robot position */
