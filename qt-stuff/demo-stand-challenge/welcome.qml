@@ -88,21 +88,39 @@ Item {
                 enabled = false;
                 text = "checking...";
 
-                request("http://".concat(backend.dbServer(), "/user/exists/", text_username.text), function (o)
+                request(
+                        "http://".concat(backend.dbServer(), "/user/register/", text_username.text),
+                        "POST",
+                        function (o)
                 {
                     enabled = true;
                     text = "Register";
 
                     if (o.status === 200)
                     {
-                        if (o.responseText === "0")
+                        backend.set_currentProfile(0);
+
+                        //console.log(o.responseText);
+                        var jsn = JSON.parse(o.responseText);
+
+                        if(jsn["userID"] === -1)
                         {
-                            registrationComplete();
+                            dialogUserError.text = "Database connection error. Your results might not be saved. Continue?";
+                            dialogUserError.open();
                         }
                         else
                         {
-                            dialogUserError.text = "There is already a user with this name. Your score will go to this user. Continue?";
-                            dialogUserError.open();
+                            backend.set_currentProfile(jsn["userID"]);
+
+                            if (jsn["isNew"] === true)
+                            {
+                                registrationComplete();
+                            }
+                            else
+                            {
+                                dialogUserError.text = "There is already a user with this name. Your score will go to this user. Continue?";
+                                dialogUserError.open();
+                            }
                         }
                     }
                     else
@@ -125,6 +143,7 @@ Item {
         id: dialogUserError
         x: (parent.width - width) / 2
         y: 0
+        modal: true
         width: 400
         height: 250
         standardButtons: Dialog.Ok | Dialog.Cancel
@@ -133,11 +152,8 @@ Item {
 
         title: "User registration"
 
-        Rectangle {
+        Item {
             anchors.fill: parent
-            //color: Styles.regionBackground
-            //border.color: Styles.mainBackground
-            //border.width: 3
 
             ColumnLayout {
                 anchors.fill: parent
@@ -176,25 +192,38 @@ Item {
         width: parent.width * 0.6
         height: parent.height * 0.4
 
-        ColumnLayout {
+        Item {
             anchors.fill: parent
 
-            ScrollView {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+            ColumnLayout {
+                anchors.fill: parent
 
-                TextArea {
-                    font.pointSize: root.secondaryFontSize
-                    text: "We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything. We can do whatever and you can't do anything."
-                    wrapMode: Text.WordWrap
+                ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    TextArea {
+                        font.pointSize: root.secondaryFontSize
+                        text: "".concat(
+                                  "Hereby you agree that this challenge will collect ",
+                                  "the entered user/nick name and the corresponding score ",
+                                  "being shown on the leaderboard to the public during ",
+                                  "the event. After the event, nicknames and score ",
+                                  "will be deleted.\n\n",
+                                  "Furthermore, the Qt Company and AWS are not liable ",
+                                  "with regards self-hurting movements, embarrassing ",
+                                  "behaviour or alike"
+                                  )
+                        wrapMode: Text.WordWrap
+                    }
                 }
-            }
 
-            Button {
-                Layout.alignment: Qt.AlignRight
-                text: "Okay, Google"
-                onClicked: {
-                    dialogTerms.close();
+                Button {
+                    Layout.alignment: Qt.AlignRight
+                    text: "Close"
+                    onClicked: {
+                        dialogTerms.close();
+                    }
                 }
             }
         }
@@ -202,7 +231,7 @@ Item {
 
     function registrationComplete()
     {
-        backend.set_currentProfile(text_username.text);
+        //console.log(backend.get_currentProfile());
         nextWindow("challenge.qml");
     }
 }

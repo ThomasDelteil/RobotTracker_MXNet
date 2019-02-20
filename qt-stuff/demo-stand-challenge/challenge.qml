@@ -405,6 +405,7 @@ Item {
                 font.pointSize: root.primaryFontSize * 2.5
                 enabled: !btn_stop.enabled
                 onClicked: {
+                    backend.set_currentProfile(0);
                     nextWindow("welcome.qml");
                 }
             }

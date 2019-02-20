@@ -90,15 +90,18 @@ ApplicationWindow {
     }
 
     // HTTP-request to the URL
-    function request(url, callback) {
+    function request(url, method, callback)
+    {
         var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = (function(myxhr) {
-            return function() {
+        xhr.onreadystatechange = (function(myxhr)
+        {
+            return function()
+            {
                 if(myxhr.readyState === 4) { callback(myxhr); }
             }
         })(xhr);
 
-        xhr.open("GET", url);
+        xhr.open(method, url);
         xhr.send();
     }
 }

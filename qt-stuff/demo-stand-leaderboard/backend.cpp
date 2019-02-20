@@ -41,23 +41,54 @@ Backend::Backend(QObject *parent) : QObject(parent)
         return "Still alive";
     });
 
-    _httpServer->route("/user/exists/", [](QString username)
+    _httpServer->route(
+                "/user/register/<arg>",
+                QHttpServerRequest::Method::Post,
+                [](const QString &username)
     {
-        // FIXME switch to using the method after it will get supported in QHttpServer
-        //if (checkUserName(username)) { return "1"; }
-        //{ return "0"; }
+        int userID = 0;
+        bool isNew = true;
+        QString err;
 
         QSqlQuery query;
-        query.prepare("SELECT COUNT (*) AS cnt FROM users WHERE users.name == :username;");
+        query.prepare("SELECT id FROM users WHERE users.name == :username;");
         query.bindValue(":username", username);
         query.exec();
+        if (query.first()) // user already exists
+        {
+            userID = query.value(0).toInt();
+            isNew = false;
+        }
+        else // create a new user
+        {
+            query.finish(); // just in case
+            query.prepare("INSERT INTO users(name) VALUES(:username);");
+            query.bindValue(":username", username);
+            if (!query.exec())
+            {
+                err = QString("Couldn't add a new user. %1").arg(query.lastError().text());
+                qWarning() << "[error]" << err;
+                userID = -1;
+            }
+            else
+            {
+                query.finish(); // just in case
+                query.prepare("SELECT last_insert_rowid();");
+                query.exec();
+                query.first();
+                userID = query.value(0).toInt();
+            }
+        }
+        //qDebug() << userID << isNew;
 
-        query.first();
-        if (query.value(0).toBool()) { return "1"; }
-        else { return "0"; }
+        QJsonObject rez;
+        rez.insert("userID", userID);
+        rez.insert("isNew", isNew);
+        rez.insert("error", err);
+        return rez;
     });
 
-    _httpServer->route("/user/saveScore/<var>/<var>", [](QString username, int score)
+    _httpServer->route("/user/saveScore/<arg>/<arg>", [](const QString &username, int score)
     {
         qDebug() << username << score;
         return "Not implemented yet";

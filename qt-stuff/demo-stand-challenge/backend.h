@@ -35,8 +35,8 @@ public slots:
     void uploadPose(QImage img);
     void uploadHand(QImage img, bool isRight);
 
-    void set_currentProfile(QString profileName);
-    QString get_currentProfile();
+    void set_currentProfile(int id);
+    int get_currentProfile();
 
     VideoWrapper *get_videoWrapper();
 
@@ -59,7 +59,7 @@ private:
     QNetworkAccessManager *managerHand;
     const QString _endpointPose = "http://localhost:8080/predictions/pose";
     const QString _endpointHand = "http://localhost:8080/predictions/hand";
-    QString _currentProfile;
+    int _currentProfile;
     bool _connected = false;
     QHash<QByteArray, QImage> _frames;
     // frame width for the camera's resolution

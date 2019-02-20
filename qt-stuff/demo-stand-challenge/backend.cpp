@@ -30,6 +30,8 @@ Backend::Backend(QObject *parent) : QObject(parent)
     //proxy.setHostName("localhost");
     //proxy.setPort(4321);
     //manager->setProxy(proxy);
+
+    _currentProfile = 0;
 }
 
 Backend::~Backend()
@@ -187,7 +189,8 @@ void Backend::requestHandFinished(QNetworkReply *reply)
             else { predicted = "1"; }
         }
 
-        if (!isRight) { emit requestLeftHandDone(predicted); }
+        // it's actually mirrored, so
+        if (isRight) { emit requestLeftHandDone(predicted); }
         else { emit requestRightHandDone(predicted); }
     }
     else
@@ -218,12 +221,12 @@ QImage Backend::cropPalmRegion(QImage originalFrame, QVariantMap elbow, QVariant
     return palm;
 }
 
-void Backend::set_currentProfile(QString profileName)
+void Backend::set_currentProfile(int id)
 {
-    _currentProfile = profileName;
+    _currentProfile = id;
 }
 
-QString Backend::get_currentProfile()
+int Backend::get_currentProfile()
 {
     return _currentProfile;
 }
