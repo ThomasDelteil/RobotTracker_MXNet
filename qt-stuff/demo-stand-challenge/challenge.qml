@@ -287,7 +287,7 @@ Item {
                                         border.color: "white"
 
                                         onTargetChanged: {
-                                            moveTheArm(name, x, y)
+                                            moveTheArm(name, x / parent.width, y / parent.height)
                                         }
 
                                         transform: Translate {
@@ -368,7 +368,7 @@ Item {
                                         border.color: "white"
 
                                         onTargetChanged: {
-                                            moveTheArm(name, x, y)
+                                            moveTheArm(name, x / parent.width, y / parent.height)
                                         }
 
                                         transform: Translate {
