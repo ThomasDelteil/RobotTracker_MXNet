@@ -12,15 +12,15 @@ QtObject {
 
     property int connectionStatus: RobotArm.ConnectionStatus.Connecting
 
-    property real x
-    property real y
-    property real z
+    property real x: minX
+    property real y: minY
+    property real z: minZ
 
-    property real roll
-    property real pitch
-    property real yaw
+    property real roll: minRoll
+    property real pitch: minPitch
+    property real yaw: minYaw
 
-    property bool open
+    property bool isOpen: false
 
     property string name
 
@@ -42,30 +42,199 @@ QtObject {
     property real minYaw: -Math.PI / 2
     property real maxYaw: -Math.PI / 2
 
-    property bool calibrationNeeded
-    property bool learningMode
+    property bool calibrationNeeded: true
+    property bool learningMode: true
 
-    function parse(object)
-    {
+    property var proxy
+
+    function move(relativeY, relativeZ) {
+        impl.lastPosition = impl.getPosition(relativeY, relativeZ)
+    }
+
+    function open() {
+        impl.lastOpen = true
+    }
+
+    function close() {
+        impl.lastOpen = false
+    }
+
+    function calibrate() {
+        impl.calibrate()
+    }
+
+    function setLearningMode(isOn) {
+        impl.setLearningMode(isOn)
+    }
+
+    function parse(object) {
         root.x = object.x
         root.y = object.y
         root.z = object.z
         root.roll = object.roll
         root.pitch = object.pitch
         root.yaw = object.yaw
-        root.open = object.open
+        root.isOpen = object.open
         root.calibrationNeeded = object.calibrationNeeded
         root.learningMode = object.learningMode
     }
 
-    function getConnectionStatusColor()
-    {
-        switch (connectionStatus)
-        {
-            case 0: return "red";
-            case 1: return "lightblue";
-            case 2: return "green";
-            case 3: return "yellow";
+    function getConnectionStatusColor() {
+        switch (connectionStatus) {
+        case 0:
+            return "red"
+        case 1:
+            return "lightblue"
+        case 2:
+            return "green"
+        case 3:
+            return "yellow"
+        }
+    }
+
+    function sendChanges() {
+        if (impl.positionChanged()) {
+            impl.move(impl.lastPosition)
+            impl.lastSentPosition = impl.lastPosition
+        }
+
+        if (impl.openedChanged()) {
+            if (impl.lastOpen) {
+                impl.open()
+            } else {
+                impl.close()
+            }
+
+            impl.lastSentOpen = impl.lastOpen
+        }
+    }
+
+    function mapXFromRobot(frame) {
+        // root.y = root.minY + (root.maxY - root.minY) * relativeY
+        return frame.width * (root.y - root.minY) / (root.maxY - root.minY)
+    }
+
+    function mapYFromRobot(frame) {
+        // root.z = root.maxZ - (root.maxZ - root.minZ) * relativeZ
+        return frame.height - frame.height * (root.z - root.minZ) / (root.minZ - root.maxZ)
+    }
+
+    property var impl: QtObject {
+        id: impl
+
+        property var lastPosition: null
+        property var lastSentPosition: null
+
+        property var lastOpen: null
+        property var lastSentOpen: null
+
+        property real threshold: 0.01
+
+        function sendRequest(route, data, callback) {
+            var url = root.proxy.httpUrl + "/" + route
+            var dataString = !!data ? JSON.stringify(data) : null
+            console.log("Sending: " + url + (!!dataString ? ' with data: ' + dataString : ''))
+
+            var doc = new XMLHttpRequest()
+            doc.onreadystatechange = function () {
+                if (doc.readyState === XMLHttpRequest.DONE) {
+                    console.log(route + " succeeded")
+                    if (!!callback) {
+                        callback(doc)
+                    }
+                }
+
+                //            if (doc.readyState === XMLHttpRequest.UNSENT) {
+                //                console.log(route + "  XMLHttpRequest.UNSENT")
+                //            }
+
+                //            if (doc.readyState === XMLHttpRequest.OPENED) {
+                //                console.log(route + " XMLHttpRequest.OPENED")
+                //            }
+
+                //            if (doc.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
+                //                console.log(route + " XMLHttpRequest.HEADERS_RECEIVED")
+                //            }
+
+                //            if (doc.readyState === XMLHttpRequest.LOADING) {
+                //                console.log(route + " XMLHttpRequest.LOADING")
+                //            }
+            }
+
+            if (!!dataString) {
+                doc.open("POST", url)
+                doc.setRequestHeader("Content-type", "application/json")
+                doc.send(dataString)
+            } else {
+                doc.open("GET", url)
+                doc.send()
+            }
+        }
+
+        function open() {
+            sendRequest(root.name + "/open")
+        }
+
+        function close() {
+            sendRequest(root.name + "/close")
+        }
+
+        function calibrate() {
+            sendRequest(root.name + "/calibrate")
+        }
+
+        function setLearningMode(isOn) {
+            var data = {
+                "isOn": isOn
+            }
+            sendRequest(root.name + "/learningMode", data)
+        }
+
+        function getPosition(relativeY, relativeZ) {
+            return {
+                "x": root.minX,
+                "y": root.minY + (root.maxY - root.minY) * relativeY,
+                "z": root.maxZ - (root.maxZ - root.minZ) * relativeZ,
+                "roll": root.minRoll,
+                "pitch": root.minPitch,
+                "yaw": root.minYaw
+            }
+        }
+
+        function move(position) {
+            sendRequest(root.name + "/move", position)
+        }
+
+        function positionChanged() {
+            if (!lastPosition) {
+                return false
+            }
+
+            if (!lastSentPosition) {
+                return true
+            }
+
+            if (Math.abs(lastPosition.y - lastSentPosition.y) > threshold) {
+                return true
+            }
+
+            if (Math.abs(lastPosition.z - lastSentPosition.z) > threshold) {
+                return true
+            }
+
+            return false
+        }
+
+        function openedChanged() {
+            if (lastOpen === null) {
+                return false
+            }
+
+            if (!lastSentOpen === null) {
+                return true
+            }
+
+            return lastOpen !== lastSentOpen
         }
     }
 }

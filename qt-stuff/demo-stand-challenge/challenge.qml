@@ -11,56 +11,64 @@ Item {
 
     signal nextWindow(string windowName)
 
-    function processPoseResults(result)
-    {
+    function processPoseResults(result) {
+
         //appendToOutput(result, false);
+        var jsn = JSON.parse(result)
 
-        var jsn = JSON.parse(result);
+        var re_x = jsn["skeleton"]["left_elbow"]["x"]
+        var re_y = jsn["skeleton"]["left_elbow"]["y"]
+        var rw_x = jsn["skeleton"]["left_wrist"]["x"]
+        var rw_y = jsn["skeleton"]["left_wrist"]["y"]
+        var le_x = jsn["skeleton"]["right_elbow"]["x"]
+        var le_y = jsn["skeleton"]["right_elbow"]["y"]
+        var lw_x = jsn["skeleton"]["right_wrist"]["x"]
+        var lw_y = jsn["skeleton"]["right_wrist"]["y"]
 
-        var re_x = jsn["skeleton"]["left_elbow"]["x"],
-            re_y = jsn["skeleton"]["left_elbow"]["y"],
-            rw_x = jsn["skeleton"]["left_wrist"]["x"],
-            rw_y = jsn["skeleton"]["left_wrist"]["y"],
-            le_x = jsn["skeleton"]["right_elbow"]["x"],
-            le_y = jsn["skeleton"]["right_elbow"]["y"],
-            lw_x = jsn["skeleton"]["right_wrist"]["x"],
-            lw_y = jsn["skeleton"]["right_wrist"]["y"];
+        var leftTarget = leftCroppingOverlay.mapFromItem(
+                    originalFrame, originalFrame.width * lw_x,
+                    originalFrame.height * lw_y)
 
-        trackerLeft.x = originalFrame.width * lw_x - root.trackerWidth/2;
-        trackerLeft.y = originalFrame.height * lw_y - root.trackerWidth/2;
-        //gotNewCoordinates(trackerLeft);
+        var rightTarget = rightCroppingOverlay.mapFromItem(
+                    originalFrame, originalFrame.width * rw_x,
+                    originalFrame.height * rw_y)
 
-        trackerRight.x = originalFrame.width * rw_x - root.trackerWidth/2;
-        trackerRight.y = originalFrame.height * rw_y - root.trackerWidth/2;
-        //gotNewCoordinates(trackerRight);
+        trackerLeft.target = leftTarget
+        trackerRight.target = rightTarget
 
-        cropRegionLeft.x = originalFrame.width * (lw_x + (lw_x - le_x) / 2) - backend.cropRegionWidth()/2;
-        cropRegionLeft.y = originalFrame.height * (lw_y + (lw_y - le_y) / 2) - backend.cropRegionWidth()/2;
-        //console.log("qml rect:", cropRegionLeft.x, cropRegionLeft.y, backend.cropRegionWidth());
+        leftHandCropRegion.x = originalFrame.width * (lw_x + (lw_x - le_x) / 2)
+                - backend.cropRegionWidth() / 2
+        leftHandCropRegion.y = originalFrame.height * (lw_y + (lw_y - le_y) / 2)
+                - backend.cropRegionWidth() / 2
 
-        cropRegionRight.x = originalFrame.width * (rw_x + (rw_x - re_x) / 2) - backend.cropRegionWidth()/2;
-        cropRegionRight.y = originalFrame.height * (rw_y + (rw_y - re_y) / 2) - backend.cropRegionWidth()/2;
+        //console.log("qml rect:", leftHandCropRegion.x, leftHandCropRegion.y, backend.cropRegionWidth());
+        rightHandCropRegion.x = originalFrame.width * (rw_x + (rw_x - re_x) / 2)
+                - backend.cropRegionWidth() / 2
+        rightHandCropRegion.y = originalFrame.height
+                * (rw_y + (rw_y - re_y) / 2) - backend.cropRegionWidth() / 2
     }
 
-    function processLeftHandResults(result)
-    {
-        palmLeft.text = result;
+    function processLeftHandResults(result) {
+        palmLeft.text = result
+        processGrip('left', result)
     }
-    function processRightHandResults(result)
-    {
-        palmRight.text = result;
+    function processRightHandResults(result) {
+        palmRight.text = result
+        processGrip('right', result)
     }
 
     //function appendToOutput(msg, panelAsWell = false)
-    function appendToOutput(msg, panelAsWell)
-    {
+    function appendToOutput(msg, panelAsWell) {
         // https://bugreports.qt.io/browse/QTCREATORBUG-21884
-        if (panelAsWell === undefined) { panelAsWell = false; }
+        if (panelAsWell === undefined) {
+            panelAsWell = false
+        }
 
-        if (root.debugOutput === true)
-        {
-            console.log(msg);
-            if (panelAsWell === true) { ta_mxnetOutput.append(msg + "\n---"); }
+        if (root.debugOutput === true) {
+            console.log(msg)
+            if (panelAsWell === true) {
+                ta_mxnetOutput.append(msg + "\n---")
+            }
         }
     }
 
@@ -98,7 +106,9 @@ Item {
                     Camera {
                         id: camera
                         deviceId: "/dev/video0" // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
-                        viewfinder.resolution: Qt.size(backend.frameWidth(), backend.frameHeight()) // picture quality
+                        //                        viewfinder.resolution: Qt.size(backend.frameWidth(),
+                        //                                                       backend.frameHeight(
+                        //                                                           )) // picture quality
                         //position: Camera.FrontFace
                         metaData.orientation: root.cameraUpsideDown ? 180 : 0
 
@@ -106,19 +116,20 @@ Item {
                         //    focusMode: Camera.FocusMacro
                         //    focusPointMode: Camera.FocusPointCenter
                         //}
-
                         onError: {
-                            cameraStatus.text = qsTr("Error: ") + errorString;
-                            console.log(errorCode, errorString);
+                            cameraStatus.text = qsTr("Error: ") + errorString
+                            console.log(errorCode, errorString)
                         }
-
-
                         Component.onCompleted: {
+
+
                             //console.log("camera orientation:", camera.orientation);
                             //console.log("camera state:", camera.cameraState);
                             //console.log("camera status:", camera.cameraStatus);
 
                             //console.log("camera supported IC resolutions:", imageCapture.supportedResolutions);
+
+
                             /*
                             console.log("camera supported VF resolutions:");
                             var supRezes = camera.supportedViewfinderResolutions();
@@ -140,7 +151,7 @@ Item {
                         id: vo
                         anchors.fill: parent
                         orientation: root.cameraUpsideDown ? 180 : 0
-                        fillMode: VideoOutput.PreserveAspectFit//PreserveAspectCrop
+                        fillMode: VideoOutput.PreserveAspectFit //PreserveAspectCrop
                         source: backend.videoWrapper
 
                         Rectangle {
@@ -150,96 +161,238 @@ Item {
                             height: parent.contentRect.height
                             color: "transparent"
 
-                            // tracker #1 (left hand)
+                            /* left robot position */
                             Rectangle {
-                                id: trackerLeft
-                                property string name: "left"
-                                x: originalFrame.width/4 - width/2
-                                y: originalFrame.height/1.3 - height/2
+                                id: robotLeft
+
+                                x: robotsModel.leftArm.mapXFromRobot(
+                                       originalFrame) - width / 2
+                                y: robotsModel.leftArm.mapYFromRobot(
+                                       originalFrame) - height / 2
                                 width: root.trackerWidth
                                 height: width
                                 color: "blue"
                                 radius: width * 0.5
-                                visible: root.manualTrackers || btn_stop.enabled
                                 border.width: 2
                                 border.color: "white"
+                                opacity: 0.3
 
-                                DragHandler {
-                                    enabled: root.manualTrackers
-                                    onActiveChanged: {
-                                        if (!active) // dragging stopped
-                                        {
-                                            gotNewCoordinates(parent);
-                                        }
+                                // animation
+                                Behavior on x {
+                                    NumberAnimation {
+                                        duration: 100
+                                        easing.type: Easing.OutQuart
                                     }
-                                    //onTranslationChanged: {
-                                    //    console.log(translation)
-                                    //}
                                 }
+                                Behavior on y {
+                                    NumberAnimation {
+                                        duration: 100
+                                        easing.type: Easing.OutQuart
+                                    }
+                                }
+                            }
 
-                                /* // animation
-                            Behavior on x {
-                                NumberAnimation {
-                                    //duration: 10
-                                    easing.type: Easing.OutQuart
-                                }
-                            }
-                            Behavior on y {
-                                NumberAnimation {
-                                    //duration: 10
-                                    easing.type: Easing.OutQuart
-                                }
-                            }
-                            */
-                            }
-                            // tracker #2 (right hand)
+                            /* right robot position */
                             Rectangle {
-                                id: trackerRight
-                                property string name: "right"
-                                x: originalFrame.width/1.3 - width/2
-                                y: originalFrame.height/1.3 - height/2
+                                id: robotRight
+
+                                x: robotsModel.rightArm.mapXFromRobot(
+                                       originalFrame) - width / 2
+                                y: robotsModel.rightArm.mapYFromRobot(
+                                       originalFrame) - height / 2
                                 width: root.trackerWidth
                                 height: width
                                 color: "green"
                                 radius: width * 0.5
-                                visible: root.manualTrackers || btn_stop.enabled
                                 border.width: 2
                                 border.color: "white"
+                                opacity: 0.3
 
-                                DragHandler {
-                                    enabled: root.manualTrackers
-                                    onActiveChanged: {
-                                        if (!active) // dragging stopped
-                                        {
-                                            gotNewCoordinates(parent);
+                                // animation
+                                Behavior on x {
+                                    NumberAnimation {
+                                        duration: 100
+                                        easing.type: Easing.OutQuart
+                                    }
+                                }
+                                Behavior on y {
+                                    NumberAnimation {
+                                        duration: 100
+                                        easing.type: Easing.OutQuart
+                                    }
+                                }
+                            }
+
+                            RowLayout {
+                                id: croppingOverlay
+
+                                property int bufferWidth: 100
+                                property real overlayOpacity: 0.1
+
+                                anchors.fill: parent
+
+                                Item {
+                                    id: leftCroppingOverlay
+
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: 'blue'
+                                        opacity: croppingOverlay.overlayOpacity
+                                    }
+
+                                    // tracker #1 (left hand)
+                                    Rectangle {
+                                        id: trackerLeft
+                                        property string name: "left"
+
+                                        property var target: ({
+                                                                  "x": originalFrame.width / 4
+                                                                       - width / 2,
+                                                                  "y": originalFrame.height / 1.3
+                                                                       - height / 2
+                                                              })
+
+                                        x: Math.min(Math.max(0, target.x),
+                                                    parent.width)
+                                        y: Math.min(Math.max(0, target.y),
+                                                    parent.height)
+
+                                        width: root.trackerWidth
+                                        height: width
+                                        color: "blue"
+                                        radius: width * 0.5
+                                        visible: root.manualTrackers
+                                                 || btn_stop.enabled
+                                        border.width: 2
+                                        border.color: "white"
+
+                                        onTargetChanged: {
+                                            moveTheArm(name, x, y)
+                                        }
+
+                                        transform: Translate {
+                                            y: -trackerLeft.height / 2
+                                            x: -trackerLeft.width / 2
+                                        }
+
+                                        DragHandler {
+                                            xAxis {
+                                                minimum: 0
+                                                maximum: parent.parent.width
+                                            }
+
+                                            yAxis {
+                                                minimum: 0
+                                                maximum: parent.parent.height
+                                            }
+
+                                            enabled: true
+                                        }
+
+                                        // animation
+                                        Behavior on x {
+                                            NumberAnimation {
+                                                duration: 100
+                                                easing.type: Easing.OutQuart
+                                            }
+                                        }
+                                        Behavior on y {
+                                            NumberAnimation {
+                                                duration: 100
+                                                easing.type: Easing.OutQuart
+                                            }
                                         }
                                     }
-                                    //onTranslationChanged: {
-                                    //    console.log(translation)
-                                    //}
                                 }
 
-                                /* // animation
-                            Behavior on x {
-                                NumberAnimation {
-                                    duration: 10
-                                    easing.type: Easing.OutQuart
+                                Item {
+                                    width: croppingOverlay.bufferWidth
+                                    Layout.fillHeight: true
                                 }
-                            }
-                            Behavior on y {
-                                NumberAnimation {
-                                    duration: 10
-                                    easing.type: Easing.OutQuart
+
+                                Item {
+                                    id: rightCroppingOverlay
+
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: 'green'
+                                        opacity: croppingOverlay.overlayOpacity
+                                    }
+
+                                    // tracker #2 (right hand)
+                                    Rectangle {
+                                        id: trackerRight
+                                        property string name: "right"
+
+                                        property var target: ({
+                                                                  "x": originalFrame.width / 1.3
+                                                                       - width / 2,
+                                                                  "y": originalFrame.height / 1.3
+                                                                       - height / 2
+                                                              })
+
+                                        x: Math.min(Math.max(0, target.x),
+                                                    parent.width)
+                                        y: Math.min(Math.max(0, target.y),
+                                                    parent.height)
+                                        width: root.trackerWidth
+                                        height: width
+                                        color: "green"
+                                        radius: width * 0.5
+                                        visible: root.manualTrackers
+                                                 || btn_stop.enabled
+                                        border.width: 2
+                                        border.color: "white"
+
+                                        onTargetChanged: {
+                                            moveTheArm(name, x, y)
+                                        }
+
+                                        transform: Translate {
+                                            y: -trackerLeft.height / 2
+                                            x: -trackerLeft.width / 2
+                                        }
+
+                                        DragHandler {
+                                            xAxis {
+                                                minimum: 0
+                                                maximum: parent.parent.width
+                                            }
+
+                                            yAxis {
+                                                minimum: 0
+                                                maximum: parent.parent.height
+                                            }
+
+                                            enabled: true
+                                        }
+
+                                        // animation
+                                        Behavior on x {
+                                            NumberAnimation {
+                                                duration: 100
+                                                easing.type: Easing.OutQuart
+                                            }
+                                        }
+                                        Behavior on y {
+                                            NumberAnimation {
+                                                duration: 100
+                                                easing.type: Easing.OutQuart
+                                            }
+                                        }
+                                    }
                                 }
-                            }
-                            */
                             }
 
                             // crop region for the left hand
                             Rectangle {
-                                id: cropRegionLeft
-                                x: trackerLeft.x - width/2
-                                y: trackerLeft.y - height/2
+                                id: leftHandCropRegion
                                 width: backend.cropRegionWidth()
                                 height: backend.cropRegionWidth()
                                 color: "blue"
@@ -255,11 +408,10 @@ Item {
                                     text: "2"
                                 }
                             }
+
                             // crop region for the right hand
                             Rectangle {
-                                id: cropRegionRight
-                                x: trackerRight.x - width/2
-                                y: trackerRight.y - height/2
+                                id: rightHandCropRegion
                                 width: backend.cropRegionWidth()
                                 height: backend.cropRegionWidth()
                                 color: "green"
@@ -297,29 +449,6 @@ Item {
                                 color: "red"
                                 //visible: btn_stop.enabled
                                 visible: root.fpsCounters
-                            }
-
-                            // screen divider, for convenience
-                            RowLayout {
-                                anchors.fill: parent
-                                spacing: 0
-                                visible: root.manualTrackers
-
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    border.width: 1
-                                    border.color: "blue"
-                                    color: "transparent"
-                                }
-
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    border.width: 1
-                                    border.color: "green"
-                                    color: "transparent"
-                                }
                             }
                         }
                     }
@@ -364,7 +493,7 @@ Item {
                 font.pointSize: root.primaryFontSize * 1.5
                 visible: enabled
                 onClicked: {
-                    startChallenge();
+                    startChallenge()
                 }
             }
 
@@ -377,7 +506,7 @@ Item {
                 enabled: !btn_start.enabled
                 visible: enabled
                 onClicked: {
-                    stopChallenge();
+                    stopChallenge()
                 }
             }
 
@@ -386,18 +515,17 @@ Item {
                 Layout.fillHeight: true
             }
 
-//            FancyButton {
-//                id: btn_play
-//                unpressedColor: "#0096FF"
-//                pressedColor: "#3679CC"
-//                text: "Playback"
-//                font.pointSize: root.primaryFontSize * 1.5
-//                enabled: btn_start.enabled
-//                onClicked: {
-//                    btn_start.enabled = false;
-//                }
-//            }
-
+            //            FancyButton {
+            //                id: btn_play
+            //                unpressedColor: "#0096FF"
+            //                pressedColor: "#3679CC"
+            //                text: "Playback"
+            //                font.pointSize: root.primaryFontSize * 1.5
+            //                enabled: btn_start.enabled
+            //                onClicked: {
+            //                    btn_start.enabled = false;
+            //                }
+            //            }
             FancyButton {
                 unpressedColor: "#008F00"
                 pressedColor: "#2C641B"
@@ -406,10 +534,9 @@ Item {
                 enabled: !btn_stop.enabled
                 onClicked: {
                     backend.set_currentProfile(0);
-                    nextWindow("welcome.qml");
+                    nextWindow("welcome.qml")
                 }
             }
-
         }
     }
 
@@ -418,7 +545,7 @@ Item {
         repeat: true
         interval: root.timerRate
         onTriggered: {
-            backend.enableSendingToMXNet(true);
+            backend.enableSendingToMXNet(true)
         }
     }
 
@@ -428,87 +555,56 @@ Item {
         repeat: true
         interval: 1000
         onTriggered: {
-            fpsCounter_camera.text = currentFPSvalue_camera;
-            currentFPSvalue_camera = 0;
+            fpsCounter_camera.text = currentFPSvalue_camera
+            currentFPSvalue_camera = 0
 
-            fpsCounter_trackers.text = currentFPSvalue_trackers;
-            currentFPSvalue_trackers = 0;
+            fpsCounter_trackers.text = currentFPSvalue_trackers
+            currentFPSvalue_trackers = 0
         }
     }
 
-    function startChallenge()
-    {
-        btn_start.enabled = false;
-        tm_sendFrame.start();
+    function startChallenge() {
+        btn_start.enabled = false
+        robotsModel.sendChanges = true
+        tm_sendFrame.start()
     }
 
-    function stopChallenge()
-    {
-        btn_start.enabled = true;
-        tm_sendFrame.stop();
-        currentFPSvalue_trackers = 0;
+    function stopChallenge() {
+        btn_start.enabled = true
+        robotsModel.sendChanges = false
+        tm_sendFrame.stop()
+        currentFPSvalue_trackers = 0
     }
 
-    function checkXcoordinate(tracker)
-    {
-        if (tracker.name === "left")
-        {
-            if (tracker.x + tracker.width/2 < 0)
-            {
-                tracker.x = 0;
-                return 0;
-            }
-            if (tracker.x + tracker.width/2  > originalFrame.width/2)
-            {
-                tracker.x = originalFrame.width/2 - tracker.width;
-                return 1;
-            }
-            return ((tracker.x + tracker.width/2) / (originalFrame.width/2)).toFixed(3);
+    function moveTheArm(armName, xCoordinate, yCoordinate) {
+        var arm = null
+        if (armName === 'left') {
+            arm = robotsModel.leftArm
         }
-        else
-        {
-            if (tracker.x + tracker.width/2 < originalFrame.width/2)
-            {
-                tracker.x = originalFrame.width/2;
-                return 0;
-            }
-            if (tracker.x + tracker.width/2 > originalFrame.width)
-            {
-                tracker.x = originalFrame.width - tracker.width;
-                return 1;
-            }
-            return ((tracker.x + tracker.width/2 - originalFrame.width/2) / (originalFrame.width / 2)).toFixed(3);
+        if (armName === 'right') {
+            arm = robotsModel.rightArm
         }
 
+        arm.move(xCoordinate, yCoordinate)
     }
 
-    function checkYcoordinate(tracker)
-    {
-        if (tracker.y + tracker.height/2 < 0)
-        {
-            tracker.y = 0;
-            return 0;
+    function processGrip(armName, result) {
+        var arm = null
+        if (armName === 'left') {
+            arm = robotsModel.leftArm
         }
-        if (tracker.y + tracker.height/2 > originalFrame.height)
-        {
-            tracker.y = originalFrame.height - tracker.height;
-            return 1;
+        if (armName === 'right') {
+            arm = robotsModel.rightArm
         }
-        return ((tracker.y + tracker.height/2) / originalFrame.height).toFixed(3);
-    }
 
-    function gotNewCoordinates(tracker)
-    {
-        var xCoordinate = checkXcoordinate(tracker),
-            yCoordinate = checkYcoordinate(tracker);
+        // @disable-check M126
+        if (result == 2) {
+            arm.open()
+        }
 
-        //appendToOutput("".concat(tracker.name, " movement: ", xCoordinate, " | ", yCoordinate), true);
-
-        moveTheArm(tracker.name, xCoordinate, yCoordinate);
-    }
-
-    function moveTheArm(armName, xCoordinate, yCoordinate)
-    {
-        robotsModel.move({ name: armName }, xCoordinate, yCoordinate)
+        // @disable-check M126
+        if (result == 1) {
+            arm.close()
+        }
     }
 }

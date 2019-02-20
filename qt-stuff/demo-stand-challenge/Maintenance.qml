@@ -91,20 +91,22 @@ Item {
                                         id: armsdata
                                         statusLeft: robotsModel.leftArm.getConnectionStatusColor()
                                         statusRight: robotsModel.rightArm.getConnectionStatusColor()
-                                        xLeft: robotsModel.leftArm.x
-                                        xRight: robotsModel.rightArm.x
-                                        yLeft: robotsModel.leftArm.y
-                                        yRight: robotsModel.rightArm.y
-                                        zLeft: robotsModel.leftArm.z
-                                        zRight: robotsModel.rightArm.z
-                                        yawLeft: robotsModel.leftArm.yaw
-                                        yawRight: robotsModel.rightArm.yaw
-                                        pitchLeft: robotsModel.leftArm.pitch
-                                        pitchRight: robotsModel.rightArm.pitch
-                                        rollLeft: robotsModel.leftArm.roll
-                                        rollRight: robotsModel.rightArm.roll
+                                        xLeft: robotsModel.leftArm.x.toFixed(3).toString()
+                                        xRight: robotsModel.rightArm.x.toFixed(3).toString()
+                                        yLeft: robotsModel.leftArm.y.toFixed(3).toString()
+                                        yRight: robotsModel.rightArm.y.toFixed(3).toString()
+                                        zLeft: robotsModel.leftArm.z.toFixed(3).toString()
+                                        zRight: robotsModel.rightArm.z.toFixed(3).toString()
+                                        yawLeft: robotsModel.leftArm.yaw.toFixed(3).toString()
+                                        yawRight: robotsModel.rightArm.yaw.toFixed(3).toString()
+                                        pitchLeft: robotsModel.leftArm.pitch.toFixed(3).toString()
+                                        pitchRight: robotsModel.rightArm.pitch.toFixed(3).toString()
+                                        rollLeft: robotsModel.leftArm.roll.toFixed(3).toString()
+                                        rollRight: robotsModel.rightArm.roll.toFixed(3).toString()
                                         calibrationNeededLeft: robotsModel.leftArm.calibrationNeeded ? "yes" : "no"
                                         calibrationNeededRight: robotsModel.rightArm.calibrationNeeded ? "yes" : "no"
+                                        openRight: robotsModel.rightArm.isOpen ? "yes" : "no"
+                                        openLeft: robotsModel.leftArm.isOpen ? "yes" : "no"
                                     }
                                 }
                             }
@@ -140,7 +142,7 @@ Item {
                                     let isOn = !robotsModel.leftArm.learningMode
                                     appendToMaintenanceOutput("setLearningMode left: " + isOn)
 
-                                    robotsModel.setLearningMode({ name: "left" }, isOn)
+                                    robotsModel.leftArm.setLearningMode(isOn)
                                 }
                             }
 
@@ -153,7 +155,7 @@ Item {
                                 onClicked: {
                                     appendToMaintenanceOutput("calibrate left")
 
-                                    robotsModel.calibrate({ name: "left" })
+                                    robotsModel.leftArm.calibrate()
                                 }
                             }
 
@@ -183,7 +185,7 @@ Item {
                                     let isOn = !robotsModel.rightArm.learningMode
                                     appendToMaintenanceOutput("setLearningMode right: " + isOn)
 
-                                    robotsModel.setLearningMode({ name: "right" }, isOn)
+                                    robotsModel.rightArm.setLearningMode(isOn)
                                 }
                             }
 
@@ -196,7 +198,7 @@ Item {
                                 onClicked: {
                                     appendToMaintenanceOutput("calibrate right")
 
-                                    robotsModel.calibrate({ name: "right" })
+                                    robotsModel.rightArm.calibrate()
                                 }
                             }
                         }

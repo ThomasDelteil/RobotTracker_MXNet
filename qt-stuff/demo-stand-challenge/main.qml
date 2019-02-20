@@ -15,6 +15,8 @@ ApplicationWindow {
     title: qsTr("Challenge")
     color: root.backgroundColor
 
+    visibility: "FullScreen"
+
     property int primaryFontSize: 24
     property int secondaryFontSize: 18
     property string backgroundColor: "#ECECEC"
@@ -25,7 +27,7 @@ ApplicationWindow {
 
     property bool debugOutput: false // show debug panel (can really kill the performance)
     property bool fpsCounters: true // show FPS counters
-    property bool manualTrackers: false // move trackers manually
+    property bool manualTrackers: true // move trackers manually
     property bool maintenance: true // enable maintenance window
 
     Backend {
