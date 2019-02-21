@@ -42,7 +42,6 @@ class Backend : public QObject {
     Q_PROPERTY(QImage leftPalm MEMBER _leftPalm READ leftPalm NOTIFY leftPalmChanged)
     Q_PROPERTY(QImage rightPalm MEMBER _rightPalm READ rightPalm NOTIFY rightPalmChanged)
     Q_PROPERTY(int cropRegionWidth READ cropRegionWidth CONSTANT)
-    Q_PROPERTY(QSize frameSize READ frameSize WRITE setFrameSize NOTIFY frameSizeChanged)
 
 public:
     explicit Backend(QObject* parent = nullptr);
@@ -57,7 +56,6 @@ signals:
     void connectedChanged(bool connected);
     void leftPalmChanged();
     void rightPalmChanged();
-    void frameSizeChanged();
 
 public slots:
     void uploadPose(QImage img);
@@ -68,9 +66,6 @@ public slots:
 
     VideoWrapper* get_videoWrapper();
 
-    QSize frameSize() const;
-    void setFrameSize(QSize size);
-
     int cropRegionWidth() const;
 
     void enableSendingToMXNet(bool sendingEnabled);
@@ -79,7 +74,6 @@ public slots:
 
     QImage leftPalm() const { return _leftPalm; }
     QImage rightPalm() const { return _rightPalm; }
-
 
 private slots:
     void requestPoseFinished(QNetworkReply* reply);
@@ -99,12 +93,6 @@ private:
     int _currentProfile;
     bool _connected = false;
     QHash<QByteArray, QImage> _frames;
-    // frame size for the camera's resolution
-    QSize _frameSize = QSize(640, 480);
-    // frame width for the camera's resolution
-    const int _frameWidth = 640;//2592
-    // frame height for the camera's resolution
-    const int _frameHeight = 480;//1944
     // crop region width (and height) for the palms crop regions
     const int _cropRegionWidth = 130;
     const QString _dbServerHost = "localhost";

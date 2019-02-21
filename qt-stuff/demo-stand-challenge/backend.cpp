@@ -197,12 +197,19 @@ void Backend::requestHandFinished(QNetworkReply* reply)
 
 QImage Backend::cropPalmRegion(QImage originalFrame, QVariantMap elbow, QVariantMap wrist)
 {
+    if (!videoWrapper) {
+        qDebug() << __PRETTY_FUNCTION__ << ": videoWrapper not set";
+        return QImage();
+    }
+
+    auto frameSize = videoWrapper->frameSize();
+
     float e_x = elbow["x"].toFloat();
     float e_y = elbow["y"].toFloat();
     float w_x = wrist["x"].toFloat();
     float w_y = wrist["y"].toFloat();
-    int x = qRound(_frameSize.width() * (w_x + (w_x - e_x) / 2) - _cropRegionWidth / 2);
-    int y = qRound(_frameSize.height() * (w_y + (w_y - e_y) / 2) - _cropRegionWidth / 2);
+    int x = qRound(frameSize.width() * (w_x + (w_x - e_x) / 2) - _cropRegionWidth / 2);
+    int y = qRound(frameSize.height() * (w_y + (w_y - e_y) / 2) - _cropRegionWidth / 2);
     //qDebug() << e_x << e_y << w_x << w_y << x << y;
 
     QRect cropRegionLeft(x, y, _cropRegionWidth, _cropRegionWidth);
@@ -260,17 +267,6 @@ int Backend::get_currentProfile()
 VideoWrapper* Backend::get_videoWrapper()
 {
     return videoWrapper;
-}
-
-QSize Backend::frameSize() const
-{
-    return _frameSize;
-}
-
-void Backend::setFrameSize(QSize size)
-{
-    _frameSize = size;
-    emit frameSizeChanged();
 }
 
 int Backend::cropRegionWidth() const

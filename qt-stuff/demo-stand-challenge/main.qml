@@ -16,7 +16,6 @@ ApplicationWindow {
     color: root.backgroundColor
 
     //visibility: "FullScreen"
-
     property int primaryFontSize: 24
     property int secondaryFontSize: 18
     property string backgroundColor: "#ECECEC"
@@ -33,25 +32,27 @@ ApplicationWindow {
     Backend {
         id: backend
 
-        frameSize: loader.item.camera.viewfinder.resolution
-
         onRequestPoseDone: {
-            if (root.fpsCounters === true) { loader.item.currentFPSvalue_trackers++; }
-            loader.item.processPoseResults(result);
+            if (root.fpsCounters === true) {
+                loader.item.currentFPSvalue_trackers++
+            }
+            loader.item.processPoseResults(result)
         }
         onRequestLeftHandDone: {
-            loader.item.processLeftHandResults(result);
+            loader.item.processLeftHandResults(result)
         }
         onRequestRightHandDone: {
-            loader.item.processRightHandResults(result);
+            loader.item.processRightHandResults(result)
         }
 
         onRequestFailed: {
-            loader.item.appendToOutput("Error: " + error, true);
+            loader.item.appendToOutput("Error: " + error, true)
         }
 
         onCounterIncreased: {
-            if (root.fpsCounters === true) { loader.item.currentFPSvalue_camera++; }
+            if (root.fpsCounters === true) {
+                loader.item.currentFPSvalue_camera++
+            }
         }
 
         onLeftPalmChanged: {
@@ -63,11 +64,22 @@ ApplicationWindow {
         }
     }
 
-    FontLoader { id: typodermic; source: "qrc:/fonts/typodermic.ttf" }
-    FontLoader { id: titillium; source: "qrc:/fonts/titillium.ttf" }
-    FontLoader { id: titilliumBold; source: "qrc:/fonts/titillium-bold.ttf" }
+    FontLoader {
+        id: typodermic
+        source: "qrc:/fonts/typodermic.ttf"
+    }
+    FontLoader {
+        id: titillium
+        source: "qrc:/fonts/titillium.ttf"
+    }
+    FontLoader {
+        id: titilliumBold
+        source: "qrc:/fonts/titillium-bold.ttf"
+    }
 
-    RobotsModel { id: robotsModel }
+    RobotsModel {
+        id: robotsModel
+    }
 
     Binding {
         target: VirtualKeyboardSettings
@@ -82,7 +94,9 @@ ApplicationWindow {
         height: root.height
         interactive: root.maintenance
 
-        Maintenance { id: maintenanceView }
+        Maintenance {
+            id: maintenanceView
+        }
     }
 
     Loader {
@@ -98,24 +112,23 @@ ApplicationWindow {
         }
     }
 
-    function getCurrentDateTime()
-    {
-        return new Date().toISOString().replace(/[:|.|T]/g, "-").replace("Z", "");
+    function getCurrentDateTime() {
+        return new Date().toISOString().replace(/[:|.|T]/g,
+                                                "-").replace("Z", "")
     }
 
     // HTTP-request to the URL
-    function request(url, method, callback)
-    {
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = (function(myxhr)
-        {
-            return function()
-            {
-                if(myxhr.readyState === 4) { callback(myxhr); }
+    function request(url, method, callback) {
+        var xhr = new XMLHttpRequest()
+        xhr.onreadystatechange = (function (myxhr) {
+            return function () {
+                if (myxhr.readyState === 4) {
+                    callback(myxhr)
+                }
             }
-        })(xhr);
+        })(xhr)
 
-        xhr.open(method, url);
-        xhr.send();
+        xhr.open(method, url)
+        xhr.send()
     }
 }

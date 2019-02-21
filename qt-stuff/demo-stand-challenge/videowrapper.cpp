@@ -33,9 +33,7 @@ bool VideoWrapper::start(const QVideoSurfaceFormat& format)
 {
     m_format = format;
     m_format.setMirrored(true);
-    if (!_frameSize.isEmpty()) {
-        m_format.setFrameSize(_frameSize);
-    }
+    setFrameSize(QSize(format.frameWidth(), static_cast<int>(format.frameHeight() * _jetsonHeightScale)));
 
     if (supportedPixelFormats().count(m_format.pixelFormat()) == 0) {
         return false;
@@ -86,21 +84,6 @@ QObject* VideoWrapper::get_source()
 
 void VideoWrapper::set_source(QObject* qsrc)
 {
-    //    //m_source = nullptr;
-
-    //    if (m_source)
-    //    {
-    //        QCamera *camera = qvariant_cast<QCamera*>(m_source->property("mediaObject"));
-    //        if (camera)
-    //        {
-    //            camera->setViewfinder((QAbstractVideoSurface*)0);
-    //        }
-    //        else
-    //        {
-    //            qsrc->setProperty("videoSurface", QVariant::fromValue<QAbstractVideoSurface*>(NULL));
-    //        }
-    //    }
-
     m_source = qsrc;
 
     if (qsrc) {
@@ -128,10 +111,13 @@ QSize VideoWrapper::frameSize() const
 
 void VideoWrapper::setFrameSize(QSize size)
 {
-    qDebug() << __FUNCTION__ << " : " << size;
+    if (size == _frameSize) {
+        return;
+    }
+
+    qDebug() << __PRETTY_FUNCTION__ << " : " << size;
 
     _frameSize = size;
-
-    stop();
-    start(m_format);
+    m_format.setFrameSize(_frameSize);
+    emit frameSizeChanged();
 }

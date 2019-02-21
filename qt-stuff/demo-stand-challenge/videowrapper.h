@@ -51,6 +51,7 @@ private:
     QAbstractVideoSurface* surf = nullptr;
     QVideoSurfaceFormat m_format;
     QSize _frameSize;
+    const qreal _jetsonHeightScale = 0.7;
     bool _sendingEnabled = false; // enabling sending frames to MXNet
 };
 

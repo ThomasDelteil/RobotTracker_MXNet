@@ -126,9 +126,13 @@ Item {
                         Camera {
                             id: camera
 
-                            function updateResolution(resolution) {
-                                camera.viewfinder.resolution = resolution
-                                backend.videoWrapper.frameSize = resolution
+                            property size viewfinderResolution: viewfinder.resolution
+
+                            viewfinder.resolution: Qt.size(vo.width, vo.height)
+
+                            onViewfinderResolutionChanged: {
+                                console.log('viewfinder changed: ' + JSON.stringify(
+                                                viewfinder))
                             }
 
                             // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
@@ -151,20 +155,12 @@ Item {
                                 var resolutions = camera.supportedViewfinderResolutions()
                                 var resolution = Qt.size(0, 0)
                                 if (!resolutions.length) {
-                                    // this happens on Jetson, try hardcoding it
-                                    resolution = Qt.size(2592, 1080)
+                                    console.log('empty')
                                 } else {
                                     resolutions.forEach(function (r) {
                                         console.log(r.width, "x", r.height)
-                                        if (r.width > resolution.width) {
-                                            resolution = Qt.size(r.width, r.height)
-                                        }
                                     })
                                 }
-
-                                camera.viewfinder.resolution = resolution
-                                updateResolution(resolution)
-                                console.log("resolution set to " + resolution)
                             }
 
                             //focus {
@@ -172,26 +168,9 @@ Item {
                             //    focusPointMode: Camera.FocusPointCenter
                             //}
                             onError: {
-                                cameraStatus.text = qsTr("Error: ") + errorString
+                                cameraStatus.text = qsTr(
+                                            "Error: ") + errorString
                                 console.log(errorCode, errorString)
-                            }
-                            Component.onCompleted: {
-
-                                //console.log("camera orientation:", camera.orientation);
-                                //console.log("camera state:", camera.cameraState);
-                                //console.log("camera status:", camera.cameraStatus);
-
-                                //console.log("camera supported IC resolutions:", imageCapture.supportedResolutions);
-
-
-                                /*
-                            console.log("camera supported VF resolutions:");
-                            var supRezes = camera.supportedViewfinderResolutions();
-                            for (var rez in supRezes)
-                            {
-                                console.log(supRezes[rez].width, "x", supRezes[rez].height);
-                            }
-                            */
                             }
                         }
 
@@ -301,9 +280,11 @@ Item {
 
                                                 property real proxy: x + y
 
-                                                x: Math.min(Math.max(0, target.x),
+                                                x: Math.min(Math.max(0,
+                                                                     target.x),
                                                             parent.width)
-                                                y: Math.min(Math.max(0, target.y),
+                                                y: Math.min(Math.max(0,
+                                                                     target.y),
                                                             parent.height)
 
                                                 width: root.trackerWidth
@@ -432,9 +413,11 @@ Item {
 
                                                 property real proxy: x + y
 
-                                                x: Math.min(Math.max(0, target.x),
+                                                x: Math.min(Math.max(0,
+                                                                     target.x),
                                                             parent.width)
-                                                y: Math.min(Math.max(0, target.y),
+                                                y: Math.min(Math.max(0,
+                                                                     target.y),
                                                             parent.height)
 
                                                 width: root.trackerWidth
@@ -700,10 +683,11 @@ Item {
                             enabled = false
                             text = "saving..."
 
-                            request("http://".concat(backend.dbServer(), "/user/saveScore/", backend.get_currentProfile(), "/", score.text),
-                                    "POST",
-                                    function (o)
-                                    {
+                            request("http://".concat(backend.dbServer(),
+                                                     "/user/saveScore/",
+                                                     backend.get_currentProfile(
+                                                         ), "/", score.text),
+                                    "POST", function (o) {
                                         enabled = true
                                         text = "Done"
 
@@ -713,8 +697,7 @@ Item {
                                         } else {
                                             console.log("[error] Couldn't save the score. Player ID:",
                                                         backend.get_currentProfile(
-                                                            ),
-                                                        "| score:",
+                                                            ), "| score:",
                                                         score.text)
                                             // FIXME dialog never opens
                                             dialogScoreError.open()
