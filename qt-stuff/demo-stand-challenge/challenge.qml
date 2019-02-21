@@ -145,10 +145,14 @@ Item {
                             console.log("Camera supported VF resolutions:")
                             var resolutions = camera.supportedViewfinderResolutions()
                             if (!resolutions.length) {
+                                // this happens on Jetson, try hardcoding it
+                                var resolution = Qt.size(2592, 1944)
+                                camera.viewfinder.resolution = resolution
+                                console.log("resolution set to " + resolution)
                                 return
                             }
 
-                            var resolution = Qt.size(0, 0)
+                            resolution = Qt.size(0, 0)
 
                             resolutions.forEach(function (r) {
                                 console.log(r.width, "x", r.height)
