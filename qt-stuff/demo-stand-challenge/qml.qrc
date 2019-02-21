@@ -10,5 +10,14 @@
         <file>ArmsData.qml</file>
         <file>RobotArm.qml</file>
         <file>RobotsModel.qml</file>
+        <file>img/button-disabled.png</file>
+        <file>img/button-done.png</file>
+        <file>img/button-pressed.png</file>
+        <file>img/button-start.png</file>
+        <file>img/button-stop.png</file>
+        <file>ImageButton.qml</file>
+        <file>fonts/titillium-bold.ttf</file>
+        <file>fonts/titillium.ttf</file>
+        <file>fonts/typodermic.ttf</file>
     </qresource>
 </RCC>

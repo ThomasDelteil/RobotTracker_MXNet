@@ -63,6 +63,10 @@ ApplicationWindow {
         }
     }
 
+    FontLoader { id: typodermic; source: "qrc:/fonts/typodermic.ttf" }
+    FontLoader { id: titillium; source: "qrc:/fonts/titillium.ttf" }
+    FontLoader { id: titilliumBold; source: "qrc:/fonts/titillium-bold.ttf" }
+
     RobotsModel { id: robotsModel }
 
     Binding {
@@ -93,8 +97,6 @@ ApplicationWindow {
             }
         }
     }
-
-
 
     function getCurrentDateTime()
     {

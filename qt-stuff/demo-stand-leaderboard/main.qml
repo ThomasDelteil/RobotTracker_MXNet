@@ -64,7 +64,7 @@ ApplicationWindow {
                 Text {
                     Layout.alignment: Qt.AlignHCenter
                     font.family: typodermic.name
-                    font.pointSize: parent.width * 0.08
+                    font.pointSize: parent.width < 1000 ? parent.width * 0.08 : parent.width * 0.07
                     color: "#63ADE8"
                     text: "LEADERBOARD"
                 }
@@ -91,7 +91,7 @@ ApplicationWindow {
                     model: backend.scores
 
                     delegate: ItemDelegate {
-                        height: root.primaryFontSize * 1.5
+                        height: root.primaryFontSize * 1.7
                         width: parent.width
                         RowLayout {
                             anchors.fill: parent
@@ -116,7 +116,7 @@ ApplicationWindow {
 
                             Text {
                                 Layout.fillWidth: true
-                                Layout.leftMargin: 25
+                                Layout.leftMargin: 30
                                 horizontalAlignment: Text.AlignLeft
                                 font.pointSize: position < 4 ? root.primaryFontSize : root.secondaryFontSize
                                 font.family: titillium.name
