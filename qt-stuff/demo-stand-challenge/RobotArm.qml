@@ -65,6 +65,9 @@ QtObject {
 
     function setLearningMode(isOn) {
         impl.setLearningMode(isOn)
+        if (!isOn) {
+            impl.selectGripper_1()
+        }
     }
 
     function parse(object) {
@@ -188,6 +191,13 @@ QtObject {
                 "isOn": isOn
             }
             sendRequest(root.name + "/learningMode", data)
+        }
+
+        function selectGripper_1() {
+            var data = {
+                "toolId": 11
+            }
+            sendRequest(root.name + "/tools", data)
         }
 
         function getPosition(relativeY, relativeZ) {

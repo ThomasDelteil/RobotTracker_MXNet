@@ -175,9 +175,10 @@ void Backend::requestHandFinished(QNetworkReply* reply)
         if (predicted == "background" || jsnObj["value"].toDouble() < 0.6) {
             predicted = "2";
         } else {
+            auto prediction = predictPalm(predicted == "open");
             // TODO use majority vote of the last [n] values | n = 3
 
-            if (predicted == "open") {
+            if (prediction) {
                 predicted = "0";
             } else {
                 predicted = "1";
@@ -226,6 +227,22 @@ void Backend::setRightPalm(QImage palm)
 {
     _rightPalm = palm;
     emit rightPalmChanged();
+}
+
+bool Backend::predictPalm(bool isOpen)
+{
+    if (_lastPalmPredictions.size() == _lastPalmPredictionsCount) {
+        _lastPalmPredictions.takeFirst();
+    }
+
+    _lastPalmPredictions.push_back(isOpen);
+
+    int openCount = _lastPalmPredictions.count(true);
+    int closedCount = _lastPalmPredictions.count(false);
+
+    qDebug() << "Yes count: " << openCount << ", no count: " << closedCount;
+
+    return openCount > closedCount;
 }
 
 void Backend::set_currentProfile(int id)

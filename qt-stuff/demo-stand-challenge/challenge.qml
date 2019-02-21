@@ -131,6 +131,20 @@ Item {
                                                    )
                         metaData.orientation: root.cameraUpsideDown ? 180 : 0
 
+                        onCameraStatusChanged: {
+                            console.log("camera state changed to " + cameraState)
+                        }
+
+                        onCameraStateChanged: {
+                            console.log("camera state changed to " + cameraState)
+                            console.log("camera supported VF resolutions:");
+                            var supRezes = camera.supportedViewfinderResolutions();
+                            for (var rez in supRezes)
+                            {
+                                console.log(supRezes[rez].width, "x", supRezes[rez].height);
+                            }
+                        }
+
                         //focus {
                         //    focusMode: Camera.FocusMacro
                         //    focusPointMode: Camera.FocusPointCenter
