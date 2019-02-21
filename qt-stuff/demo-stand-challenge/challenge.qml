@@ -125,10 +125,10 @@ Item {
                         // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
                         deviceId: "/dev/video0"
                         // picture quality
-                        viewfinder.resolution: Qt.size(
-                                                   backend.frameWidth(),
-                                                   backend.frameHeight()
-                                                   )
+                        //                        viewfinder.resolution: Qt.size(
+                        //                                                   backend.frameWidth(),
+                        //                                                   backend.frameHeight()
+                        //                                                   )
                         metaData.orientation: root.cameraUpsideDown ? 180 : 0
 
                         onCameraStatusChanged: {
@@ -137,12 +137,28 @@ Item {
 
                         onCameraStateChanged: {
                             console.log("camera state changed to " + cameraState)
-                            console.log("camera supported VF resolutions:");
-                            var supRezes = camera.supportedViewfinderResolutions();
-                            for (var rez in supRezes)
-                            {
-                                console.log(supRezes[rez].width, "x", supRezes[rez].height);
+
+                            if (cameraState != Camera.ActiveState) {
+                                return
                             }
+
+                            console.log("Camera supported VF resolutions:")
+                            var resolutions = camera.supportedViewfinderResolutions()
+                            if (!resolutions.length) {
+                                return
+                            }
+
+                            var resolution = Qt.size(0, 0)
+
+                            resolutions.forEach(function (r) {
+                                console.log(r.width, "x", r.height)
+                                if (r.width > resolution.width) {
+                                    resolution = Qt.size(r.width, r.height)
+                                }
+                            })
+
+                            camera.viewfinder.resolution = resolution
+                            console.log("resolution set to " + resolution)
                         }
 
                         //focus {
@@ -154,11 +170,13 @@ Item {
                             console.log(errorCode, errorString)
                         }
                         Component.onCompleted: {
+
                             //console.log("camera orientation:", camera.orientation);
                             //console.log("camera state:", camera.cameraState);
                             //console.log("camera status:", camera.cameraStatus);
 
                             //console.log("camera supported IC resolutions:", imageCapture.supportedResolutions);
+
 
                             /*
                             console.log("camera supported VF resolutions:");
@@ -189,9 +207,9 @@ Item {
 
                             anchors.fill: parent
 
-//                            anchors.centerIn: parent
-//                            width: parent.contentRect.width
-//                            height: parent.contentRect.height
+                            //                            anchors.centerIn: parent
+                            //                            width: parent.contentRect.width
+                            //                            height: parent.contentRect.height
                             color: "transparent"
 
                             /* left robot position */
@@ -303,7 +321,8 @@ Item {
                                         border.color: "white"
 
                                         onTargetChanged: {
-                                            moveTheArm(name, x / parent.width, y / parent.height)
+                                            moveTheArm(name, x / parent.width,
+                                                       y / parent.height)
                                         }
 
                                         transform: Translate {
@@ -384,7 +403,8 @@ Item {
                                         border.color: "white"
 
                                         onTargetChanged: {
-                                            moveTheArm(name, x / parent.width, y / parent.height)
+                                            moveTheArm(name, x / parent.width,
+                                                       y / parent.height)
                                         }
 
                                         transform: Translate {
@@ -589,8 +609,10 @@ Item {
                         text: "-"
                         font.pointSize: root.primaryFontSize
                         onClicked: {
-                            var s = parseInt(score.text);
-                            if (s > 0) { score.text = s - 1; }
+                            var s = parseInt(score.text)
+                            if (s > 0) {
+                                score.text = s - 1
+                            }
                         }
                     }
 
@@ -610,7 +632,7 @@ Item {
                         text: "+"
                         font.pointSize: root.primaryFontSize
                         onClicked: {
-                            score.text = parseInt(score.text) + 1;
+                            score.text = parseInt(score.text) + 1
                         }
                     }
                 }
@@ -623,40 +645,36 @@ Item {
                 font.pointSize: root.primaryFontSize * 1.5
                 enabled: !btn_stop.enabled
                 onClicked: {
-                    enabled = false;
-                    text = "saving...";
+                    enabled = false
+                    text = "saving..."
 
-                    request(
-                            "http://".concat(backend.dbServer(), "/user/saveScore/", backend.get_currentProfile(), "/", score.text),
-                            "POST",
-                            function (o)
-                    {
-                        enabled = true;
-                        text = "Done";
+                    request("http://".concat(backend.dbServer(),
+                                             "/user/saveScore/",
+                                             backend.get_currentProfile(), "/",
+                                             score.text), "POST", function (o) {
+                                                 enabled = true
+                                                 text = "Done"
 
-                        if (o.status === 200 || o.responseText === "0")
-                        {
-                            console.log(o.responseText);
-                        }
-                        else
-                        {
-                            console.log(
-                                        "[error] Couldn't save the score. Player ID:",
-                                        backend.get_currentProfile(),
-                                        "| score:",
-                                        score.text
-                                        );
-                            // FIXME dialog never opens
-                            dialogScoreError.open();
-                        }
+                                                 if (o.status === 200
+                                                         || o.responseText === "0") {
+                                                     console.log(o.responseText)
+                                                 } else {
+                                                     console.log("[error] Couldn't save the score. Player ID:",
+                                                                 backend.get_currentProfile(
+                                                                     ),
+                                                                 "| score:",
+                                                                 score.text)
+                                                     // FIXME dialog never opens
+                                                     dialogScoreError.open()
+                                                 }
 
-                        scoreLayout.visible = false;
-                        score.text = 0;
+                                                 scoreLayout.visible = false
+                                                 score.text = 0
 
-                        backend.set_currentProfile(0);
+                                                 backend.set_currentProfile(0)
 
-                        nextWindow("welcome.qml");
-                    });
+                                                 nextWindow("welcome.qml")
+                                             })
                 }
             }
         }
@@ -721,7 +739,7 @@ Item {
     }
 
     function startChallenge() {
-        scoreLayout.visible = true;
+        scoreLayout.visible = true
         btn_start.enabled = false
         robotsModel.sendChanges = true
         tm_sendFrame.start()
