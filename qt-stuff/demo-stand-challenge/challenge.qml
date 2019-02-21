@@ -205,7 +205,8 @@ Item {
                         id: vo
                         anchors.fill: parent
                         orientation: root.cameraUpsideDown ? 180 : 0
-                        fillMode: VideoOutput.PreserveAspectFit //PreserveAspectCrop
+                        fillMode: VideoOutput.Stretch
+                        // VideoOutput.PreserveAspectFit //PreserveAspectCrop
                         source: backend.videoWrapper
 
                         Rectangle {

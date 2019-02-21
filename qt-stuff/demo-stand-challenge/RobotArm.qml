@@ -36,11 +36,11 @@ QtObject {
     property real minRoll: 0
     property real maxRoll: 0
 
-    property real minPitch: 0 //Math.PI / 2
-    property real maxPitch: 0 //Math.PI / 2
+    property real minPitch: Math.PI / 2
+    property real maxPitch: Math.PI / 2
 
-    property real minYaw: -Math.PI / 2
-    property real maxYaw: -Math.PI / 2
+    property real minYaw: 0 //-Math.PI / 2
+    property real maxYaw: 0 //-Math.PI / 2
 
     property bool calibrationNeeded: true
     property bool learningMode: true

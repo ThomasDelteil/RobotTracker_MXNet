@@ -125,6 +125,8 @@ QSize VideoWrapper::frameSize() const
 
 void VideoWrapper::setFrameSize(QSize size)
 {
+    qDebug() << __FUNCTION__ << " : " << size;
+
     m_format.setFrameSize(size);
 
     stop();
