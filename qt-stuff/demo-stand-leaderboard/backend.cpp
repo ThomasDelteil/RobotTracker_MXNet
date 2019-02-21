@@ -6,7 +6,7 @@ Backend::Backend(QObject *parent) : QObject(parent)
 
     _updateTimer = new QTimer(this);
     connect(_updateTimer, &QTimer::timeout, this, &Backend::fetchDataFromDB);
-    _updateTimer->start(2000);
+    _updateTimer->start(10000);
 
     // --- database
 
