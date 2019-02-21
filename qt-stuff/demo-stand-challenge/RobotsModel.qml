@@ -4,7 +4,7 @@ import QtWebSockets 1.1
 Item {
     id: root
 
-    property bool sendChanges: false
+    property bool sendChanges: true
 
     property alias leftArm: left
     property alias rightArm: right

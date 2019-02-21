@@ -88,7 +88,7 @@ private slots:
     void setLeftPalm(QImage palm);
     void setRightPalm(QImage palm);
 
-    bool predictPalm(bool isOpen);
+    bool accumulatedPalmPrediction(bool isOpen, bool isRight);
 
 private:
     VideoWrapper* videoWrapper;
@@ -111,7 +111,8 @@ private:
     const quint16 _dbServerPort = 6547;
     QImage _leftPalm;
     QImage _rightPalm;
-    QList<bool> _lastPalmPredictions;
+    QList<bool> _lastLeftPalmPredictions;
+    QList<bool> _lastRightPalmPredictions;
     const int _lastPalmPredictionsCount = 5;
 };
 

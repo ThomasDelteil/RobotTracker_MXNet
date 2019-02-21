@@ -67,6 +67,7 @@ QtObject {
         impl.setLearningMode(isOn)
         if (!isOn) {
             impl.selectGripper_1()
+            console.log(name + ' arm tool selected')
         }
     }
 
@@ -119,14 +120,16 @@ QtObject {
     function mapXFromRobot(frame) {
         // root.y = root.minY + (root.maxY - root.minY) * relativeY
         var x_frame = mapCoords(root.y, frame.width, root.minY, root.maxY)
-        console.log('robot y -> x:' + root.y + ' -> ' + x_frame)
+        //console.log('robot y -> x:' + root.y + ' -> ' + x_frame)
         return x_frame
     }
 
     function mapYFromRobot(frame) {
         // root.z = root.maxZ - (root.maxZ - root.minZ) * relativeZ
         var y_frame = mapCoords(root.z, frame.height, root.minZ, root.maxZ)
-        console.log('robot z -> y:' + root.z + ' -> ' + y_frame)
+        // flip y axis
+        y_frame = frame.height - y_frame
+        //console.log('robot z -> y:' + root.z + ' -> ' + y_frame)
         return y_frame
     }
 

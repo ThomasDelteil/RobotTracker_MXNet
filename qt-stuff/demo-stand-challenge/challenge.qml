@@ -89,103 +89,99 @@ Item {
         updateSourceTimer.start()
     }
 
-    Rectangle {
+    ColumnLayout {
         anchors.fill: parent
-        color: "#CECFD4"
+        //anchors.margins: 5
+        spacing: 0
 
-        ColumnLayout {
-            anchors.fill: parent
-            //anchors.margins: 5
-            spacing: 20
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: parent.height * 0.8
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: parent.height * 0.8
+            RowLayout {
+                anchors.fill: parent
+                spacing: 0
 
-                RowLayout {
-                    anchors.fill: parent
-                    spacing: 0
+                Rectangle {
+                    id: cameraBackground
+                    Layout.preferredWidth: root.debugOutput ? parent.width * 0.6 : parent.width
+                    Layout.fillWidth: !root.debugOutput
+                    Layout.fillHeight: true
+                    color: root.backgroundColor
+                    z: 1
 
-                    Rectangle {
-                        id: cameraBackground
-                        Layout.preferredWidth: root.debugOutput ? parent.width * 0.6 : parent.width
-                        Layout.fillWidth: !root.debugOutput
-                        Layout.fillHeight: true
-                        color: "#F3F3F3"
-                        z: 1
+                    Text {
+                        id: cameraStatus
+                        anchors.centerIn: parent
+                        width: parent.width
+                        text: qsTr("loading camera...")
+                        font.pointSize: 40
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.WordWrap
+                    }
 
-                        Text {
-                            id: cameraStatus
-                            anchors.centerIn: parent
-                            width: parent.width
-                            text: qsTr("loading camera...")
-                            font.pointSize: 40
-                            horizontalAlignment: Text.AlignHCenter
-                            wrapMode: Text.WordWrap
+                    Camera {
+                        id: camera
+
+                        function updateResolution(resolution) {
+                            camera.viewfinder.resolution = resolution
+                            backend.videoWrapper.frameSize = resolution
                         }
 
-                        Camera {
-                            id: camera
+                        // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
+                        deviceId: "/dev/video0"
 
-                            function updateResolution(resolution) {
-                                camera.viewfinder.resolution = resolution
-                                backend.videoWrapper.frameSize = resolution
+                        metaData.orientation: root.cameraUpsideDown ? 180 : 0
+
+                        onCameraStatusChanged: {
+                            console.log("camera status changed to " + camera.cameraStatus)
+                        }
+
+                        onCameraStateChanged: {
+                            console.log("camera state changed to " + camera.cameraState)
+
+                            if (cameraState != Camera.ActiveState) {
+                                return
                             }
 
-                            // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
-                            deviceId: "/dev/video0"
-
-                            metaData.orientation: root.cameraUpsideDown ? 180 : 0
-
-                            onCameraStatusChanged: {
-                                console.log("camera status changed to " + camera.cameraStatus)
+                            console.log("Camera supported VF resolutions:")
+                            var resolutions = camera.supportedViewfinderResolutions()
+                            var resolution = Qt.size(0, 0)
+                            if (!resolutions.length) {
+                                // this happens on Jetson, try hardcoding it
+                                resolution = Qt.size(2592, 1080)
+                            } else {
+                                resolutions.forEach(function (r) {
+                                    console.log(r.width, "x", r.height)
+                                    if (r.width > resolution.width) {
+                                        resolution = Qt.size(r.width, r.height)
+                                    }
+                                })
                             }
 
-                            onCameraStateChanged: {
-                                console.log("camera state changed to " + camera.cameraState)
+                            camera.viewfinder.resolution = resolution
+                            updateResolution(resolution)
+                            console.log("resolution set to " + resolution)
+                        }
 
-                                if (cameraState != Camera.ActiveState) {
-                                    return
-                                }
+                        //focus {
+                        //    focusMode: Camera.FocusMacro
+                        //    focusPointMode: Camera.FocusPointCenter
+                        //}
+                        onError: {
+                            cameraStatus.text = qsTr("Error: ") + errorString
+                            console.log(errorCode, errorString)
+                        }
+                        Component.onCompleted: {
 
-                                console.log("Camera supported VF resolutions:")
-                                var resolutions = camera.supportedViewfinderResolutions()
-                                var resolution = Qt.size(0, 0)
-                                if (!resolutions.length) {
-                                    // this happens on Jetson, try hardcoding it
-                                    resolution = Qt.size(2592, 1080)
-                                } else {
-                                    resolutions.forEach(function (r) {
-                                        console.log(r.width, "x", r.height)
-                                        if (r.width > resolution.width) {
-                                            resolution = Qt.size(r.width, r.height)
-                                        }
-                                    })
-                                }
+                            //console.log("camera orientation:", camera.orientation);
+                            //console.log("camera state:", camera.cameraState);
+                            //console.log("camera status:", camera.cameraStatus);
 
-                                camera.viewfinder.resolution = resolution
-                                updateResolution(resolution)
-                                console.log("resolution set to " + resolution)
-                            }
-
-                            //focus {
-                            //    focusMode: Camera.FocusMacro
-                            //    focusPointMode: Camera.FocusPointCenter
-                            //}
-                            onError: {
-                                cameraStatus.text = qsTr("Error: ") + errorString
-                                console.log(errorCode, errorString)
-                            }
-                            Component.onCompleted: {
-
-                                //console.log("camera orientation:", camera.orientation);
-                                //console.log("camera state:", camera.cameraState);
-                                //console.log("camera status:", camera.cameraStatus);
-
-                                //console.log("camera supported IC resolutions:", imageCapture.supportedResolutions);
+                            //console.log("camera supported IC resolutions:", imageCapture.supportedResolutions);
 
 
-                                /*
+                            /*
                             console.log("camera supported VF resolutions:");
                             var supRezes = camera.supportedViewfinderResolutions();
                             for (var rez in supRezes)
@@ -193,113 +189,96 @@ Item {
                                 console.log(supRezes[rez].width, "x", supRezes[rez].height);
                             }
                             */
-                            }
                         }
+                    }
 
-                        Binding {
-                            target: backend.videoWrapper
-                            property: "source"
-                            value: camera
-                        }
+                    Binding {
+                        target: backend.videoWrapper
+                        property: "source"
+                        value: camera
+                    }
 
-                        VideoOutput {
-                            id: vo
-                            anchors.fill: parent
-                            orientation: root.cameraUpsideDown ? 180 : 0
-                            // fillMode: VideoOutput.Stretch
-                            fillMode: VideoOutput.PreserveAspectFit //PreserveAspectCrop
-                            source: backend.videoWrapper
+                    VideoOutput {
+                        id: vo
+                        anchors.fill: parent
+                        orientation: root.cameraUpsideDown ? 180 : 0
+                        // fillMode: VideoOutput.Stretch
+                        fillMode: VideoOutput.PreserveAspectFit //PreserveAspectCrop
+                        source: backend.videoWrapper
 
+                        Rectangle {
+                            id: originalFrame
+
+                            anchors.centerIn: parent
+                            width: parent.contentRect.width
+                            height: parent.contentRect.height
+                            color: "transparent"
+
+                            onWidthChanged: console.log(
+                                                'originalFrame size: ' + Qt.size(
+                                                    width, height))
+                            onHeightChanged: console.log(
+                                                 'originalFrame size: ' + Qt.size(
+                                                     width, height))
+
+                            /* left robot position */
                             Rectangle {
-                                id: originalFrame
+                                id: robotLeft
 
-                                anchors.centerIn: parent
-                                width: parent.contentRect.width
-                                height: parent.contentRect.height
-                                color: "transparent"
+                                x: robotsModel.leftArm.mapXFromRobot(
+                                       leftCroppingOverlay)
+                                y: robotsModel.leftArm.mapYFromRobot(
+                                       leftCroppingOverlay)
+                                width: root.trackerWidth
+                                height: width
+                                color: "blue"
+                                radius: width * 0.5
+                                border.width: 2
+                                border.color: "white"
+                                opacity: 0.3
 
-                                onWidthChanged: console.log(
-                                                    'originalFrame size: ' + Qt.size(
-                                                        width, height))
-                                onHeightChanged: console.log(
-                                                     'originalFrame size: ' + Qt.size(
-                                                         width, height))
-
-                                /* left robot position */
-                                Rectangle {
-                                    id: robotLeft
-
-                                    x: robotsModel.leftArm.mapXFromRobot(
-                                           leftCroppingOverlay)
-                                    y: robotsModel.leftArm.mapYFromRobot(
-                                           leftCroppingOverlay)
-                                    width: root.trackerWidth
-                                    height: width
-                                    color: "blue"
-                                    radius: width * 0.5
-                                    border.width: 2
-                                    border.color: "white"
-                                    opacity: 0.3
-
-                                    // animation
-                                    Behavior on x {
-                                        NumberAnimation {
-                                            duration: 100
-                                            easing.type: Easing.OutQuart
-                                        }
-                                    }
-                                    Behavior on y {
-                                        NumberAnimation {
-                                            duration: 100
-                                            easing.type: Easing.OutQuart
-                                        }
-                                    }
+                                transform: Translate {
+                                    y: -trackerLeft.height / 2
+                                    x: -trackerLeft.width / 2
                                 }
 
-                                /* right robot position */
-                                Rectangle {
-                                    id: robotRight
-
-                                    x: robotsModel.rightArm.mapXFromRobot(
-                                           leftCroppingOverlay)
-                                    y: robotsModel.rightArm.mapYFromRobot(
-                                           leftCroppingOverlay)
-                                    width: root.trackerWidth
-                                    height: width
-                                    color: "green"
-                                    radius: width * 0.5
-                                    border.width: 2
-                                    border.color: "white"
-                                    opacity: 0.3
-
-                                    // animation
-                                    Behavior on x {
-                                        NumberAnimation {
-                                            duration: 100
-                                            easing.type: Easing.OutQuart
-                                        }
-                                    }
-                                    Behavior on y {
-                                        NumberAnimation {
-                                            duration: 100
-                                            easing.type: Easing.OutQuart
-                                        }
+                                // animation
+                                Behavior on x {
+                                    NumberAnimation {
+                                        duration: 100
+                                        easing.type: Easing.OutQuart
                                     }
                                 }
+                                Behavior on y {
+                                    NumberAnimation {
+                                        duration: 100
+                                        easing.type: Easing.OutQuart
+                                    }
+                                }
+                            }
 
-                                RowLayout {
-                                    id: croppingOverlay
+                            RowLayout {
+                                id: croppingOverlay
 
-                                    property int bufferWidth: 100
-                                    property real overlayOpacity: 0.1
+                                property int bufferWidth: 100
+                                property int marginWidth: 50
+                                property real overlayOpacity: 0.1
 
-                                    anchors.fill: parent
+                                anchors.fill: parent
+
+                                Item {
+                                    id: leftCroppingOverlay
+
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
 
                                     Item {
-                                        id: leftCroppingOverlay
-
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
+                                        anchors {
+                                            fill: parent
+                                            topMargin: croppingOverlay.marginWidth
+                                            bottomMargin: croppingOverlay.marginWidth
+                                            leftMargin: croppingOverlay.marginWidth
+                                        }
 
                                         Rectangle {
                                             anchors.fill: parent
@@ -313,10 +292,8 @@ Item {
                                             property string name: "left"
 
                                             property var target: ({
-                                                                      "x": originalFrame.width / 4
-                                                                           - width / 2,
-                                                                      "y": originalFrame.height / 1.3
-                                                                           - height / 2
+                                                                      "x": originalFrame.width / 4 - width / 2,
+                                                                      "y": originalFrame.height / 1.3 - height / 2
                                                                   })
 
                                             property real proxy: x + y
@@ -341,7 +318,8 @@ Item {
                                             }
 
                                             onProxyChanged: {
-                                                moveTheArm(name, x / parent.width,
+                                                moveTheArm(name,
+                                                           x / parent.width,
                                                            y / parent.height)
                                             }
 
@@ -376,22 +354,67 @@ Item {
                                             }
                                         }
                                     }
+                                }
+
+                                Item {
+                                    width: croppingOverlay.bufferWidth
+                                    Layout.fillHeight: true
+                                }
+
+                                Item {
+                                    id: rightCroppingOverlay
+
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
 
                                     Item {
-                                        width: croppingOverlay.bufferWidth
-                                        Layout.fillHeight: true
-                                    }
-
-                                    Item {
-                                        id: rightCroppingOverlay
-
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
+                                        anchors {
+                                            fill: parent
+                                            topMargin: croppingOverlay.marginWidth
+                                            bottomMargin: croppingOverlay.marginWidth
+                                            rightMargin: croppingOverlay.marginWidth
+                                        }
 
                                         Rectangle {
                                             anchors.fill: parent
                                             color: 'green'
                                             opacity: croppingOverlay.overlayOpacity
+                                        }
+
+                                        /* right robot position */
+                                        Rectangle {
+                                            id: robotRight
+
+                                            x: robotsModel.rightArm.mapXFromRobot(
+                                                   rightCroppingOverlay)
+                                            y: robotsModel.rightArm.mapYFromRobot(
+                                                   rightCroppingOverlay)
+                                            width: root.trackerWidth
+                                            height: width
+                                            color: "green"
+                                            radius: width * 0.5
+                                            border.width: 2
+                                            border.color: "white"
+                                            opacity: 0.3
+
+                                            transform: Translate {
+                                                y: -trackerLeft.height / 2
+                                                x: -trackerLeft.width / 2
+                                            }
+
+                                            // animation
+                                            Behavior on x {
+                                                NumberAnimation {
+                                                    duration: 100
+                                                    easing.type: Easing.OutQuart
+                                                }
+                                            }
+                                            Behavior on y {
+                                                NumberAnimation {
+                                                    duration: 100
+                                                    easing.type: Easing.OutQuart
+                                                }
+                                            }
                                         }
 
                                         // tracker #2 (right hand)
@@ -400,10 +423,8 @@ Item {
                                             property string name: "right"
 
                                             property var target: ({
-                                                                      "x": originalFrame.width / 1.3
-                                                                           - width / 2,
-                                                                      "y": originalFrame.height / 1.3
-                                                                           - height / 2
+                                                                      "x": originalFrame.width / 1.3 - width / 2,
+                                                                      "y": originalFrame.height / 1.3 - height / 2
                                                                   })
 
                                             property real proxy: x + y
@@ -428,7 +449,8 @@ Item {
                                             }
 
                                             onProxyChanged: {
-                                                moveTheArm(name, x / parent.width,
+                                                moveTheArm(name,
+                                                           x / parent.width,
                                                            y / parent.height)
                                             }
 
@@ -464,245 +486,240 @@ Item {
                                         }
                                     }
                                 }
+                            }
 
-                                Image {
-                                    id: leftPalmDebug
+                            Image {
+                                id: leftPalmDebug
 
-                                    width: backend.cropRegionWidth
-                                    height: width
-                                    cache: false
-                                    anchors {
-                                        top: parent.top
-                                        left: parent.left
-                                        margins: 10
-                                    }
+                                width: backend.cropRegionWidth
+                                height: width
+                                cache: false
+                                anchors {
+                                    top: parent.top
+                                    left: parent.left
+                                    margins: 10
                                 }
+                            }
 
-                                Image {
-                                    id: rightPalmDebug
+                            Image {
+                                id: rightPalmDebug
 
-                                    width: backend.cropRegionWidth
-                                    height: width
-                                    cache: false
-                                    anchors {
-                                        top: parent.top
-                                        right: parent.right
-                                        margins: 10
-                                    }
+                                width: backend.cropRegionWidth
+                                height: width
+                                cache: false
+                                anchors {
+                                    top: parent.top
+                                    right: parent.right
+                                    margins: 10
                                 }
+                            }
 
-                                // crop region for the left hand
-                                Rectangle {
-                                    id: leftHandCropRegion
-                                    width: backend.cropRegionWidth
-                                    height: backend.cropRegionWidth
-                                    color: "blue"
-                                    opacity: 0.6
-                                    visible: btn_stop.enabled
+                            // crop region for the left hand
+                            Rectangle {
+                                id: leftHandCropRegion
+                                width: backend.cropRegionWidth
+                                height: backend.cropRegionWidth
+                                color: "blue"
+                                opacity: 0.6
+                                visible: btn_stop.enabled
 
-                                    Text {
-                                        id: palmLeft
-                                        anchors.centerIn: parent
-                                        font.pointSize: root.primaryFontSize * 3
-                                        font.bold: true
-                                        color: "white"
-                                        text: "2"
-                                    }
-                                }
-
-                                // crop region for the right hand
-                                Rectangle {
-                                    id: rightHandCropRegion
-                                    width: backend.cropRegionWidth
-                                    height: backend.cropRegionWidth
-                                    color: "green"
-                                    opacity: 0.6
-                                    visible: btn_stop.enabled
-
-                                    Text {
-                                        id: palmRight
-                                        anchors.centerIn: parent
-                                        font.pointSize: root.primaryFontSize * 3
-                                        font.bold: true
-                                        color: "white"
-                                        text: "2"
-                                    }
-                                }
-
-                                // FPS counters
                                 Text {
-                                    id: fpsCounter_camera
-                                    anchors.top: parent.top
-                                    anchors.left: parent.left
-                                    anchors.topMargin: 10
-                                    anchors.leftMargin: 15
-                                    text: "0"
-                                    font.pointSize: 40
-                                    color: "yellow"
-                                    visible: root.fpsCounters
+                                    id: palmLeft
+                                    anchors.centerIn: parent
+                                    font.pointSize: root.primaryFontSize * 3
+                                    font.bold: true
+                                    color: "white"
+                                    text: "2"
                                 }
+                            }
+
+                            // crop region for the right hand
+                            Rectangle {
+                                id: rightHandCropRegion
+                                width: backend.cropRegionWidth
+                                height: backend.cropRegionWidth
+                                color: "green"
+                                opacity: 0.6
+                                visible: btn_stop.enabled
+
                                 Text {
-                                    id: fpsCounter_trackers
-                                    anchors.top: fpsCounter_camera.bottom
-                                    anchors.left: fpsCounter_camera.left
-                                    text: "0"
-                                    font.pointSize: 40
-                                    color: "red"
-                                    //visible: btn_stop.enabled
-                                    visible: root.fpsCounters
+                                    id: palmRight
+                                    anchors.centerIn: parent
+                                    font.pointSize: root.primaryFontSize * 3
+                                    font.bold: true
+                                    color: "white"
+                                    text: "2"
                                 }
+                            }
+
+                            // FPS counters
+                            Text {
+                                id: fpsCounter_camera
+                                anchors.top: parent.top
+                                anchors.left: parent.left
+                                anchors.topMargin: 10
+                                anchors.leftMargin: 15
+                                text: "0"
+                                font.pointSize: 40
+                                color: "yellow"
+                                visible: root.fpsCounters
+                            }
+                            Text {
+                                id: fpsCounter_trackers
+                                anchors.top: fpsCounter_camera.bottom
+                                anchors.left: fpsCounter_camera.left
+                                text: "0"
+                                font.pointSize: 40
+                                color: "red"
+                                //visible: btn_stop.enabled
+                                visible: root.fpsCounters
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    Layout.preferredWidth: parent.width * 0.4
+                    Layout.fillHeight: true
+                    color: root.backgroundColor
+                    border.width: 1
+                    visible: root.debugOutput
+
+                    ScrollView {
+                        anchors.fill: parent
+                        anchors.margins: 5
+
+                        TextArea {
+                            id: ta_mxnetOutput
+                            readOnly: true
+                            font.pointSize: root.secondaryFontSize
+                            font.family: "Courier New"
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            selectByMouse: true
+                        }
+                    }
+                }
+            }
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.preferredHeight: parent.height * 0.2
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+            spacing: 20
+
+            FancyButton {
+                id: btn_start
+                unpressedColor: "#0096FF"
+                pressedColor: "#3679CC"
+                text: "Start"
+                font.pointSize: root.primaryFontSize * 1.5
+                visible: enabled
+                onClicked: {
+                    startChallenge()
+                }
+            }
+
+            FancyButton {
+                id: btn_stop
+                unpressedColor: "#FF2600"
+                pressedColor: "#B5331E"
+                text: "Stop"
+                font.pointSize: root.primaryFontSize * 1.5
+                enabled: !btn_start.enabled
+                visible: enabled
+                onClicked: {
+                    stopChallenge()
+                }
+            }
+
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                RowLayout {
+                    id: scoreLayout
+                    anchors.centerIn: parent
+                    spacing: 15
+                    visible: false
+
+                    FancyButton {
+                        topPadding: 10
+                        rightPadding: 15
+                        bottomPadding: 10
+                        leftPadding: 15
+                        unpressedColor: "#E0E0E0"
+                        pressedColor: "#C1C1C1"
+                        text: "-"
+                        font.pointSize: root.primaryFontSize
+                        onClicked: {
+                            var s = parseInt(score.text)
+                            if (s > 0) {
+                                score.text = s - 1
                             }
                         }
                     }
 
-                    Rectangle {
-                        Layout.preferredWidth: parent.width * 0.4
-                        Layout.fillHeight: true
-                        color: root.backgroundColor
-                        border.width: 1
-                        visible: root.debugOutput
+                    Text {
+                        id: score
+                        text: "0"
+                        font.pointSize: root.primaryFontSize * 2
+                    }
 
-                        ScrollView {
-                            anchors.fill: parent
-                            anchors.margins: 5
-
-                            TextArea {
-                                id: ta_mxnetOutput
-                                readOnly: true
-                                font.pointSize: root.secondaryFontSize
-                                font.family: "Courier New"
-                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                selectByMouse: true
-                            }
+                    FancyButton {
+                        topPadding: 10
+                        rightPadding: 15
+                        bottomPadding: 10
+                        leftPadding: 15
+                        unpressedColor: "#E0E0E0"
+                        pressedColor: "#C1C1C1"
+                        text: "+"
+                        font.pointSize: root.primaryFontSize
+                        onClicked: {
+                            score.text = parseInt(score.text) + 1
                         }
                     }
                 }
             }
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                color: "#F3F3F3"
+            FancyButton {
+                unpressedColor: "#008F00"
+                pressedColor: "#2C641B"
+                text: "Done"
+                font.pointSize: root.primaryFontSize * 1.5
+                enabled: !btn_stop.enabled
+                onClicked: {
+                    enabled = false
+                    text = "saving..."
 
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: 15
-                    anchors.rightMargin: 15
-                    spacing: 20
+                    request("http://".concat(backend.dbServer(),
+                                             "/user/saveScore/",
+                                             backend.get_currentProfile(), "/",
+                                             score.text), "POST", function (o) {
+                                                 enabled = true
+                                                 text = "Done"
 
-                    ImageButton {
-                        id: btn_start
-                        Layout.preferredHeight: parent.height * 0.6
-                        //Layout.maximumWidth: parent.width / 4
-                        unpressedImage: "qrc:/img/button-start.png"
-                        text: "START"
-                        visible: enabled
-                        onClicked: {
-                            startChallenge()
-                        }
-                    }
+                                                 if (o.status === 200
+                                                         || o.responseText === "0") {
+                                                     console.log(o.responseText)
+                                                 } else {
+                                                     console.log("[error] Couldn't save the score. Player ID:",
+                                                                 backend.get_currentProfile(
+                                                                     ),
+                                                                 "| score:",
+                                                                 score.text)
+                                                     // FIXME dialog never opens
+                                                     dialogScoreError.open()
+                                                 }
 
-                    ImageButton {
-                        id: btn_stop
-                        //Layout.preferredHeight: parent.height * 0.6
-                        Layout.maximumWidth: parent.width / 4
-                        unpressedImage: "qrc:/img/button-stop.png"
-                        text: "STOP"
-                        enabled: !btn_start.enabled
-                        visible: enabled
-                        onClicked: {
-                            stopChallenge()
-                        }
-                    }
+                                                 scoreLayout.visible = false
+                                                 score.text = 0
 
-                    Item {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
+                                                 backend.set_currentProfile(0)
 
-                        RowLayout {
-                            id: scoreLayout
-                            anchors.centerIn: parent
-                            spacing: 15
-                            visible: false
-
-                            FancyButton {
-                                topPadding: 10
-                                rightPadding: 15
-                                bottomPadding: 10
-                                leftPadding: 15
-                                unpressedColor: "#E0E0E0"
-                                pressedColor: "#C1C1C1"
-                                text: "-"
-                                font.pointSize: root.primaryFontSize
-                                onClicked: {
-                                    var s = parseInt(score.text)
-                                    if (s > 0) {
-                                        score.text = s - 1
-                                    }
-                                }
-                            }
-
-                            Text {
-                                id: score
-                                text: "0"
-                                font.pointSize: root.primaryFontSize * 2
-                            }
-
-                            FancyButton {
-                                topPadding: 10
-                                rightPadding: 15
-                                bottomPadding: 10
-                                leftPadding: 15
-                                unpressedColor: "#E0E0E0"
-                                pressedColor: "#C1C1C1"
-                                text: "+"
-                                font.pointSize: root.primaryFontSize
-                                onClicked: {
-                                    score.text = parseInt(score.text) + 1
-                                }
-                            }
-                        }
-                    }
-
-                    ImageButton {
-                        Layout.preferredHeight: parent.height * 0.6
-                        //Layout.maximumWidth: parent.width / 4
-                        unpressedImage: "qrc:/img/button-done.png"
-                        text: "DONE"
-                        enabled: !btn_stop.enabled
-                        onClicked: {
-                            enabled = false
-                            text = "saving..."
-
-                            request("http://".concat(backend.dbServer(), "/user/saveScore/", backend.get_currentProfile(), "/", score.text),
-                                    "POST",
-                                    function (o)
-                                    {
-                                         enabled = true
-                                         text = "Done"
-
-                                         if (o.status === 200
-                                                 || o.responseText === "0") {
-                                             console.log(o.responseText)
-                                         } else {
-                                             console.log("[error] Couldn't save the score. Player ID:",
-                                                         backend.get_currentProfile(
-                                                             ),
-                                                         "| score:",
-                                                         score.text)
-                                             // FIXME dialog never opens
-                                             dialogScoreError.open()
-                                         }
-
-                                         scoreLayout.visible = false
-                                         score.text = 0
-
-                                         backend.set_currentProfile(0)
-
-                                         nextWindow("welcome.qml")
-                                     })
-                        }
-                    }
+                                                 nextWindow("welcome.qml")
+                                             })
                 }
             }
         }
