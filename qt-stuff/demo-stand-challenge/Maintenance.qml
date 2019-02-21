@@ -91,22 +91,36 @@ Item {
                                         id: armsdata
                                         statusLeft: robotsModel.leftArm.getConnectionStatusColor()
                                         statusRight: robotsModel.rightArm.getConnectionStatusColor()
-                                        xLeft: robotsModel.leftArm.x.toFixed(3).toString()
-                                        xRight: robotsModel.rightArm.x.toFixed(3).toString()
-                                        yLeft: robotsModel.leftArm.y.toFixed(3).toString()
-                                        yRight: robotsModel.rightArm.y.toFixed(3).toString()
-                                        zLeft: robotsModel.leftArm.z.toFixed(3).toString()
-                                        zRight: robotsModel.rightArm.z.toFixed(3).toString()
-                                        yawLeft: robotsModel.leftArm.yaw.toFixed(3).toString()
-                                        yawRight: robotsModel.rightArm.yaw.toFixed(3).toString()
-                                        pitchLeft: robotsModel.leftArm.pitch.toFixed(3).toString()
-                                        pitchRight: robotsModel.rightArm.pitch.toFixed(3).toString()
-                                        rollLeft: robotsModel.leftArm.roll.toFixed(3).toString()
-                                        rollRight: robotsModel.rightArm.roll.toFixed(3).toString()
+                                        xLeft: robotsModel.leftArm.x.toFixed(
+                                                   3).toString()
+                                        xRight: robotsModel.rightArm.x.toFixed(
+                                                    3).toString()
+                                        yLeft: robotsModel.leftArm.y.toFixed(
+                                                   3).toString()
+                                        yRight: robotsModel.rightArm.y.toFixed(
+                                                    3).toString()
+                                        zLeft: robotsModel.leftArm.z.toFixed(
+                                                   3).toString()
+                                        zRight: robotsModel.rightArm.z.toFixed(
+                                                    3).toString()
+                                        yawLeft: robotsModel.leftArm.yaw.toFixed(
+                                                     3).toString()
+                                        yawRight: robotsModel.rightArm.yaw.toFixed(
+                                                      3).toString()
+                                        pitchLeft: robotsModel.leftArm.pitch.toFixed(
+                                                       3).toString()
+                                        pitchRight: robotsModel.rightArm.pitch.toFixed(
+                                                        3).toString()
+                                        rollLeft: robotsModel.leftArm.roll.toFixed(
+                                                      3).toString()
+                                        rollRight: robotsModel.rightArm.roll.toFixed(
+                                                       3).toString()
                                         calibrationNeededLeft: robotsModel.leftArm.calibrationNeeded ? "yes" : "no"
                                         calibrationNeededRight: robotsModel.rightArm.calibrationNeeded ? "yes" : "no"
                                         openRight: robotsModel.rightArm.isOpen ? "yes" : "no"
                                         openLeft: robotsModel.leftArm.isOpen ? "yes" : "no"
+                                        learningModeLeft: robotsModel.leftArm.learningMode ? "yes" : "no"
+                                        learningModeRight: robotsModel.rightArm.learningMode ? "yes" : "no"
                                     }
                                 }
                             }
@@ -139,8 +153,9 @@ Item {
                                 text: "Learning mode"
                                 checked: robotsModel.leftArm.learningMode
                                 onClicked: {
-                                    let isOn = !robotsModel.leftArm.learningMode
-                                    appendToMaintenanceOutput("setLearningMode left: " + isOn)
+                                    var isOn = !robotsModel.leftArm.learningMode
+                                    appendToMaintenanceOutput(
+                                                "setLearningMode left: " + isOn)
 
                                     robotsModel.leftArm.setLearningMode(isOn)
                                 }
@@ -158,7 +173,6 @@ Item {
                                     robotsModel.leftArm.calibrate()
                                 }
                             }
-
                         }
 
                         Rectangle {
@@ -182,8 +196,9 @@ Item {
                                 text: "Learning mode"
                                 checked: robotsModel.rightArm.learningMode
                                 onClicked: {
-                                    let isOn = !robotsModel.rightArm.learningMode
-                                    appendToMaintenanceOutput("setLearningMode right: " + isOn)
+                                    var isOn = !robotsModel.rightArm.learningMode
+                                    appendToMaintenanceOutput(
+                                                "setLearningMode right: " + isOn)
 
                                     robotsModel.rightArm.setLearningMode(isOn)
                                 }

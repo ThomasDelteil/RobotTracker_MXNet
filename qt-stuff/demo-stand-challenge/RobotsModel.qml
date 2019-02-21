@@ -65,7 +65,7 @@ Item {
         }
 
         onTextMessageReceived: {
-            console.log('Message received: ' + message)
+            //console.log('Message received: ' + message)
 
             var obj = JSON.parse(message)
             if (!!obj.left) {

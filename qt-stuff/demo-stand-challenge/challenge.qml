@@ -229,9 +229,9 @@ Item {
                                 id: robotLeft
 
                                 x: robotsModel.leftArm.mapXFromRobot(
-                                       originalFrame) - width / 2
+                                       leftCroppingOverlay)
                                 y: robotsModel.leftArm.mapYFromRobot(
-                                       originalFrame) - height / 2
+                                       leftCroppingOverlay)
                                 width: root.trackerWidth
                                 height: width
                                 color: "blue"
@@ -260,9 +260,9 @@ Item {
                                 id: robotRight
 
                                 x: robotsModel.rightArm.mapXFromRobot(
-                                       originalFrame) - width / 2
+                                       leftCroppingOverlay)
                                 y: robotsModel.rightArm.mapYFromRobot(
-                                       originalFrame) - height / 2
+                                       leftCroppingOverlay)
                                 width: root.trackerWidth
                                 height: width
                                 color: "green"
@@ -318,6 +318,8 @@ Item {
                                                                        - height / 2
                                                               })
 
+                                        property real proxy: x + y
+
                                         x: Math.min(Math.max(0, target.x),
                                                     parent.width)
                                         y: Math.min(Math.max(0, target.y),
@@ -332,17 +334,19 @@ Item {
                                         border.width: 2
                                         border.color: "white"
 
-                                        onTargetChanged: {
-                                            moveTheArm(name, x / parent.width,
-                                                       y / parent.height)
-                                        }
-
                                         transform: Translate {
                                             y: -trackerLeft.height / 2
                                             x: -trackerLeft.width / 2
                                         }
 
+                                        onProxyChanged: {
+                                            moveTheArm(name, x / parent.width,
+                                                       y / parent.height)
+                                        }
+
                                         DragHandler {
+                                            id: leftDrag
+
                                             xAxis {
                                                 minimum: 0
                                                 maximum: parent.parent.width
@@ -401,10 +405,13 @@ Item {
                                                                        - height / 2
                                                               })
 
+                                        property real proxy: x + y
+
                                         x: Math.min(Math.max(0, target.x),
                                                     parent.width)
                                         y: Math.min(Math.max(0, target.y),
                                                     parent.height)
+
                                         width: root.trackerWidth
                                         height: width
                                         color: "green"
@@ -414,17 +421,19 @@ Item {
                                         border.width: 2
                                         border.color: "white"
 
-                                        onTargetChanged: {
-                                            moveTheArm(name, x / parent.width,
-                                                       y / parent.height)
-                                        }
-
                                         transform: Translate {
                                             y: -trackerLeft.height / 2
                                             x: -trackerLeft.width / 2
                                         }
 
+                                        onProxyChanged: {
+                                            moveTheArm(name, x / parent.width,
+                                                       y / parent.height)
+                                        }
+
                                         DragHandler {
+                                            id: rightDrag
+
                                             xAxis {
                                                 minimum: 0
                                                 maximum: parent.parent.width
