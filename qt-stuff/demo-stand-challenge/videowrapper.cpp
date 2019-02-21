@@ -33,6 +33,9 @@ bool VideoWrapper::start(const QVideoSurfaceFormat& format)
 {
     m_format = format;
     m_format.setMirrored(true);
+    if (!_frameSize.isEmpty()) {
+        m_format.setFrameSize(_frameSize);
+    }
 
     if (supportedPixelFormats().count(m_format.pixelFormat()) == 0) {
         return false;
@@ -120,14 +123,14 @@ void VideoWrapper::enableSending(bool sendingEnabled)
 
 QSize VideoWrapper::frameSize() const
 {
-    return m_format.frameSize();
+    return _frameSize;
 }
 
 void VideoWrapper::setFrameSize(QSize size)
 {
     qDebug() << __FUNCTION__ << " : " << size;
 
-    m_format.setFrameSize(size);
+    _frameSize = size;
 
     stop();
     start(m_format);

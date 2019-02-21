@@ -50,6 +50,7 @@ private:
     QObject* m_source = nullptr;
     QAbstractVideoSurface* surf = nullptr;
     QVideoSurfaceFormat m_format;
+    QSize _frameSize;
     bool _sendingEnabled = false; // enabling sending frames to MXNet
 };
 
