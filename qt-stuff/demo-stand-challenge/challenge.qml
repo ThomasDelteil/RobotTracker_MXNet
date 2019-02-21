@@ -203,42 +203,6 @@ Item {
                                                      'originalFrame size: ' + Qt.size(
                                                          width, height))
 
-                                /* left robot position */
-                                Rectangle {
-                                    id: robotLeft
-
-                                    x: robotsModel.leftArm.mapXFromRobot(
-                                           leftCroppingOverlay)
-                                    y: robotsModel.leftArm.mapYFromRobot(
-                                           leftCroppingOverlay)
-                                    width: root.trackerWidth
-                                    height: width
-                                    color: "blue"
-                                    radius: width * 0.5
-                                    border.width: 2
-                                    border.color: "white"
-                                    opacity: 0.3
-
-                                    transform: Translate {
-                                        y: -trackerLeft.height / 2
-                                        x: -trackerLeft.width / 2
-                                    }
-
-                                    // animation
-                                    Behavior on x {
-                                        NumberAnimation {
-                                            duration: 100
-                                            easing.type: Easing.OutQuart
-                                        }
-                                    }
-                                    Behavior on y {
-                                        NumberAnimation {
-                                            duration: 100
-                                            easing.type: Easing.OutQuart
-                                        }
-                                    }
-                                }
-
                                 RowLayout {
                                     id: croppingOverlay
 
@@ -266,6 +230,44 @@ Item {
                                                 anchors.fill: parent
                                                 color: 'blue'
                                                 opacity: croppingOverlay.overlayOpacity
+                                            }
+
+                                            /* left robot position */
+                                            Rectangle {
+                                                id: robotLeft
+
+                                                property point pos: robotsModel.leftArm.mapToItem(
+                                                                        parent.width,
+                                                                        parent.height)
+
+                                                x: pos.x
+                                                y: pos.y
+                                                width: root.trackerWidth
+                                                height: width
+                                                color: "blue"
+                                                radius: width * 0.5
+                                                border.width: 2
+                                                border.color: "white"
+                                                opacity: 0.3
+
+                                                transform: Translate {
+                                                    y: -trackerLeft.height / 2
+                                                    x: -trackerLeft.width / 2
+                                                }
+
+                                                // animation
+                                                Behavior on x {
+                                                    NumberAnimation {
+                                                        duration: 100
+                                                        easing.type: Easing.OutQuart
+                                                    }
+                                                }
+                                                Behavior on y {
+                                                    NumberAnimation {
+                                                        duration: 100
+                                                        easing.type: Easing.OutQuart
+                                                    }
+                                                }
                                             }
 
                                             // tracker #1 (left hand)
@@ -369,10 +371,15 @@ Item {
                                             Rectangle {
                                                 id: robotRight
 
-                                                x: robotsModel.rightArm.mapXFromRobot(
-                                                       rightCroppingOverlay)
-                                                y: robotsModel.rightArm.mapYFromRobot(
-                                                       rightCroppingOverlay)
+                                                property point pos: robotsModel.rightArm.mapToItem(
+                                                                        parent.width,
+                                                                        parent.height)
+
+                                                onPosChanged: console.log(
+                                                                  'pos ' + pos)
+
+                                                x: pos.x
+                                                y: pos.y
                                                 width: root.trackerWidth
                                                 height: width
                                                 color: "green"

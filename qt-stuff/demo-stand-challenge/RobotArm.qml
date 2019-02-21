@@ -117,6 +117,12 @@ QtObject {
         }
     }
 
+    function mapToItem(itemWidth, itemHeight) {
+        var normalX = (root.y - root.minY) / (root.maxY - root.minY)
+        var normalY = (root.z - root.minZ) / (root.maxZ - root.minZ)
+        return Qt.point(itemWidth * normalX, itemHeight * normalY)
+    }
+
     function mapXFromRobot(frame) {
         // root.y = root.minY + (root.maxY - root.minY) * relativeY
         var x_frame = mapCoords(root.y, frame.width, root.minY, root.maxY)
