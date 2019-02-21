@@ -237,36 +237,10 @@ Item {
                                 border.color: "white"
                                 opacity: 0.3
 
-                                // animation
-                                Behavior on x {
-                                    NumberAnimation {
-                                        duration: 100
-                                        easing.type: Easing.OutQuart
-                                    }
+                                transform: Translate {
+                                    y: -trackerLeft.height / 2
+                                    x: -trackerLeft.width / 2
                                 }
-                                Behavior on y {
-                                    NumberAnimation {
-                                        duration: 100
-                                        easing.type: Easing.OutQuart
-                                    }
-                                }
-                            }
-
-                            /* right robot position */
-                            Rectangle {
-                                id: robotRight
-
-                                x: robotsModel.rightArm.mapXFromRobot(
-                                       leftCroppingOverlay)
-                                y: robotsModel.rightArm.mapYFromRobot(
-                                       leftCroppingOverlay)
-                                width: root.trackerWidth
-                                height: width
-                                color: "green"
-                                radius: width * 0.5
-                                border.width: 2
-                                border.color: "white"
-                                opacity: 0.3
 
                                 // animation
                                 Behavior on x {
@@ -282,6 +256,7 @@ Item {
                                     }
                                 }
                             }
+
 
                             RowLayout {
                                 id: croppingOverlay
@@ -388,6 +363,43 @@ Item {
                                         anchors.fill: parent
                                         color: 'green'
                                         opacity: croppingOverlay.overlayOpacity
+                                    }
+
+
+                                    /* right robot position */
+                                    Rectangle {
+                                        id: robotRight
+
+                                        x: robotsModel.rightArm.mapXFromRobot(
+                                               rightCroppingOverlay)
+                                        y: robotsModel.rightArm.mapYFromRobot(
+                                               rightCroppingOverlay)
+                                        width: root.trackerWidth
+                                        height: width
+                                        color: "green"
+                                        radius: width * 0.5
+                                        border.width: 2
+                                        border.color: "white"
+                                        opacity: 0.3
+
+                                        transform: Translate {
+                                            y: -trackerLeft.height / 2
+                                            x: -trackerLeft.width / 2
+                                        }
+
+                                        // animation
+                                        Behavior on x {
+                                            NumberAnimation {
+                                                duration: 100
+                                                easing.type: Easing.OutQuart
+                                            }
+                                        }
+                                        Behavior on y {
+                                            NumberAnimation {
+                                                duration: 100
+                                                easing.type: Easing.OutQuart
+                                            }
+                                        }
                                     }
 
                                     // tracker #2 (right hand)
