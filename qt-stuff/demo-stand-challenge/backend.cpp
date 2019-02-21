@@ -175,7 +175,7 @@ void Backend::requestHandFinished(QNetworkReply* reply)
         if (predicted == "background" || jsnObj["value"].toDouble() < 0.6) {
             predicted = "2";
         } else {
-            auto prediction = predictPalm(predicted == "open");
+            auto prediction = accumulatedPalmPrediction(predicted == "open", isRight);
             // TODO use majority vote of the last [n] values | n = 3
 
             if (prediction) {
@@ -229,18 +229,20 @@ void Backend::setRightPalm(QImage palm)
     emit rightPalmChanged();
 }
 
-bool Backend::predictPalm(bool isOpen)
+bool Backend::accumulatedPalmPrediction(bool isOpen, bool isRight)
 {
-    if (_lastPalmPredictions.size() == _lastPalmPredictionsCount) {
-        _lastPalmPredictions.takeFirst();
+    auto& list = isRight ? _lastRightPalmPredictions : _lastLeftPalmPredictions;
+
+    if (list.size() == _lastPalmPredictionsCount) {
+        list.takeFirst();
     }
 
-    _lastPalmPredictions.push_back(isOpen);
+    list.push_back(isOpen);
 
-    int openCount = _lastPalmPredictions.count(true);
-    int closedCount = _lastPalmPredictions.count(false);
+    int openCount = list.count(true);
+    int closedCount = list.count(false);
 
-    qDebug() << "Yes count: " << openCount << ", no count: " << closedCount;
+    qDebug() << (isRight ? "Right " : "Left ") << "yes count: " << openCount << ", no count: " << closedCount;
 
     return openCount > closedCount;
 }
