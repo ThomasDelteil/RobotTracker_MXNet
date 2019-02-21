@@ -122,17 +122,23 @@ Item {
 
                     Camera {
                         id: camera
+
+                        function updateResolution(resolution) {
+                            camera.viewfinder.resolution = resolution
+                            backend.videoWrapper.frameSize = resolution
+                        }
+
                         // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
                         deviceId: "/dev/video0"
 
                         metaData.orientation: root.cameraUpsideDown ? 180 : 0
 
                         onCameraStatusChanged: {
-                            console.log("camera status changed to " + cameraStatus)
+                            console.log("camera status changed to " + camera.cameraStatus)
                         }
 
                         onCameraStateChanged: {
-                            console.log("camera state changed to " + cameraState)
+                            console.log("camera state changed to " + camera.cameraState)
 
                             if (cameraState != Camera.ActiveState) {
                                 return

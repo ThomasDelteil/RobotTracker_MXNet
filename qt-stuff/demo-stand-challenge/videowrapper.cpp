@@ -117,3 +117,16 @@ void VideoWrapper::enableSending(bool sendingEnabled)
 {
     _sendingEnabled = sendingEnabled;
 }
+
+QSize VideoWrapper::frameSize() const
+{
+    return m_format.frameSize();
+}
+
+void VideoWrapper::setFrameSize(QSize size)
+{
+    m_format.setFrameSize(size);
+
+    stop();
+    start(m_format);
+}
