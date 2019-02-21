@@ -124,15 +124,11 @@ Item {
                         id: camera
                         // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
                         deviceId: "/dev/video0"
-                        // picture quality
-                        //                        viewfinder.resolution: Qt.size(
-                        //                                                   backend.frameWidth(),
-                        //                                                   backend.frameHeight()
-                        //                                                   )
+
                         metaData.orientation: root.cameraUpsideDown ? 180 : 0
 
                         onCameraStatusChanged: {
-                            console.log("camera state changed to " + cameraState)
+                            console.log("camera status changed to " + cameraStatus)
                         }
 
                         onCameraStateChanged: {
@@ -146,7 +142,7 @@ Item {
                             var resolutions = camera.supportedViewfinderResolutions()
                             if (!resolutions.length) {
                                 // this happens on Jetson, try hardcoding it
-                                var resolution = Qt.size(2592, 1944)
+                                var resolution = Qt.size(2592, 1458)
                                 camera.viewfinder.resolution = resolution
                                 console.log("resolution set to " + resolution)
                                 return
@@ -214,8 +210,12 @@ Item {
                             height: parent.contentRect.height
                             color: "transparent"
 
-                            onWidthChanged: console.log('originalFrame size: ' + Qt.size(width, height))
-                            onHeightChanged: console.log('originalFrame size: ' + Qt.size(width, height))
+                            onWidthChanged: console.log(
+                                                'originalFrame size: ' + Qt.size(
+                                                    width, height))
+                            onHeightChanged: console.log(
+                                                 'originalFrame size: ' + Qt.size(
+                                                     width, height))
 
                             /* left robot position */
                             Rectangle {
