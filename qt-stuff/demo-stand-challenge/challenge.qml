@@ -122,14 +122,47 @@ Item {
 
                     Camera {
                         id: camera
+
+                        function updateResolution(resolution) {
+                            camera.viewfinder.resolution = resolution
+                            backend.videoWrapper.frameSize = resolution
+                        }
+
                         // NVIDIA Jetson TX2: QT_GSTREAMER_CAMERABIN_VIDEOSRC="nvcamerasrc ! nvvidconv" ./your-application
                         deviceId: "/dev/video0"
-                        // picture quality
-                        viewfinder.resolution: Qt.size(
-                                                   backend.frameWidth(),
-                                                   backend.frameHeight()
-                                                   )
+
                         metaData.orientation: root.cameraUpsideDown ? 180 : 0
+
+                        onCameraStatusChanged: {
+                            console.log("camera status changed to " + camera.cameraStatus)
+                        }
+
+                        onCameraStateChanged: {
+                            console.log("camera state changed to " + camera.cameraState)
+
+                            if (cameraState != Camera.ActiveState) {
+                                return
+                            }
+
+                            console.log("Camera supported VF resolutions:")
+                            var resolutions = camera.supportedViewfinderResolutions()
+                            var resolution = Qt.size(0, 0)
+                            if (!resolutions.length) {
+                                // this happens on Jetson, try hardcoding it
+                                resolution = Qt.size(2592, 1080)
+                            } else {
+                                resolutions.forEach(function (r) {
+                                    console.log(r.width, "x", r.height)
+                                    if (r.width > resolution.width) {
+                                        resolution = Qt.size(r.width, r.height)
+                                    }
+                                })
+                            }
+
+                            camera.viewfinder.resolution = resolution
+                            updateResolution(resolution)
+                            console.log("resolution set to " + resolution)
+                        }
 
                         //focus {
                         //    focusMode: Camera.FocusMacro
@@ -140,11 +173,13 @@ Item {
                             console.log(errorCode, errorString)
                         }
                         Component.onCompleted: {
+
                             //console.log("camera orientation:", camera.orientation);
                             //console.log("camera state:", camera.cameraState);
                             //console.log("camera status:", camera.cameraStatus);
 
                             //console.log("camera supported IC resolutions:", imageCapture.supportedResolutions);
+
 
                             /*
                             console.log("camera supported VF resolutions:");
@@ -167,27 +202,33 @@ Item {
                         id: vo
                         anchors.fill: parent
                         orientation: root.cameraUpsideDown ? 180 : 0
+                        // fillMode: VideoOutput.Stretch
                         fillMode: VideoOutput.PreserveAspectFit //PreserveAspectCrop
                         source: backend.videoWrapper
 
                         Rectangle {
                             id: originalFrame
 
-                            anchors.fill: parent
-
-//                            anchors.centerIn: parent
-//                            width: parent.contentRect.width
-//                            height: parent.contentRect.height
+                            anchors.centerIn: parent
+                            width: parent.contentRect.width
+                            height: parent.contentRect.height
                             color: "transparent"
+
+                            onWidthChanged: console.log(
+                                                'originalFrame size: ' + Qt.size(
+                                                    width, height))
+                            onHeightChanged: console.log(
+                                                 'originalFrame size: ' + Qt.size(
+                                                     width, height))
 
                             /* left robot position */
                             Rectangle {
                                 id: robotLeft
 
                                 x: robotsModel.leftArm.mapXFromRobot(
-                                       originalFrame) - width / 2
+                                       leftCroppingOverlay)
                                 y: robotsModel.leftArm.mapYFromRobot(
-                                       originalFrame) - height / 2
+                                       leftCroppingOverlay)
                                 width: root.trackerWidth
                                 height: width
                                 color: "blue"
@@ -216,9 +257,9 @@ Item {
                                 id: robotRight
 
                                 x: robotsModel.rightArm.mapXFromRobot(
-                                       originalFrame) - width / 2
+                                       leftCroppingOverlay)
                                 y: robotsModel.rightArm.mapYFromRobot(
-                                       originalFrame) - height / 2
+                                       leftCroppingOverlay)
                                 width: root.trackerWidth
                                 height: width
                                 color: "green"
@@ -274,6 +315,8 @@ Item {
                                                                        - height / 2
                                                               })
 
+                                        property real proxy: x + y
+
                                         x: Math.min(Math.max(0, target.x),
                                                     parent.width)
                                         y: Math.min(Math.max(0, target.y),
@@ -288,16 +331,19 @@ Item {
                                         border.width: 2
                                         border.color: "white"
 
-                                        onTargetChanged: {
-                                            moveTheArm(name, x / parent.width, y / parent.height)
-                                        }
-
                                         transform: Translate {
                                             y: -trackerLeft.height / 2
                                             x: -trackerLeft.width / 2
                                         }
 
+                                        onProxyChanged: {
+                                            moveTheArm(name, x / parent.width,
+                                                       y / parent.height)
+                                        }
+
                                         DragHandler {
+                                            id: leftDrag
+
                                             xAxis {
                                                 minimum: 0
                                                 maximum: parent.parent.width
@@ -356,10 +402,13 @@ Item {
                                                                        - height / 2
                                                               })
 
+                                        property real proxy: x + y
+
                                         x: Math.min(Math.max(0, target.x),
                                                     parent.width)
                                         y: Math.min(Math.max(0, target.y),
                                                     parent.height)
+
                                         width: root.trackerWidth
                                         height: width
                                         color: "green"
@@ -369,16 +418,19 @@ Item {
                                         border.width: 2
                                         border.color: "white"
 
-                                        onTargetChanged: {
-                                            moveTheArm(name, x / parent.width, y / parent.height)
-                                        }
-
                                         transform: Translate {
                                             y: -trackerLeft.height / 2
                                             x: -trackerLeft.width / 2
                                         }
 
+                                        onProxyChanged: {
+                                            moveTheArm(name, x / parent.width,
+                                                       y / parent.height)
+                                        }
+
                                         DragHandler {
+                                            id: rightDrag
+
                                             xAxis {
                                                 minimum: 0
                                                 maximum: parent.parent.width
@@ -575,8 +627,10 @@ Item {
                         text: "-"
                         font.pointSize: root.primaryFontSize
                         onClicked: {
-                            var s = parseInt(score.text);
-                            if (s > 0) { score.text = s - 1; }
+                            var s = parseInt(score.text)
+                            if (s > 0) {
+                                score.text = s - 1
+                            }
                         }
                     }
 
@@ -596,7 +650,7 @@ Item {
                         text: "+"
                         font.pointSize: root.primaryFontSize
                         onClicked: {
-                            score.text = parseInt(score.text) + 1;
+                            score.text = parseInt(score.text) + 1
                         }
                     }
                 }
@@ -609,40 +663,36 @@ Item {
                 font.pointSize: root.primaryFontSize * 1.5
                 enabled: !btn_stop.enabled
                 onClicked: {
-                    enabled = false;
-                    text = "saving...";
+                    enabled = false
+                    text = "saving..."
 
-                    request(
-                            "http://".concat(backend.dbServer(), "/user/saveScore/", backend.get_currentProfile(), "/", score.text),
-                            "POST",
-                            function (o)
-                    {
-                        enabled = true;
-                        text = "Done";
+                    request("http://".concat(backend.dbServer(),
+                                             "/user/saveScore/",
+                                             backend.get_currentProfile(), "/",
+                                             score.text), "POST", function (o) {
+                                                 enabled = true
+                                                 text = "Done"
 
-                        if (o.status === 200 || o.responseText === "0")
-                        {
-                            console.log(o.responseText);
-                        }
-                        else
-                        {
-                            console.log(
-                                        "[error] Couldn't save the score. Player ID:",
-                                        backend.get_currentProfile(),
-                                        "| score:",
-                                        score.text
-                                        );
-                            // FIXME dialog never opens
-                            dialogScoreError.open();
-                        }
+                                                 if (o.status === 200
+                                                         || o.responseText === "0") {
+                                                     console.log(o.responseText)
+                                                 } else {
+                                                     console.log("[error] Couldn't save the score. Player ID:",
+                                                                 backend.get_currentProfile(
+                                                                     ),
+                                                                 "| score:",
+                                                                 score.text)
+                                                     // FIXME dialog never opens
+                                                     dialogScoreError.open()
+                                                 }
 
-                        scoreLayout.visible = false;
-                        score.text = 0;
+                                                 scoreLayout.visible = false
+                                                 score.text = 0
 
-                        backend.set_currentProfile(0);
+                                                 backend.set_currentProfile(0)
 
-                        nextWindow("welcome.qml");
-                    });
+                                                 nextWindow("welcome.qml")
+                                             })
                 }
             }
         }
@@ -707,7 +757,7 @@ Item {
     }
 
     function startChallenge() {
-        scoreLayout.visible = true;
+        scoreLayout.visible = true
         btn_start.enabled = false
         robotsModel.sendChanges = true
         tm_sendFrame.start()

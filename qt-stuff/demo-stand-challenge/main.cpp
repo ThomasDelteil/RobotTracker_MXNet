@@ -1,8 +1,8 @@
+#include "backend.h"
+#include <QCameraInfo>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include <QCameraInfo>
-#include "backend.h"
 
 QString getBasePath(QString applicationDirPath)
 {
@@ -16,18 +16,15 @@ QString getBasePath(QString applicationDirPath)
     return QString("%1%2").arg(applicationDirPath).arg(pathLastMile);
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
 
-    /*
     qDebug() << "cameras found:";
     QListIterator<QCameraInfo> cameras(QCameraInfo::availableCameras());
-    while(cameras.hasNext())
-    {
+    while (cameras.hasNext()) {
         qDebug() << "-" << cameras.next();
     }
-    */
 
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
@@ -46,7 +43,9 @@ int main(int argc, char *argv[])
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     auto rootObjects = engine.rootObjects();
-    if (rootObjects.isEmpty()) { return -1; }
+    if (rootObjects.isEmpty()) {
+        return -1;
+    }
 
     auto parent = rootObjects.first();
     auto backend = parent->findChild<Backend*>();

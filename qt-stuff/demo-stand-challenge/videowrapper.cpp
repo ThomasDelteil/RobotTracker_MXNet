@@ -6,12 +6,13 @@ QList<QVideoFrame::PixelFormat> VideoWrapper::supportedPixelFormats(QAbstractVid
     return QList<QVideoFrame::PixelFormat>() << QVideoFrame::Format_UYVY << QVideoFrame::Format_BGR32;
 }
 
-bool VideoWrapper::present(const QVideoFrame &frame)
+bool VideoWrapper::present(const QVideoFrame& frame)
 {
-    if (surf) { surf->present(frame); }
+    if (surf) {
+        surf->present(frame);
+    }
 
-    if (_sendingEnabled)
-    {
+    if (_sendingEnabled) {
         _sendingEnabled = false;
 
         QVideoFrame frameCopy = frame;
@@ -28,19 +29,25 @@ bool VideoWrapper::present(const QVideoFrame &frame)
     return true;
 }
 
-bool VideoWrapper::start(const QVideoSurfaceFormat &format)
+bool VideoWrapper::start(const QVideoSurfaceFormat& format)
 {
     m_format = format;
     m_format.setMirrored(true);
+    if (!_frameSize.isEmpty()) {
+        m_format.setFrameSize(_frameSize);
+    }
 
-    if(supportedPixelFormats().count(m_format.pixelFormat()) == 0)
-        { return false; }
+    if (supportedPixelFormats().count(m_format.pixelFormat()) == 0) {
+        return false;
+    }
 
-    if(!QAbstractVideoSurface::start(m_format))
-        { return false; }
+    if (!QAbstractVideoSurface::start(m_format)) {
+        return false;
+    }
 
-    if( surf && !surf->start(m_format) )
-        { return false; }
+    if (surf && !surf->start(m_format)) {
+        return false;
+    }
 
     return true;
 }
@@ -50,56 +57,58 @@ void VideoWrapper::stop()
     QAbstractVideoSurface::stop();
 }
 
-QAbstractVideoSurface *VideoWrapper::get_videoSurface() const
+QAbstractVideoSurface* VideoWrapper::get_videoSurface() const
 {
     return surf;
 }
 
-void VideoWrapper::set_videoSurface(QAbstractVideoSurface *m)
+void VideoWrapper::set_videoSurface(QAbstractVideoSurface* m)
 {
-    if (surf == m) { return; }
+    if (surf == m) {
+        return;
+    }
 
-    if (surf && surf->isActive()) { surf->stop(); }
+    if (surf && surf->isActive()) {
+        surf->stop();
+    }
 
     surf = m;
 
-    if (surf && isActive()) { surf->start(m_format); }
+    if (surf && isActive()) {
+        surf->start(m_format);
+    }
 }
 
-QObject *VideoWrapper::get_source()
+QObject* VideoWrapper::get_source()
 {
     return m_source;
 }
 
-void VideoWrapper::set_source(QObject *qsrc)
+void VideoWrapper::set_source(QObject* qsrc)
 {
-//    //m_source = nullptr;
+    //    //m_source = nullptr;
 
-//    if (m_source)
-//    {
-//        QCamera *camera = qvariant_cast<QCamera*>(m_source->property("mediaObject"));
-//        if (camera)
-//        {
-//            camera->setViewfinder((QAbstractVideoSurface*)0);
-//        }
-//        else
-//        {
-//            qsrc->setProperty("videoSurface", QVariant::fromValue<QAbstractVideoSurface*>(NULL));
-//        }
-//    }
+    //    if (m_source)
+    //    {
+    //        QCamera *camera = qvariant_cast<QCamera*>(m_source->property("mediaObject"));
+    //        if (camera)
+    //        {
+    //            camera->setViewfinder((QAbstractVideoSurface*)0);
+    //        }
+    //        else
+    //        {
+    //            qsrc->setProperty("videoSurface", QVariant::fromValue<QAbstractVideoSurface*>(NULL));
+    //        }
+    //    }
 
     m_source = qsrc;
 
-    if (qsrc)
-    {
-        QCamera *camera = qvariant_cast<QCamera*>(qsrc->property("mediaObject"));
-        if(camera)
-        {
+    if (qsrc) {
+        QCamera* camera = qvariant_cast<QCamera*>(qsrc->property("mediaObject"));
+        if (camera) {
             camera->setCaptureMode(QCamera::CaptureViewfinder);
             camera->setViewfinder(this);
-        }
-        else
-        {
+        } else {
             qsrc->setProperty("videoSurface", QVariant::fromValue<QAbstractVideoSurface*>(this));
         }
     }
@@ -110,4 +119,19 @@ void VideoWrapper::set_source(QObject *qsrc)
 void VideoWrapper::enableSending(bool sendingEnabled)
 {
     _sendingEnabled = sendingEnabled;
+}
+
+QSize VideoWrapper::frameSize() const
+{
+    return _frameSize;
+}
+
+void VideoWrapper::setFrameSize(QSize size)
+{
+    qDebug() << __FUNCTION__ << " : " << size;
+
+    _frameSize = size;
+
+    stop();
+    start(m_format);
 }

@@ -39,8 +39,8 @@ QtObject {
     property real minPitch: Math.PI / 2
     property real maxPitch: Math.PI / 2
 
-    property real minYaw: -Math.PI / 2
-    property real maxYaw: -Math.PI / 2
+    property real minYaw: 0 //-Math.PI / 2
+    property real maxYaw: 0 //-Math.PI / 2
 
     property bool calibrationNeeded: true
     property bool learningMode: true
@@ -65,6 +65,9 @@ QtObject {
 
     function setLearningMode(isOn) {
         impl.setLearningMode(isOn)
+        if (!isOn) {
+            impl.selectGripper_1()
+        }
     }
 
     function parse(object) {
@@ -93,6 +96,10 @@ QtObject {
     }
 
     function sendChanges() {
+        if (learningMode) {
+            return
+        }
+
         if (impl.positionChanged()) {
             impl.move(impl.lastPosition)
             impl.lastSentPosition = impl.lastPosition
@@ -111,12 +118,26 @@ QtObject {
 
     function mapXFromRobot(frame) {
         // root.y = root.minY + (root.maxY - root.minY) * relativeY
-        return frame.width * (root.y - root.minY) / (root.maxY - root.minY)
+        var x_frame = mapCoords(root.y, frame.width, root.minY, root.maxY)
+        console.log('robot y -> x:' + root.y + ' -> ' + x_frame)
+        return x_frame
     }
 
     function mapYFromRobot(frame) {
         // root.z = root.maxZ - (root.maxZ - root.minZ) * relativeZ
-        return frame.height - frame.height * (root.z - root.minZ) / (root.minZ - root.maxZ)
+        var y_frame = mapCoords(root.z, frame.height, root.minZ, root.maxZ)
+        console.log('robot z -> y:' + root.z + ' -> ' + y_frame)
+        return y_frame
+    }
+
+    function clipCoords(c, c_min, c_max) {
+        return Math.min(Math.max(c, c_min), c_max)
+    }
+
+    function mapCoords(source, target_space, source_min, source_max) {
+        var source_clip = clipCoords(source, source_min, source_max)
+        var source_space = source_max - source_min
+        return target_space * (source - source_min)/source_space
     }
 
     property var impl: QtObject {
@@ -188,6 +209,13 @@ QtObject {
                 "isOn": isOn
             }
             sendRequest(root.name + "/learningMode", data)
+        }
+
+        function selectGripper_1() {
+            var data = {
+                "toolId": 11
+            }
+            sendRequest(root.name + "/tools", data)
         }
 
         function getPosition(relativeY, relativeZ) {

@@ -21,8 +21,9 @@ GridLayout {
     property alias calibrationNeededRight: calibrationNeededRight.text
     property alias openRight: openRight.text
     property alias openLeft: openLeft.text
+    property alias learningModeLeft: learningModeLeft.text
+    property alias learningModeRight: learningModeRight.text
 
-    rows: 8
     columns: 3
     rowSpacing: 10
     columnSpacing: 15
@@ -302,6 +303,35 @@ GridLayout {
     Text {
         id: calibrationNeededRight
         Layout.row: 10
+        Layout.column: 3
+        Layout.alignment: Qt.AlignLeft
+        font.pointSize: root.secondaryFontSize
+        font.family: "Courier New"
+        text: "-"
+    }
+
+    // learning mode
+    Text {
+        id: learningModeLeft
+
+        Layout.row: 11
+        Layout.column: 1
+        Layout.alignment: Qt.AlignRight
+        font.pointSize: root.secondaryFontSize
+        font.family: "Courier New"
+        text: "-"
+    }
+    Text {
+        Layout.row: 11
+        Layout.column: 2
+        Layout.alignment: Qt.AlignHCenter
+        font.pointSize: root.secondaryFontSize
+        font.bold: true
+        text: "learning"
+    }
+    Text {
+        id: learningModeRight
+        Layout.row: 11
         Layout.column: 3
         Layout.alignment: Qt.AlignLeft
         font.pointSize: root.secondaryFontSize

@@ -88,6 +88,8 @@ private slots:
     void setLeftPalm(QImage palm);
     void setRightPalm(QImage palm);
 
+    bool predictPalm(bool isOpen);
+
 private:
     VideoWrapper* videoWrapper;
     QNetworkAccessManager* managerPose;
@@ -109,6 +111,8 @@ private:
     const quint16 _dbServerPort = 6547;
     QImage _leftPalm;
     QImage _rightPalm;
+    QList<bool> _lastPalmPredictions;
+    const int _lastPalmPredictionsCount = 5;
 };
 
 #endif // BACKEND_H
