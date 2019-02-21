@@ -209,12 +209,13 @@ Item {
                         Rectangle {
                             id: originalFrame
 
-                            anchors.fill: parent
-
-                            //                            anchors.centerIn: parent
-                            //                            width: parent.contentRect.width
-                            //                            height: parent.contentRect.height
+                            anchors.centerIn: parent
+                            width: parent.contentRect.width
+                            height: parent.contentRect.height
                             color: "transparent"
+
+                            onWidthChanged: console.log('originalFrame size: ' + Qt.size(width, height))
+                            onHeightChanged: console.log('originalFrame size: ' + Qt.size(width, height))
 
                             /* left robot position */
                             Rectangle {
