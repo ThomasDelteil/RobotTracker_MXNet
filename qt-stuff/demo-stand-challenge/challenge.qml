@@ -148,7 +148,7 @@ Item {
                             var resolutions = camera.supportedViewfinderResolutions()
                             if (!resolutions.length) {
                                 // this happens on Jetson, try hardcoding it
-                                var resolution = Qt.size(2592, 1458)
+                                var resolution = Qt.size(2592, 1080)
                                 camera.viewfinder.resolution = resolution
                                 console.log("resolution set to " + resolution)
                                 return
@@ -205,8 +205,8 @@ Item {
                         id: vo
                         anchors.fill: parent
                         orientation: root.cameraUpsideDown ? 180 : 0
-                        fillMode: VideoOutput.Stretch
-                        // VideoOutput.PreserveAspectFit //PreserveAspectCrop
+                        // fillMode: VideoOutput.Stretch
+                        fillMode: VideoOutput.PreserveAspectFit //PreserveAspectCrop
                         source: backend.videoWrapper
 
                         Rectangle {
