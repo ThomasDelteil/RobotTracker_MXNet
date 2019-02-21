@@ -27,13 +27,13 @@ Item {
         var lw_x = jsn["skeleton"]["right_wrist"]["x"]
         var lw_y = jsn["skeleton"]["right_wrist"]["y"]
 
-        var leftTarget = leftCroppingOverlay.mapFromItem(
-                    originalFrame, originalFrame.width * lw_x,
-                    originalFrame.height * lw_y)
-
-        var rightTarget = rightCroppingOverlay.mapFromItem(
-                    originalFrame, originalFrame.width * rw_x,
-                    originalFrame.height * rw_y)
+        var leftSourcePoint = vo.mapNormalizedPointToItem(lw_x, lw_y)
+        var leftTarget = leftCroppingOverlay.mapFromItem(vo, leftSourcePoint.x,
+                                                         leftSourcePoint.y)
+        var rightSourcePoint = vo.mapNormalizedPointToItem(rw_x, rw_y)
+        var rightTarget = rightCroppingOverlay.mapFromItem(vo,
+                                                           rightSourcePoint.x,
+                                                           rightSourcePoint.y)
 
         trackerLeft.target = leftTarget
         trackerRight.target = rightTarget
@@ -274,8 +274,8 @@ Item {
                                                 property string name: "left"
 
                                                 property var target: ({
-                                                                          "x": originalFrame.width / 4 - width / 2,
-                                                                          "y": originalFrame.height / 1.3 - height / 2
+                                                                          "x": parent.width / 2,
+                                                                          "y": parent.height / 2
                                                                       })
 
                                                 property real proxy: x + y
@@ -407,8 +407,8 @@ Item {
                                                 property string name: "right"
 
                                                 property var target: ({
-                                                                          "x": originalFrame.width / 1.3 - width / 2,
-                                                                          "y": originalFrame.height / 1.3 - height / 2
+                                                                          "x": parent.width / 2,
+                                                                          "y": parent.height / 2
                                                                       })
 
                                                 property real proxy: x + y

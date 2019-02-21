@@ -12,9 +12,9 @@ QtObject {
 
     property int connectionStatus: RobotArm.ConnectionStatus.Connecting
 
-    property real x: minX
-    property real y: minY
-    property real z: minZ
+    property real x: minX + (maxX - minX) / 2.0
+    property real y: minY + (maxY - minY) / 2.0
+    property real z: minZ + (maxZ - minZ) / 2.0
 
     property real roll: minRoll
     property real pitch: minPitch
