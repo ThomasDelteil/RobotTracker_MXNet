@@ -28,10 +28,10 @@ Item {
         var lw_y = jsn["skeleton"]["right_wrist"]["y"]
 
         var leftSourcePoint = vo.mapNormalizedPointToItem(lw_x, lw_y)
-        var leftTarget = leftCroppingOverlay.mapFromItem(vo, leftSourcePoint.x,
+        var leftTarget = leftCroppingOverlayInner.mapFromItem(vo, leftSourcePoint.x,
                                                          leftSourcePoint.y)
         var rightSourcePoint = vo.mapNormalizedPointToItem(rw_x, rw_y)
-        var rightTarget = rightCroppingOverlay.mapFromItem(vo,
+        var rightTarget = rightCroppingOverlayInner.mapFromItem(vo,
                                                            rightSourcePoint.x,
                                                            rightSourcePoint.y)
 
@@ -220,6 +220,8 @@ Item {
                                         Layout.fillHeight: true
 
                                         Item {
+                                            id: leftCroppingOverlayInner
+
                                             anchors {
                                                 fill: parent
                                                 topMargin: croppingOverlay.marginWidth
@@ -323,6 +325,8 @@ Item {
                                         Layout.fillHeight: true
 
                                         Item {
+                                            id: rightCroppingOverlayInner
+
                                             anchors {
                                                 fill: parent
                                                 topMargin: croppingOverlay.marginWidth
