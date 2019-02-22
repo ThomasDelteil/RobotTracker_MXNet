@@ -15,11 +15,6 @@ Item {
 
         anchors.centerIn: parent
 
-        transform: Translate {
-            y: -root.height / 2
-            x: -root.width / 2
-        }
-
         width: root.diameter
         height: width
         radius: width * 0.5
