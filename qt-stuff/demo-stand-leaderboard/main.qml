@@ -64,6 +64,7 @@ ApplicationWindow {
                 Text {
                     Layout.alignment: Qt.AlignHCenter
                     font.family: typodermic.name
+                    // TODO check on super high resolution displays
                     font.pointSize: parent.width < 1000 ? parent.width * 0.08 : parent.width * 0.07
                     color: "#63ADE8"
                     text: "LEADERBOARD"
@@ -82,7 +83,7 @@ ApplicationWindow {
                 // TODO perhaps, it's worth doing something to prevent list "jumping" on model updates
                 ListView {
                     Layout.preferredWidth: parent.width * 0.6
-                    Layout.minimumWidth: 400
+                    Layout.minimumWidth: 450
                     Layout.fillHeight: true
                     Layout.topMargin: 25
                     Layout.alignment: Qt.AlignHCenter

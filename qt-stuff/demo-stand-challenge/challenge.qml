@@ -514,9 +514,9 @@ Item {
 
                             FancyButton {
                                 topPadding: 10
-                                rightPadding: 15
+                                rightPadding: 20
                                 bottomPadding: 10
-                                leftPadding: 15
+                                leftPadding: 20
                                 unpressedColor: "#E0E0E0"
                                 pressedColor: "#C1C1C1"
                                 text: "-"
