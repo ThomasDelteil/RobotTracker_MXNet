@@ -38,7 +38,7 @@ ApplicationWindow {
             anchors.top: parent.top
             anchors.topMargin: 10
             width: parent.width
-            source: "qrc:/img/top-shelf.png"
+            source: "qrc:/img/bookshelf.png"
             fillMode: Image.PreserveAspectFit
         }
 
@@ -65,13 +65,12 @@ ApplicationWindow {
                     Layout.alignment: Qt.AlignHCenter
                     font.family: typodermic.name
                     // TODO check on super high resolution displays
-                    font.pointSize: parent.width < 1000 ? parent.width * 0.08 : parent.width * 0.07
-                    color: "#63ADE8"
+                    font.pointSize: parent.width < 1000 ? parent.width * 0.08 : root.primaryFontSize * 2
+                    color: "#43ADEE"
                     text: "LEADERBOARD"
                 }
 
                 Text {
-                    Layout.topMargin: -5
                     id: plrsCnt
                     Layout.alignment: Qt.AlignHCenter
                     font.family: titillium.name
@@ -147,7 +146,7 @@ ApplicationWindow {
             anchors.bottom: parent.bottom
             width: parent.width
             height: parent.height * 0.025
-            color: "#A98052"
+            color: "#B17F4A"
         }
     }
 }

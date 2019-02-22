@@ -111,6 +111,33 @@ Backend::Backend(QObject *parent) : QObject(parent)
         }
     });
 
+    _httpServer->route(
+                "/top",
+                QHttpServerRequest::Method::Get,
+                []()
+    {
+        QString userName = "unknown";
+        int score = 0;
+
+        QSqlQuery query;
+        query.prepare("SELECT u.name, s.score "
+                      "FROM scores AS s JOIN users as U on s.user_id = u.id "
+                      "ORDER BY score DESC, s.id ASC "
+                      "LIMIT 1;");
+        query.exec();
+        if (query.first())
+        {
+            userName = query.value(0).toString();
+            score = query.value(1).toInt();
+        }
+        //qDebug() << userName << score;
+
+        QJsonObject rez;
+        rez.insert("userName", userName);
+        rez.insert("score", score);
+        return rez;
+    });
+
     if (_httpServer->listen(QHostAddress::Any, _port) == -1)
     {
         qWarning() << QString(

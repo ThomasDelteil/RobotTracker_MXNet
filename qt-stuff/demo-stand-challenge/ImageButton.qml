@@ -5,11 +5,16 @@ Image {
     id: btn
 
     property alias text: txt.text
+    property alias fontSize: txt.font.pointSize
+    property alias tapEnabled: tap.enabled
     property string unpressedImage: "qrc:/img/button-start.png"
+    property string pressedImage: "qrc:/img/button-pressed.png"
+    property string unpressedColor: "black"
+    property string pressedColor: "white"
 
     signal clicked
 
-    source: btn.enabled ? (tap.pressed ? "qrc:/img/button-pressed.png" : unpressedImage) : "qrc:/img/button-disabled.png"
+    source: btn.enabled ? (tap.pressed ? pressedImage : unpressedImage) : "qrc:/img/button-disabled.png"
     fillMode: Image.PreserveAspectFit
 
     Text {
@@ -17,7 +22,7 @@ Image {
         anchors.centerIn: parent
         font.pointSize: root.primaryFontSize
         font.family: typodermic.name
-        color: btn.enabled ? (tap.pressed ? "white" : "black") : "gray"
+        color: btn.enabled ? (tap.pressed ? pressedColor : unpressedColor) : "gray"
         text: "BUTTON"
     }
 

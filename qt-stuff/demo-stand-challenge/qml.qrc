@@ -21,5 +21,16 @@
         <file>fonts/typodermic.ttf</file>
         <file>PositionDot.qml</file>
         <file>TargetPositionDot.qml</file>
+        <file>img/terms-background.png</file>
+        <file>img/robot-right.png</file>
+        <file>img/robot-left.png</file>
+        <file>img/bookshelf-left.png</file>
+        <file>img/bookshelf-right.png</file>
+        <file>img/welcome-background.png</file>
+        <file>ImageCheckbox.qml</file>
+        <file>img/check-box.png</file>
+        <file>img/check-mark.png</file>
+        <file>img/button-terms-pressed.png</file>
+        <file>img/button-terms.png</file>
     </qresource>
 </RCC>

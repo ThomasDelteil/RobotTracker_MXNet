@@ -7,6 +7,7 @@ import io.qt.Backend 1.0
 
 ApplicationWindow {
     id: root
+    //visibility: "FullScreen"
     visible: true
     width: 1100
     minimumWidth: 900
@@ -15,10 +16,10 @@ ApplicationWindow {
     title: qsTr("Challenge")
     color: root.backgroundColor
 
-    visibility: "FullScreen"
     property int primaryFontSize: 24
     property int secondaryFontSize: 18
     property string backgroundColor: "#ECECEC"
+    property string primaryColor: "#43ADEE"
 
     property bool cameraUpsideDown: false // if you need to rotate viewfinder to 180
     property double timerRate: 0.05 * 1000 // ms, the rate of grabbing frames (0.05 * 1000 = 20 FPS)
@@ -64,18 +65,9 @@ ApplicationWindow {
         }
     }
 
-    FontLoader {
-        id: typodermic
-        source: "qrc:/fonts/typodermic.ttf"
-    }
-    FontLoader {
-        id: titillium
-        source: "qrc:/fonts/titillium.ttf"
-    }
-    FontLoader {
-        id: titilliumBold
-        source: "qrc:/fonts/titillium-bold.ttf"
-    }
+    FontLoader { id: typodermic; source: "qrc:/fonts/typodermic.ttf" }
+    FontLoader { id: titillium; source: "qrc:/fonts/titillium.ttf" }
+    FontLoader { id: titilliumBold; source: "qrc:/fonts/titillium-bold.ttf" }
 
     RobotsModel {
         id: robotsModel
