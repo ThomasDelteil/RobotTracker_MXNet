@@ -16,9 +16,9 @@ QtObject {
     property real y: minY + rangeY / 2.0
     property real z: minZ + rangeZ / 2.0
 
-    property real normalizedX: rangeX > 0 ? Math.abs(x / rangeX) : 0
-    property real normalizedY: rangeY > 0 ? Math.abs(y / rangeY) : 0
-    property real normalizedZ: rangeZ > 0 ? Math.abs(z / rangeZ) : 0
+    property real normalizedX: rangeX > 0 ? Math.abs(x - minX) / rangeX : 0
+    property real normalizedY: rangeY > 0 ? Math.abs(y - minY) / rangeY : 0
+    property real normalizedZ: rangeZ > 0 ? Math.abs(z - minZ) / rangeZ : 0
 
     /*
     onNormalizedXChanged: console.log('onNormalizedXChanged: ' + normalizedX)
@@ -30,9 +30,12 @@ QtObject {
     property real pitch: minPitch
     property real yaw: minYaw
 
-    property real normalizedRoll: roll / rangeRoll
-    property real normalizedPitch: roll / rangePitch
-    property real normalizedYaw: roll / rangeYaw
+    property real normalizedRoll: rangeRoll > 0 ? Math.abs(
+                                                      roll - minRoll) / rangeRoll : 0
+    property real normalizedPitch: rangePitch > 0 ? Math.abs(
+                                                        pitch - minPitch) / rangePitch : 0
+    property real normalizedYaw: rangeYaw > 0 ? Math.abs(
+                                                    yaw - minYaw) / rangeYaw : 0
 
     property bool isOpen: false
 
@@ -40,27 +43,27 @@ QtObject {
 
     property real minX: 0.253
     property real maxX: 0.253
-    property real rangeX: maxX - minX
+    property real rangeX: Math.abs(maxX - minX)
 
     property real minY: -0.25
     property real maxY: 0.25
-    property real rangeY: maxY - minY
+    property real rangeY: Math.abs(maxY - minY)
 
     property real minZ: 0.1
     property real maxZ: 0.37
-    property real rangeZ: maxZ - minZ
+    property real rangeZ: Math.abs(maxZ - minZ)
 
     property real minRoll: 0
     property real maxRoll: 0
-    property real rangeRoll: maxRoll - minRoll
+    property real rangeRoll: Math.abs(maxRoll - minRoll)
 
     property real minPitch: Math.PI / 2
     property real maxPitch: Math.PI / 2
-    property real rangePitch: maxPitch - minPitch
+    property real rangePitch: Math.abs(maxPitch - minPitch)
 
     property real minYaw: 0 //-Math.PI / 2
     property real maxYaw: 0 //-Math.PI / 2
-    property real rangeYaw: maxYaw - minYaw
+    property real rangeYaw: Math.abs(maxYaw - minYaw)
 
     property bool calibrationNeeded: true
     property bool learningMode: true
@@ -138,7 +141,7 @@ QtObject {
     }
 
     function mapToItem(itemWidth, itemHeight) {
-        return Qt.point(itemWidth * normalizedX, itemHeight * (1 - normalizedY))
+        return Qt.point(Math.abs(itemWidth) * normalizedY, Math.abs(itemHeight) * (1 - normalizedZ))
     }
 
     function mapXFromRobot(frame) {
