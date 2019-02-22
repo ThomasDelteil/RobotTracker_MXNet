@@ -155,6 +155,11 @@ Item {
                             font.family: titilliumBold.name
                             font.bold: true
                             text: "veryqtperson"
+
+                            onEditingFinished: {
+                                // to get rid of virtual keyboard showing up before switching the view
+                                checkbox_consent.forceActiveFocus();
+                            }
                         }
                     }
 
