@@ -224,8 +224,8 @@ Item {
 
                                             anchors {
                                                 fill: parent
-                                                topMargin: croppingOverlay.marginWidth
-                                                bottomMargin: croppingOverlay.marginWidth
+                                                topMargin: croppingOverlay.marginWidth + (originalFrame.height - vo.height ) / 2
+                                                bottomMargin: croppingOverlay.marginWidth + (originalFrame.height - vo.height ) / 2
                                                 leftMargin: croppingOverlay.marginWidth
                                             }
 
@@ -329,8 +329,8 @@ Item {
 
                                             anchors {
                                                 fill: parent
-                                                topMargin: croppingOverlay.marginWidth
-                                                bottomMargin: croppingOverlay.marginWidth
+                                                topMargin: croppingOverlay.marginWidth + (originalFrame.height - vo.height ) / 2
+                                                bottomMargin: croppingOverlay.marginWidth + (originalFrame.height - vo.height ) / 2
                                                 rightMargin: croppingOverlay.marginWidth
                                             }
 
