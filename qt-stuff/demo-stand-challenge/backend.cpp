@@ -244,7 +244,7 @@ bool Backend::accumulatedPalmPrediction(bool isOpen, bool isRight)
     int openCount = list.count(true);
     int closedCount = list.count(false);
 
-    qDebug() << (isRight ? "Right " : "Left ") << "yes count: " << openCount << ", no count: " << closedCount;
+    //qDebug() << list << (isRight ? "Right " : "Left ") << "yes count: " << openCount << ", no count: " << closedCount;
 
     return openCount > closedCount;
 }

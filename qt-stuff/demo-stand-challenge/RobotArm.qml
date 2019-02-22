@@ -125,6 +125,7 @@ QtObject {
         }
 
         if (impl.positionChanged()) {
+            //console.log('will send position: ' + JSON.stringify(impl.lastPosition))
             impl.move(impl.lastPosition)
             impl.lastSentPosition = impl.lastPosition
         }
@@ -181,10 +182,13 @@ QtObject {
 
         property real threshold: 0.01
 
+        property int requestCount: 0
+
         function sendRequest(route, data, callback) {
             var url = root.proxy.httpUrl + "/" + route
             var dataString = !!data ? JSON.stringify(data) : null
-            console.log("Sending: " + url + (!!dataString ? ' with data: ' + dataString : ''))
+            requestCount++
+            console.log("Sending " + requestCount + " : "  + url + (!!dataString ? ' with data: ' + dataString : ''))
 
             var doc = new XMLHttpRequest()
             doc.onreadystatechange = function () {
@@ -250,9 +254,9 @@ QtObject {
 
         function getPosition(relativeY, relativeZ) {
             return {
-                "x": root.minX,
-                "y": root.minY + (root.maxY - root.minY) * relativeY,
-                "z": root.maxZ - (root.maxZ - root.minZ) * relativeZ,
+                "x": root.minX, // constant
+                "y": root.minY + root.rangeY * relativeY,
+                "z": root.maxZ - root.rangeZ * relativeZ, //flit z coord vertically
                 "roll": root.minRoll,
                 "pitch": root.minPitch,
                 "yaw": root.minYaw
