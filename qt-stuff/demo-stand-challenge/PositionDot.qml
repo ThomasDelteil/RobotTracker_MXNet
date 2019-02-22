@@ -5,7 +5,7 @@ Item {
 
     property real diameter
     property alias color: inner.color
-    property point position: Qt.point(0, 0)
+    property point position: Qt.point(x, y)
 
     x: position.x
     y: position.y

@@ -255,7 +255,7 @@ Item {
                                                 color: "blue"
                                                 visible: root.manualTrackers
                                                          || btn_stop.enabled
-                                                onPositionChanged: {
+                                                onNormalPositionChanged: {
                                                     moveTheArm(name,
                                                                normalPosition)
                                                 }
@@ -263,6 +263,13 @@ Item {
 
                                             DragHandler {
                                                 target: trackerLeft
+                                                onCentroidChanged: {
+                                                    if (!active) {
+                                                        return
+                                                    }
+
+                                                    target.target = centroid.position
+                                                }
                                             }
                                         }
                                     }
@@ -314,7 +321,7 @@ Item {
                                                 color: "green"
                                                 visible: root.manualTrackers
                                                          || btn_stop.enabled
-                                                onPositionChanged: {
+                                                onNormalPositionChanged: {
                                                     moveTheArm(name,
                                                                normalPosition)
                                                 }
@@ -322,6 +329,13 @@ Item {
 
                                             DragHandler {
                                                 target: trackerRight
+                                                onCentroidChanged: {
+                                                    if (!active) {
+                                                        return
+                                                    }
+
+                                                    target.target = centroid.position
+                                                }
                                             }
                                         }
                                     }
@@ -643,6 +657,8 @@ Item {
     }
 
     function moveTheArm(armName, position) {
+        console.log('moveTheArm: ' + armName + ': ' + position)
+
         var arm = null
         if (armName === 'left') {
             arm = robotsModel.leftArm
