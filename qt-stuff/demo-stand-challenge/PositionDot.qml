@@ -28,7 +28,7 @@ Item {
         border.color: "white"
     }
 
-    onPositionChanged: console.log('position: ' + position)
+//    onPositionChanged: console.log('position: ' + position)
 
     // animation
     Behavior on x {
