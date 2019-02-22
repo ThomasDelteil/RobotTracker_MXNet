@@ -265,13 +265,7 @@ Item {
 
                                             DragHandler {
                                                 target: trackerLeft
-                                                onCentroidChanged: {
-                                                    if (!active) {
-                                                        return
-                                                    }
-
-                                                    target.target = centroid.position
-                                                }
+                                                onCentroidChanged: chllng.onCentroidChanged(this)
                                             }
                                         }
 
@@ -370,13 +364,7 @@ Item {
 
                                             DragHandler {
                                                 target: trackerRight
-                                                onCentroidChanged: {
-                                                    if (!active) {
-                                                        return
-                                                    }
-
-                                                    target.target = centroid.position
-                                                }
+                                                onCentroidChanged: chllng.onCentroidChanged(this)
                                             }
                                         }
 
@@ -665,6 +653,10 @@ Item {
         robotsModel.sendChanges = false
         tm_sendFrame.stop()
         currentFPSvalue_trackers = 0
+    }
+
+    function onCentroidChanged(item) {
+        item.target.target = Qt.point(item.target.x, item.target.y)
     }
 
     function moveTheArm(armName, position) {
