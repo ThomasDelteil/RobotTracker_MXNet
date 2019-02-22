@@ -27,11 +27,11 @@ Item {
         var lw_x = jsn["skeleton"]["right_wrist"]["x"]
         var lw_y = jsn["skeleton"]["right_wrist"]["y"]
 
-        var leftSourcePoint = vo.mapNormalizedPointToItem(lw_x, lw_y)
-        var leftTarget = leftCroppingOverlayInner.mapFromItem(vo, leftSourcePoint.x,
+        var leftSourcePoint = Qt.point(lw_x * originalFrame.width, lw_y * originalFrame.height)
+        var leftTarget = leftCroppingOverlayInner.mapFromItem(originalFrame, leftSourcePoint.x,
                                                          leftSourcePoint.y)
-        var rightSourcePoint = vo.mapNormalizedPointToItem(rw_x, rw_y)
-        var rightTarget = rightCroppingOverlayInner.mapFromItem(vo,
+        var rightSourcePoint = Qt.point(rw_x * originalFrame.width, rw_y * originalFrame.height)
+        var rightTarget = rightCroppingOverlayInner.mapFromItem(originalFrame,
                                                            rightSourcePoint.x,
                                                            rightSourcePoint.y)
 
