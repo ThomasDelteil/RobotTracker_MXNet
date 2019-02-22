@@ -31,11 +31,6 @@ Backend::Backend(QObject* parent)
     _currentProfile = 0;
 }
 
-Backend::~Backend()
-{
-    // close connections or whatever
-}
-
 void Backend::uploadPose(QImage img)
 {
     // apparently, 384x288 is enough for MXNet
@@ -43,7 +38,7 @@ void Backend::uploadPose(QImage img)
     shotScaled = shotScaled.mirrored(true, false);
     //qDebug() << shotScaled.save(QString("%1-some.jpg").arg(QDateTime::currentDateTime().toString("hh-mm-ss-zzz")));
 
-    QBuffer* imgBuffer = new QBuffer();
+    auto imgBuffer = new QBuffer();
     //QImageWriter iw(imgBuffer, "JPG");
     //bool shotSaved = iw.write(shot);
     bool shotSaved = shotScaled.save(imgBuffer, "JPG");
@@ -72,7 +67,7 @@ void Backend::uploadHand(QImage img, bool isRight)
         setLeftPalm(img);
     }
 
-    QBuffer* imgBuffer = new QBuffer();
+    auto imgBuffer = new QBuffer();
     bool shotSaved = img.save(imgBuffer, "JPG");
     if (!shotSaved) {
         qCritical() << "[error] Couldn't save the shot for cropping]" << imgBuffer->errorString();
@@ -167,7 +162,7 @@ void Backend::requestHandFinished(QNetworkReply* reply)
     if (err.error == QJsonParseError::NoError) {
         QJsonObject jsnObj = jsn.object();
         QVariantMap root_map = jsnObj.toVariantMap();
-        QVariantMap confidence_map = root_map["confidence"].toMap();
+        //QVariantMap confidence_map = root_map["confidence"].toMap();
 
         QString predicted = jsnObj["predicted"].toString();
 

@@ -233,111 +233,35 @@ Item {
                                             }
 
                                             /* left robot position */
-                                            Rectangle {
+                                            PositionDot {
                                                 id: robotLeft
 
-                                                property point pos: robotsModel.leftArm.mapToItem(
-                                                                        parent.width,
-                                                                        parent.height)
-
-                                                x: pos.x
-                                                y: pos.y
-                                                width: root.trackerWidth
-                                                height: width
+                                                position: robotsModel.leftArm.mapToItem(
+                                                              parent.width,
+                                                              parent.height)
+                                                diameter: root.trackerWidth
                                                 color: "blue"
-                                                radius: width * 0.5
-                                                border.width: 2
-                                                border.color: "white"
                                                 opacity: 0.3
-
-                                                transform: Translate {
-                                                    y: -trackerLeft.height / 2
-                                                    x: -trackerLeft.width / 2
-                                                }
-
-                                                // animation
-                                                Behavior on x {
-                                                    NumberAnimation {
-                                                        duration: 100
-                                                        easing.type: Easing.OutQuart
-                                                    }
-                                                }
-                                                Behavior on y {
-                                                    NumberAnimation {
-                                                        duration: 100
-                                                        easing.type: Easing.OutQuart
-                                                    }
-                                                }
                                             }
 
                                             // tracker #1 (left hand)
-                                            Rectangle {
+                                            TargetPositionDot {
                                                 id: trackerLeft
+
                                                 property string name: "left"
 
-                                                property var target: ({
-                                                                          "x": parent.width / 2,
-                                                                          "y": parent.height / 2
-                                                                      })
-
-                                                property real proxy: x + y
-
-                                                x: Math.min(Math.max(0,
-                                                                     target.x),
-                                                            parent.width)
-                                                y: Math.min(Math.max(0,
-                                                                     target.y),
-                                                            parent.height)
-
-                                                width: root.trackerWidth
-                                                height: width
+                                                diameter: root.trackerWidth
                                                 color: "blue"
-                                                radius: width * 0.5
                                                 visible: root.manualTrackers
                                                          || btn_stop.enabled
-                                                border.width: 2
-                                                border.color: "white"
-
-                                                transform: Translate {
-                                                    y: -trackerLeft.height / 2
-                                                    x: -trackerLeft.width / 2
-                                                }
-
-                                                onProxyChanged: {
+                                                onPositionChanged: {
                                                     moveTheArm(name,
-                                                               x / parent.width,
-                                                               y / parent.height)
+                                                               normalPosition)
                                                 }
+                                            }
 
-                                                DragHandler {
-                                                    id: leftDrag
-
-                                                    xAxis {
-                                                        minimum: 0
-                                                        maximum: parent.parent.width
-                                                    }
-
-                                                    yAxis {
-                                                        minimum: 0
-                                                        maximum: parent.parent.height
-                                                    }
-
-                                                    enabled: true
-                                                }
-
-                                                // animation
-                                                Behavior on x {
-                                                    NumberAnimation {
-                                                        duration: 100
-                                                        easing.type: Easing.OutQuart
-                                                    }
-                                                }
-                                                Behavior on y {
-                                                    NumberAnimation {
-                                                        duration: 100
-                                                        easing.type: Easing.OutQuart
-                                                    }
-                                                }
+                                            DragHandler {
+                                                target: trackerLeft
                                             }
                                         }
                                     }
@@ -367,115 +291,36 @@ Item {
                                                 opacity: croppingOverlay.overlayOpacity
                                             }
 
-                                            /* right robot position */
-                                            Rectangle {
+                                            /* left robot position */
+                                            PositionDot {
                                                 id: robotRight
 
-                                                property point pos: robotsModel.rightArm.mapToItem(
-                                                                        parent.width,
-                                                                        parent.height)
-
-                                                onPosChanged: console.log(
-                                                                  'pos ' + pos)
-
-                                                x: pos.x
-                                                y: pos.y
-                                                width: root.trackerWidth
-                                                height: width
+                                                position: robotsModel.rightArm.mapToItem(
+                                                              parent.width,
+                                                              parent.height)
+                                                diameter: root.trackerWidth
                                                 color: "green"
-                                                radius: width * 0.5
-                                                border.width: 2
-                                                border.color: "white"
                                                 opacity: 0.3
-
-                                                transform: Translate {
-                                                    y: -trackerLeft.height / 2
-                                                    x: -trackerLeft.width / 2
-                                                }
-
-                                                // animation
-                                                Behavior on x {
-                                                    NumberAnimation {
-                                                        duration: 100
-                                                        easing.type: Easing.OutQuart
-                                                    }
-                                                }
-                                                Behavior on y {
-                                                    NumberAnimation {
-                                                        duration: 100
-                                                        easing.type: Easing.OutQuart
-                                                    }
-                                                }
                                             }
 
                                             // tracker #2 (right hand)
-                                            Rectangle {
+                                            TargetPositionDot {
                                                 id: trackerRight
+
                                                 property string name: "right"
 
-                                                property var target: ({
-                                                                          "x": parent.width / 2,
-                                                                          "y": parent.height / 2
-                                                                      })
-
-                                                property real proxy: x + y
-
-                                                x: Math.min(Math.max(0,
-                                                                     target.x),
-                                                            parent.width)
-                                                y: Math.min(Math.max(0,
-                                                                     target.y),
-                                                            parent.height)
-
-                                                width: root.trackerWidth
-                                                height: width
+                                                diameter: root.trackerWidth
                                                 color: "green"
-                                                radius: width * 0.5
                                                 visible: root.manualTrackers
                                                          || btn_stop.enabled
-                                                border.width: 2
-                                                border.color: "white"
-
-                                                transform: Translate {
-                                                    y: -trackerLeft.height / 2
-                                                    x: -trackerLeft.width / 2
-                                                }
-
-                                                onProxyChanged: {
+                                                onPositionChanged: {
                                                     moveTheArm(name,
-                                                               x / parent.width,
-                                                               y / parent.height)
+                                                               normalPosition)
                                                 }
+                                            }
 
-                                                DragHandler {
-                                                    id: rightDrag
-
-                                                    xAxis {
-                                                        minimum: 0
-                                                        maximum: parent.parent.width
-                                                    }
-
-                                                    yAxis {
-                                                        minimum: 0
-                                                        maximum: parent.parent.height
-                                                    }
-
-                                                    enabled: true
-                                                }
-
-                                                // animation
-                                                Behavior on x {
-                                                    NumberAnimation {
-                                                        duration: 100
-                                                        easing.type: Easing.OutQuart
-                                                    }
-                                                }
-                                                Behavior on y {
-                                                    NumberAnimation {
-                                                        duration: 100
-                                                        easing.type: Easing.OutQuart
-                                                    }
-                                                }
+                                            DragHandler {
+                                                target: trackerRight
                                             }
                                         }
                                     }
@@ -796,7 +641,7 @@ Item {
         currentFPSvalue_trackers = 0
     }
 
-    function moveTheArm(armName, xCoordinate, yCoordinate) {
+    function moveTheArm(armName, position) {
         var arm = null
         if (armName === 'left') {
             arm = robotsModel.leftArm
@@ -805,7 +650,7 @@ Item {
             arm = robotsModel.rightArm
         }
 
-        arm.move(xCoordinate, yCoordinate)
+        arm.move(position.x, position.y)
     }
 
     function processGrip(armName, result) {

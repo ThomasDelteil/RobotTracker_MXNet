@@ -87,7 +87,7 @@ void VideoWrapper::set_source(QObject* qsrc)
     m_source = qsrc;
 
     if (qsrc) {
-        QCamera* camera = qvariant_cast<QCamera*>(qsrc->property("mediaObject"));
+        auto camera = qvariant_cast<QCamera*>(qsrc->property("mediaObject"));
         if (camera) {
             camera->setCaptureMode(QCamera::CaptureViewfinder);
             camera->setViewfinder(this);

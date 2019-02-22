@@ -19,5 +19,7 @@
         <file>fonts/titillium-bold.ttf</file>
         <file>fonts/titillium.ttf</file>
         <file>fonts/typodermic.ttf</file>
+        <file>PositionDot.qml</file>
+        <file>TargetPositionDot.qml</file>
     </qresource>
 </RCC>

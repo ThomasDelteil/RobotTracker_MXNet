@@ -45,7 +45,7 @@ class Backend : public QObject {
 
 public:
     explicit Backend(QObject* parent = nullptr);
-    ~Backend();
+    ~Backend() = default;
 
 signals:
     QString requestPoseDone(QString result);
