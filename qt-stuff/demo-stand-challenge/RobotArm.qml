@@ -12,13 +12,27 @@ QtObject {
 
     property int connectionStatus: RobotArm.ConnectionStatus.Connecting
 
-    property real x: minX + (maxX - minX) / 2.0
-    property real y: minY + (maxY - minY) / 2.0
-    property real z: minZ + (maxZ - minZ) / 2.0
+    property real x: minX + rangeX / 2.0
+    property real y: minY + rangeY / 2.0
+    property real z: minZ + rangeZ / 2.0
+
+    property real normalizedX: rangeX > 0 ? Math.abs(x / rangeX) : 0
+    property real normalizedY: rangeY > 0 ? Math.abs(y / rangeY) : 0
+    property real normalizedZ: rangeZ > 0 ? Math.abs(z / rangeZ) : 0
+
+    /*
+    onNormalizedXChanged: console.log('onNormalizedXChanged: ' + normalizedX)
+    onNormalizedYChanged: console.log('onNormalizedYChanged: ' + normalizedY)
+    onNormalizedZChanged: console.log('onNormalizedZChanged: ' + normalizedZ)
+    */
 
     property real roll: minRoll
     property real pitch: minPitch
     property real yaw: minYaw
+
+    property real normalizedRoll: roll / rangeRoll
+    property real normalizedPitch: roll / rangePitch
+    property real normalizedYaw: roll / rangeYaw
 
     property bool isOpen: false
 
@@ -26,21 +40,27 @@ QtObject {
 
     property real minX: 0.253
     property real maxX: 0.253
+    property real rangeX: maxX - minX
 
     property real minY: -0.25
     property real maxY: 0.25
+    property real rangeY: maxY - minY
 
     property real minZ: 0.1
     property real maxZ: 0.37
+    property real rangeZ: maxZ - minZ
 
     property real minRoll: 0
     property real maxRoll: 0
+    property real rangeRoll: maxRoll - minRoll
 
     property real minPitch: Math.PI / 2
     property real maxPitch: Math.PI / 2
+    property real rangePitch: maxPitch - minPitch
 
     property real minYaw: 0 //-Math.PI / 2
     property real maxYaw: 0 //-Math.PI / 2
+    property real rangeYaw: maxYaw - minYaw
 
     property bool calibrationNeeded: true
     property bool learningMode: true
@@ -118,9 +138,7 @@ QtObject {
     }
 
     function mapToItem(itemWidth, itemHeight) {
-        var normalX = (root.y - root.minY) / (root.maxY - root.minY)
-        var normalY = (root.z - root.minZ) / (root.maxZ - root.minZ)
-        return Qt.point(itemWidth * normalX, itemHeight * normalY)
+        return Qt.point(itemWidth * normalizedX, itemHeight * (1 - normalizedY))
     }
 
     function mapXFromRobot(frame) {
@@ -146,7 +164,7 @@ QtObject {
     function mapCoords(source, target_space, source_min, source_max) {
         var source_clip = clipCoords(source, source_min, source_max)
         var source_space = source_max - source_min
-        return target_space * (source - source_min)/source_space
+        return target_space * (source - source_min) / source_space
     }
 
     property var impl: QtObject {

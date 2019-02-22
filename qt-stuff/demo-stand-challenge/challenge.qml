@@ -272,6 +272,43 @@ Item {
                                                 }
                                             }
                                         }
+
+                                        ColumnLayout {
+                                            anchors {
+                                                top: parent.top
+                                                left: parent.left
+                                                margins: 10
+                                                topMargin: (originalFrame.height - vo.height ) / 2 + 10
+                                            }
+
+                                            spacing: 10
+
+                                            Image {
+                                                id: leftPalmDebug
+
+                                                width: backend.cropRegionWidth
+                                                height: width
+                                                cache: false
+                                                visible: sourceSize.height > 0
+                                            }
+
+                                            // FPS counters
+                                            Text {
+                                                id: fpsCounter_camera
+                                                text: "0"
+                                                font.pointSize: 40
+                                                color: "yellow"
+                                                visible: root.fpsCounters
+                                            }
+                                            Text {
+                                                id: fpsCounter_trackers
+                                                text: "0"
+                                                font.pointSize: 40
+                                                color: "red"
+                                                //visible: btn_stop.enabled
+                                                visible: root.fpsCounters
+                                            }
+                                        }
                                     }
 
                                     Item {
@@ -338,32 +375,25 @@ Item {
                                                 }
                                             }
                                         }
-                                    }
-                                }
 
-                                Image {
-                                    id: leftPalmDebug
+                                        ColumnLayout {
+                                            anchors {
+                                                top: parent.top
+                                                right: parent.right
+                                                margins: 10
+                                                topMargin: (originalFrame.height - vo.height ) / 2 + 10
+                                            }
 
-                                    width: backend.cropRegionWidth
-                                    height: width
-                                    cache: false
-                                    anchors {
-                                        top: parent.top
-                                        left: parent.left
-                                        margins: 10
-                                    }
-                                }
+                                            spacing: 10
 
-                                Image {
-                                    id: rightPalmDebug
+                                            Image {
+                                                id: rightPalmDebug
 
-                                    width: backend.cropRegionWidth
-                                    height: width
-                                    cache: false
-                                    anchors {
-                                        top: parent.top
-                                        right: parent.right
-                                        margins: 10
+                                                width: backend.cropRegionWidth
+                                                height: width
+                                                cache: false
+                                            }
+                                        }
                                     }
                                 }
 
@@ -403,29 +433,6 @@ Item {
                                         color: "white"
                                         text: "2"
                                     }
-                                }
-
-                                // FPS counters
-                                Text {
-                                    id: fpsCounter_camera
-                                    anchors.top: parent.top
-                                    anchors.left: parent.left
-                                    anchors.topMargin: 10
-                                    anchors.leftMargin: 15
-                                    text: "0"
-                                    font.pointSize: 40
-                                    color: "yellow"
-                                    visible: root.fpsCounters
-                                }
-                                Text {
-                                    id: fpsCounter_trackers
-                                    anchors.top: fpsCounter_camera.bottom
-                                    anchors.left: fpsCounter_camera.left
-                                    text: "0"
-                                    font.pointSize: 40
-                                    color: "red"
-                                    //visible: btn_stop.enabled
-                                    visible: root.fpsCounters
                                 }
                             }
                         }
@@ -657,7 +664,7 @@ Item {
     }
 
     function moveTheArm(armName, position) {
-        console.log('moveTheArm: ' + armName + ': ' + position)
+        //console.log('moveTheArm: ' + armName + ': ' + position)
 
         var arm = null
         if (armName === 'left') {
