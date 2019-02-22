@@ -207,7 +207,10 @@ QImage Backend::cropPalmRegion(QImage originalFrame, QVariantMap elbow, QVariant
     int y = qRound(frameSize.height() * (w_y + (w_y - e_y) / 2) - _cropRegionWidth / 2);
     //qDebug() << e_x << e_y << w_x << w_y << x << y;
 
-    QRect cropRegionLeft(x, y, _cropRegionWidth, _cropRegionWidth);
+    x = qRound(frameSize.width() * w_x);
+    y = qRound(frameSize.height() * w_y);
+
+    QRect cropRegionLeft(x-_cropRegionWidth, y-_cropRegionWidth, _cropRegionWidth*2, _cropRegionWidth*2);
     //qDebug() << "cpp rect:" << cropRegionLeft;
 
     QImage palm = originalFrame.mirrored(true, false).copy(cropRegionLeft);
@@ -244,7 +247,7 @@ bool Backend::accumulatedPalmPrediction(bool isOpen, bool isRight)
     int openCount = list.count(true);
     int closedCount = list.count(false);
 
-    qDebug() << (isRight ? "Right " : "Left ") << "yes count: " << openCount << ", no count: " << closedCount;
+    //qDebug() << list << (isRight ? "Right " : "Left ") << "yes count: " << openCount << ", no count: " << closedCount;
 
     return openCount > closedCount;
 }
