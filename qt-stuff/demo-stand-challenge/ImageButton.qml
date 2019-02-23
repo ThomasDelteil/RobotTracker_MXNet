@@ -20,7 +20,7 @@ Image {
     Text {
         id: txt
         anchors.centerIn: parent
-        font.pointSize: root.primaryFontSize
+        font.pointSize: root.calculateFontSize(btn.paintedWidth, 0.04)
         font.family: typodermic.name
         color: btn.enabled ? (tap.pressed ? pressedColor : unpressedColor) : "gray"
         text: "BUTTON"

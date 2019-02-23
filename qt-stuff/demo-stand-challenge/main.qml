@@ -7,8 +7,8 @@ import io.qt.Backend 1.0
 
 ApplicationWindow {
     id: root
-    //visibility: "FullScreen"
     visible: true
+    visibility: "FullScreen"
     width: 1100
     minimumWidth: 900
     height: 700
@@ -16,6 +16,7 @@ ApplicationWindow {
     title: qsTr("Challenge")
     color: root.backgroundColor
 
+    property real scaleRatio: Screen.devicePixelRatio.toFixed(0) < 2 ? 1.5 : 2
     property int primaryFontSize: 24
     property int secondaryFontSize: 18
     property string backgroundColor: "#ECECEC"
@@ -122,5 +123,12 @@ ApplicationWindow {
 
         xhr.open(method, url)
         xhr.send()
+    }
+
+    function calculateFontSize(parentWidth, parentWidthFraction)
+    {
+        var fontSize = parentWidth > 0 ? parentWidth * parentWidthFraction * root.scaleRatio : root.primaryFontSize;
+        //console.log(parentWidth, parentWidthFraction, fontSize);
+        return Math.round(fontSize);
     }
 }

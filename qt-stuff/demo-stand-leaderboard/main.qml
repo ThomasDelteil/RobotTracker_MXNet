@@ -7,14 +7,14 @@ import io.qt.Backend 1.0
 ApplicationWindow {
     id: root
     visible: true
+    visibility: "FullScreen"
     width: 1100
     minimumWidth: 900
     height: 700
     minimumHeight: 500
     title: qsTr("Leaderboard")
 
-    property int primaryFontSize: 40
-    property int secondaryFontSize: 30
+    property real scaleRatio: Screen.devicePixelRatio.toFixed(0) < 2 ? 1.5 : 2
     property string backgroundColor: "#ECECEC"
 
     Backend {
@@ -62,10 +62,11 @@ ApplicationWindow {
                 spacing: 0
 
                 Text {
+                    Layout.topMargin: parent.height * 0.02
                     Layout.alignment: Qt.AlignHCenter
                     font.family: typodermic.name
                     // TODO check on super high resolution displays
-                    font.pointSize: parent.width < 1000 ? parent.width * 0.08 : root.primaryFontSize * 2
+                    font.pointSize: calculateFontSize(parent.width, 0.04)
                     color: "#43ADEE"
                     text: "LEADERBOARD"
                 }
@@ -74,15 +75,15 @@ ApplicationWindow {
                     id: plrsCnt
                     Layout.alignment: Qt.AlignHCenter
                     font.family: titillium.name
-                    font.pointSize: root.secondaryFontSize
+                    font.pointSize: calculateFontSize(parent.width, 0.02)
                     font.bold: true
                     text: "Total participants: " + backend.scores.rowCount()
                 }
 
                 // TODO perhaps, it's worth doing something to prevent list "jumping" on model updates
                 ListView {
+                    id: scoresList
                     Layout.preferredWidth: parent.width * 0.6
-                    Layout.minimumWidth: 450
                     Layout.fillHeight: true
                     Layout.topMargin: 25
                     Layout.alignment: Qt.AlignHCenter
@@ -91,7 +92,8 @@ ApplicationWindow {
                     model: backend.scores
 
                     delegate: ItemDelegate {
-                        height: root.primaryFontSize * 1.7
+                        height: position < 4 ? calculateFontSize(parent.width, 0.035) * 2.5 : calculateFontSize(parent.width, 0.025) * 3
+
                         width: parent.width
                         RowLayout {
                             anchors.fill: parent
@@ -107,7 +109,7 @@ ApplicationWindow {
                             Text {
                                 Layout.preferredWidth: parent.width * 0.1
                                 horizontalAlignment: Text.AlignRight
-                                font.pointSize: position < 4 ? root.primaryFontSize : root.secondaryFontSize
+                                font.pointSize: position < 4 ? calculateFontSize(parent.width, 0.035) : calculateFontSize(parent.width, 0.025)
                                 font.family: titillium.name
                                 font.bold: true
                                 visible: position >= 4
@@ -118,7 +120,7 @@ ApplicationWindow {
                                 Layout.fillWidth: true
                                 Layout.leftMargin: 30
                                 horizontalAlignment: Text.AlignLeft
-                                font.pointSize: position < 4 ? root.primaryFontSize : root.secondaryFontSize
+                                font.pointSize: position < 4 ? calculateFontSize(parent.width, 0.035) : calculateFontSize(parent.width, 0.025)
                                 font.family: titillium.name
                                 //font.bold: position < 4 ? true : false
                                 text: player
@@ -129,7 +131,7 @@ ApplicationWindow {
                                 Layout.preferredWidth: parent.width * 0.1
                                 Layout.leftMargin: 5
                                 horizontalAlignment: Text.AlignHCenter
-                                font.pointSize: position < 4 ? root.primaryFontSize : root.secondaryFontSize
+                                font.pointSize: position < 4 ? calculateFontSize(parent.width, 0.035) : calculateFontSize(parent.width, 0.025)
                                 font.family: titillium.name
                                 font.bold: position < 4 ? true : false
                                 text: score
@@ -148,5 +150,12 @@ ApplicationWindow {
             height: parent.height * 0.025
             color: "#B17F4A"
         }
+    }
+
+    function calculateFontSize(parentWidth, parentWidthFraction)
+    {
+        var fontSize = parentWidth > 0 ? parentWidth * parentWidthFraction * root.scaleRatio : root.primaryFontSize;
+        //console.log(parentWidth, parentWidthFraction, fontSize);
+        return Math.round(fontSize);
     }
 }

@@ -55,6 +55,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     width: parent.width * 0.85
                     height: parent.height
+                    clip: true
                     //spacing: 0
 
                     Item {
@@ -66,7 +67,7 @@ Item {
                         Layout.alignment: Qt.AlignHCenter
                         color: root.primaryColor
                         font.family: typodermic.name
-                        font.pointSize: formLayout.width > 0 ? formLayout.width * 0.12 : root.primaryFontSize
+                        font.pointSize: calculateFontSize(formLayout.width, 0.06)
                         text: "THE GREAT"
                     }
                     Text {
@@ -74,24 +75,24 @@ Item {
                         Layout.alignment: Qt.AlignHCenter
                         color: root.primaryColor
                         font.family: typodermic.name
-                        font.pointSize: formLayout.width > 0 ? formLayout.width * 0.08 : root.primaryFontSize
+                        font.pointSize: calculateFontSize(formLayout.width, 0.04)
                         text: "robot arm challenge"
                     }
 
                     Text {
-                        Layout.topMargin: 10
+                        Layout.topMargin: parent.height * 0.01
                         Layout.alignment: Qt.AlignHCenter
-                        font.pointSize: formLayout.width > 0 ? formLayout.width * 0.04 : root.primaryFontSize
+                        font.pointSize: calculateFontSize(formLayout.width, 0.02)
                         font.family: titillium.name
                         font.bold: true
                         text: "How many books can you move in 5 minutes?"
                     }
 
                     Row {
-                        Layout.topMargin: 15
+                        Layout.topMargin: parent.height * 0.015
                         Layout.alignment: Qt.AlignHCenter
                         Text {
-                            font.pointSize: formLayout.width > 0 ? formLayout.width * 0.04 : root.primaryFontSize
+                            font.pointSize: calculateFontSize(formLayout.width, 0.02)
                             font.family: titillium.name
                             font.bold: true
                             color: root.primaryColor
@@ -99,19 +100,19 @@ Item {
                         }
                         Text {
                             id: topScore
-                            font.pointSize: formLayout.width > 0 ? formLayout.width * 0.04 : root.primaryFontSize
+                            font.pointSize: calculateFontSize(formLayout.width, 0.02)
                             font.family: titillium.name
                             font.bold: true
                             text: "0"
                         }
                     }
                     Row {
-                        Layout.topMargin: -10
+                        Layout.topMargin: -10//parent.height * 0.01
                         Layout.alignment: Qt.AlignHCenter
 
                         Text {
                             color: root.primaryColor
-                            font.pointSize: formLayout.width > 0 ? formLayout.width * 0.04 : root.primaryFontSize
+                            font.pointSize: calculateFontSize(formLayout.width, 0.02)
                             font.family: titillium.name
                             font.bold: true
                             horizontalAlignment: Text.AlignHCenter
@@ -119,7 +120,7 @@ Item {
                         }
                         Text {
                             id: topUser
-                            font.pointSize: formLayout.width > 0 ? formLayout.width * 0.04 : root.primaryFontSize
+                            font.pointSize: calculateFontSize(formLayout.width, 0.02)
                             font.family: titillium.name
                             font.bold: true
                             // TODO figure out how to set the width and keep the alignment
@@ -129,16 +130,17 @@ Item {
                     }
 
                     Text {
-                        Layout.topMargin: 15
+                        Layout.topMargin: parent.height * 0.015
                         Layout.alignment: Qt.AlignHCenter
-                        font.pointSize: formLayout.width > 0 ? formLayout.width * 0.04 : root.primaryFontSize
+                        font.pointSize: calculateFontSize(formLayout.width, 0.02)
                         font.family: titillium.name
                         text: "Register with your name/nickname to play!"
                     }
 
                     Rectangle {
-                        Layout.topMargin: 5
-                        Layout.fillWidth: true
+                        Layout.topMargin: parent.height * 0.005
+                        Layout.alignment: Qt.AlignHCenter
+                        Layout.preferredWidth: parent.width * 0.8
                         Layout.preferredHeight: text_username.height * 1.5
                         border.width: 1
 
@@ -146,7 +148,7 @@ Item {
                             id: text_username
                             anchors.verticalCenter: parent.verticalCenter
                             width: parent.width
-                            font.pointSize: root.primaryFontSize
+                            font.pointSize: calculateFontSize(formLayout.width, 0.02)
                             horizontalAlignment: Text.AlignHCenter
                             leftPadding: 10
                             rightPadding: leftPadding
@@ -164,7 +166,7 @@ Item {
                     }
 
                     Item {
-                        Layout.topMargin: 10
+                        Layout.topMargin: parent.height * 0.01
                         Layout.fillWidth: true
                         Layout.preferredHeight: 30
 
@@ -174,7 +176,7 @@ Item {
 
                             ImageCheckbox {
                                 id: checkbox_consent
-                                width: txtAgree.height
+                                width: txtAgree.height * 0.7
 
                                 TapHandler {
                                     onTapped: {
@@ -185,7 +187,7 @@ Item {
 
                             Text {
                                 id: txtAgree
-                                font.pointSize: root.secondaryFontSize
+                                font.pointSize: calculateFontSize(formLayout.width, 0.02)
                                 font.family: titilliumBold.name
                                 text: "I agree to the terms"
                             }
@@ -193,17 +195,16 @@ Item {
                     }
 
                     ImageButton {
-                        Layout.topMargin: 10
+                        Layout.topMargin: parent.height * 0.015
                         Layout.alignment: Qt.AlignHCenter
                         Layout.preferredWidth: parent.width * 0.7
-                        Layout.preferredHeight: text_username.height
+                        Layout.preferredHeight: text_username.height * 1.5
                         //width: parent.width * 0.5
                         unpressedImage: "qrc:/img/button-terms.png"
                         pressedImage: "qrc:/img/button-terms-pressed.png"
                         unpressedColor: "#41CD52"
                         fillMode: Image.Stretch
                         text: "Read the terms"
-                        fontSize: height / 2
                         onClicked: {
                             // TODO report the bug of overlapping tap handlers
                             btnRegister.tapEnabled = false;
@@ -384,19 +385,19 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
                     text: "TERMS AND CONDITIONS"
                     font.family: typodermic.name
-                    font.pointSize: root.primaryFontSize * 1.5
+                    font.pointSize: calculateFontSize(termsBackground.paintedWidth, 0.02)
                     color: "#63ADE8"
                 }
 
                 ScrollView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.topMargin: 30
+                    Layout.topMargin: parent.height * 0.05
 
                     TextArea {
                         id: termsText
                         readOnly: true
-                        font.pointSize: root.secondaryFontSize
+                        font.pointSize: calculateFontSize(termsBackground.paintedWidth, 0.01)
                         text: "".concat(
                                   "Hereby you agree that this challenge will collect ",
                                   "the entered user/nick name and the corresponding score ",
