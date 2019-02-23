@@ -67,7 +67,7 @@ Item {
                         Layout.alignment: Qt.AlignHCenter
                         color: root.primaryColor
                         font.family: typodermic.name
-                        font.pointSize: calculateFontSize(formLayout.width, 0.06)
+                        font.pointSize: root.calculateFontSize(formLayout.width, 0.06)
                         text: "THE GREAT"
                     }
                     Text {
@@ -75,14 +75,14 @@ Item {
                         Layout.alignment: Qt.AlignHCenter
                         color: root.primaryColor
                         font.family: typodermic.name
-                        font.pointSize: calculateFontSize(formLayout.width, 0.04)
+                        font.pointSize: root.calculateFontSize(formLayout.width, 0.04)
                         text: "robot arm challenge"
                     }
 
                     Text {
                         Layout.topMargin: parent.height * 0.01
                         Layout.alignment: Qt.AlignHCenter
-                        font.pointSize: calculateFontSize(formLayout.width, 0.02)
+                        font.pointSize: root.calculateFontSize(formLayout.width, 0.02)
                         font.family: titillium.name
                         font.bold: true
                         text: "How many books can you move in 5 minutes?"
@@ -92,7 +92,7 @@ Item {
                         Layout.topMargin: parent.height * 0.015
                         Layout.alignment: Qt.AlignHCenter
                         Text {
-                            font.pointSize: calculateFontSize(formLayout.width, 0.02)
+                            font.pointSize: root.calculateFontSize(formLayout.width, 0.02)
                             font.family: titillium.name
                             font.bold: true
                             color: root.primaryColor
@@ -100,7 +100,7 @@ Item {
                         }
                         Text {
                             id: topScore
-                            font.pointSize: calculateFontSize(formLayout.width, 0.02)
+                            font.pointSize: root.calculateFontSize(formLayout.width, 0.02)
                             font.family: titillium.name
                             font.bold: true
                             text: "0"
@@ -112,7 +112,7 @@ Item {
 
                         Text {
                             color: root.primaryColor
-                            font.pointSize: calculateFontSize(formLayout.width, 0.02)
+                            font.pointSize: root.calculateFontSize(formLayout.width, 0.02)
                             font.family: titillium.name
                             font.bold: true
                             horizontalAlignment: Text.AlignHCenter
@@ -120,7 +120,7 @@ Item {
                         }
                         Text {
                             id: topUser
-                            font.pointSize: calculateFontSize(formLayout.width, 0.02)
+                            font.pointSize: root.calculateFontSize(formLayout.width, 0.02)
                             font.family: titillium.name
                             font.bold: true
                             // TODO figure out how to set the width and keep the alignment
@@ -132,7 +132,7 @@ Item {
                     Text {
                         Layout.topMargin: parent.height * 0.015
                         Layout.alignment: Qt.AlignHCenter
-                        font.pointSize: calculateFontSize(formLayout.width, 0.02)
+                        font.pointSize: root.calculateFontSize(formLayout.width, 0.02)
                         font.family: titillium.name
                         text: "Register with your name/nickname to play!"
                     }
@@ -148,7 +148,7 @@ Item {
                             id: text_username
                             anchors.verticalCenter: parent.verticalCenter
                             width: parent.width
-                            font.pointSize: calculateFontSize(formLayout.width, 0.02)
+                            font.pointSize: root.calculateFontSize(formLayout.width, 0.02)
                             horizontalAlignment: Text.AlignHCenter
                             leftPadding: 10
                             rightPadding: leftPadding
@@ -187,7 +187,7 @@ Item {
 
                             Text {
                                 id: txtAgree
-                                font.pointSize: calculateFontSize(formLayout.width, 0.02)
+                                font.pointSize: root.calculateFontSize(formLayout.width, 0.02)
                                 font.family: titilliumBold.name
                                 text: "I agree to the terms"
                             }
@@ -385,7 +385,7 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
                     text: "TERMS AND CONDITIONS"
                     font.family: typodermic.name
-                    font.pointSize: calculateFontSize(termsBackground.paintedWidth, 0.02)
+                    font.pointSize: root.calculateFontSize(termsBackground.paintedWidth, 0.02)
                     color: "#63ADE8"
                 }
 
@@ -397,7 +397,7 @@ Item {
                     TextArea {
                         id: termsText
                         readOnly: true
-                        font.pointSize: calculateFontSize(termsBackground.paintedWidth, 0.01)
+                        font.pointSize: root.calculateFontSize(termsBackground.paintedWidth, 0.01)
                         text: "".concat(
                                   "Hereby you agree that this challenge will collect ",
                                   "the entered user/nick name and the corresponding score ",
