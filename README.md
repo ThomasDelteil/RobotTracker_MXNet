@@ -1,15 +1,14 @@
 # 6-axis Robot Arm Controls with Python and MXNet
 
----------------------------
-
-This is meant to run on a [jetson TX2 board](https://www.amazon.com/NVIDIA-945-82771-0000-000-Jetson-TX2-Development/dp/B06XPFH939/ref=sr_1_1?s=electronics&ie=UTF8&qid=1542768659&sr=1-1&keywords=jetson+tx2) connected to 
+This is meant to run on a [NVIDIA Jetson TX2 board](https://www.amazon.com/NVIDIA-945-82771-0000-000-Jetson-TX2-Development/dp/B06XPFH939/ref=sr_1_1?s=electronics&ie=UTF8&qid=1542768659&sr=1-1&keywords=jetson+tx2) connected to 
 a [SainSmart 6 axes](https://www.amazon.com/SainSmart-Desktop-Grippers-Assembled-MEGA2560/dp/B00UMOSQCI) robot via i2c.
+
+Repository also contains Qt-based GUI applications for demo purposes.
 
 The robot has a webcam at its extremity and is centering itself on the highest scored person detected in the current frame.
 
----------------------------
+For terminal control:
 
-For terminal control
 ```python
 $ python 
 >>> from robot import Robot
@@ -19,8 +18,6 @@ $ python
 >>> robot.servos.move_servo_to_percent(4, 0)
 >>> robot.servos.move_servo_to_percent(4, 100)
 ```
-
-----------------------------
 
 Usage:
 
