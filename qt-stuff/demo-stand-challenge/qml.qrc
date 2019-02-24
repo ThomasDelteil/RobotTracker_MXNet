@@ -42,5 +42,7 @@
         <file>img/books-03.png</file>
         <file>img/shadow-33.png</file>
         <file>img/shadow-13.png</file>
+        <file>Salute.qml</file>
+        <file>Fireworks.qml</file>
     </qresource>
 </RCC>

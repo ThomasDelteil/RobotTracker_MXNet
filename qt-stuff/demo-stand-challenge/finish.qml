@@ -2,7 +2,6 @@ import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
-import QtQuick.Particles 2.12
 
 Item {
     id: fnsh
@@ -13,135 +12,11 @@ Item {
         anchors.fill: parent
         color: "#D1E1ED"
 
-        // --- fireworks
-
-        ParticleSystem {
-            id: randomFireworks
-            z: 1
-
-            ImageParticle {
-                system: randomFireworks
-                source: "qrc:///particleresources/glowdot.png"
-                color: "gold"
-                colorVariation: 0.2
-            }
-
-            Component {
-                id: emitterComp
-                Emitter {
-                    id: container
-                    Emitter {
-                        id: emitMore
-                        system: randomFireworks
-                        emitRate: 128
-                        lifeSpan: 600
-                        size: 12
-                        endSize: 8
-                        velocity: AngleDirection { angleVariation: 360; magnitude: 60 }
-                    }
-
-                    property int life: 2600
-                    property real targetX: 0
-                    property real targetY: 0
-                    function go() {
-                        xAnim.start();
-                        yAnim.start();
-                        container.enabled = true
-                    }
-                    system: randomFireworks
-                    emitRate: 32
-                    lifeSpan: 600
-                    size: 12
-                    endSize: 8
-                    NumberAnimation on x {
-                        id: xAnim;
-                        to: targetX
-                        duration: life
-                        running: false
-                    }
-                    NumberAnimation on y {
-                        id: yAnim;
-                        to: targetY
-                        duration: life
-                        running: false
-                    }
-                    Timer {
-                        interval: life
-                        running: true
-                        onTriggered: container.destroy();
-                    }
-                }
-            }
-        }
-
-        ParticleSystem {
-            anchors.fill: parent
-
-            ParticleGroup {
-                name: "fire"
-                duration: 1500
-                durationVariation: 1500
-                to: { "splode": 1 }
-            }
-
-            ParticleGroup {
-                name: "splode"
-                duration: 800
-                to: { "dead": 1 }
-                TrailEmitter {
-                    group: "works"
-                    emitRatePerParticle: 100
-                    lifeSpan: 1000
-                    maximumEmitted: 1200
-                    size: 8
-                    velocity: AngleDirection { angle: 270; angleVariation: 45; magnitude: 20; magnitudeVariation: 20; }
-                    acceleration: PointDirection { y: 100; yVariation: 20 }
-                }
-            }
-
-            ParticleGroup {
-                name: "dead"
-                duration: 1000
-                Affector {
-                    once: true
-                    onAffected: worksEmitter.burst(400, x, y)
-                }
-            }
-
-            Emitter {
-                id: startingEmitter
-                group: "fire"
-                width: parent.width
-                y: parent.height
-                enabled: false
-                emitRate: 80
-                lifeSpan: 6000
-                velocity: PointDirection { y: -100; }
-                size: 16
-            }
-
-            Emitter {
-                id: worksEmitter
-                group: "works"
-                enabled: false
-                emitRate: 100
-                lifeSpan: 3000
-                maximumEmitted: 6400
-                size: 8
-                velocity: CumulativeDirection {
-                    PointDirection { y: -100 }
-                    AngleDirection {angleVariation: 360; magnitudeVariation: 80;}
-                }
-                acceleration: PointDirection { y: 100; yVariation: 20 }
-            }
-
-            ImageParticle {
-                groups: ["works", "fire", "splode"]
-                source: "qrc:///particleresources/glowdot.png"
-                color: "lime"
-                colorVariation: 0.6
-            }
-        }
+        //Fireworks { id: fireworks1; majorColor: "pink"; z: 1 }
+        Salute { id: salute1; anchors.fill: parent; majorColor: "orangered" }
+        Salute { id: salute2; anchors.fill: parent; majorColor: "green" }
+        Salute { id: salute3; anchors.fill: parent; majorColor: "magenta" }
+        Salute { id: salute4; anchors.fill: parent; majorColor: "blue" }
 
         Image {
             id: topShelf
@@ -317,8 +192,6 @@ Item {
         id: step5
         interval: 1000
         onTriggered: {
-            fireworks1.start();
-            fireworks2.start();
             results.visible = true;
             step6.start();
         }
@@ -327,6 +200,9 @@ Item {
         id: step6
         interval: 500
         onTriggered: {
+            fireworksTimer1.start();
+            //fireworksTimer2.start();
+            stopFireworks.start();
             grats.visible = true;
             step7.start();
         }
@@ -358,35 +234,35 @@ Item {
         }
     }
     Timer {
-        id: fireworks1
+        id: fireworksTimer1
         interval: 500
         repeat: true
         triggeredOnStart: true
         onTriggered: {
-            startingEmitter.pulse(100);
+            salute1.startingEmitter.pulse(20);
+            salute2.startingEmitter.pulse(70);
+            salute3.startingEmitter.pulse(30);
+            salute4.startingEmitter.pulse(50);
         }
     }
     Timer {
-        id: fireworks2
-        interval: 2000
-        repeat: true
-        onTriggered: customEmit(Math.random() * results.width, Math.random() * results.height)
-    }
-
-    function customEmit(x, y)
-    {
-        for (var i = 0; i < 8; i++)
-        {
-            var obj = emitterComp.createObject(results);
-            obj.x = x;
-            obj.y = y;
-            obj.targetX = Math.random() * 240 - 120 + obj.x;
-            obj.targetY = Math.random() * 240 - 120 + obj.y;
-            obj.life = Math.round(Math.random() * 2400) + 200;
-            obj.emitRate = Math.round(Math.random() * 32) + 32;
-            obj.go();
+        id: stopFireworks
+        interval: 5000
+        onTriggered: {
+            fireworksTimer1.stop();
+            //fireworksTimer2.stop();
         }
     }
+//    Timer {
+//        id: fireworksTimer2
+//        interval: 2000
+//        repeat: true
+//        onTriggered: {
+//            fireworks1.customEmit(Math.random() * results.width, Math.random() * results.height);
+//            fireworks2.customEmit(Math.random() * results.width, Math.random() * results.height);
+//            fireworks3.customEmit(Math.random() * results.width, Math.random() * results.height);
+//        }
+//    }
 
     Component.onCompleted: {
         request(

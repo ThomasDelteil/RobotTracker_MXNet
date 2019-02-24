@@ -567,8 +567,8 @@ Item {
                                                         backend.get_currentProfile(
                                                             ), "| score:",
                                                         backend.get_currentScore())
-                                            // FIXME dialog never opens
-                                            dialogScoreError.open()
+                                            // FIXME dialog opens only for a fraction of second
+                                            //dialogScoreError.open()
                                         }
 
                                         scoreLayout.visible = false;
