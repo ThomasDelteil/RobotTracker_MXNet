@@ -29,6 +29,7 @@ Backend::Backend(QObject* parent)
     //manager->setProxy(proxy);
 
     _currentProfile = 0;
+    _currentScore = 0;
 }
 
 void Backend::uploadPose(QImage img)
@@ -260,6 +261,16 @@ void Backend::set_currentProfile(int id)
 int Backend::get_currentProfile()
 {
     return _currentProfile;
+}
+
+void Backend::set_currentScore(int score)
+{
+    _currentScore = score;
+}
+
+int Backend::get_currentScore()
+{
+    return _currentScore;
 }
 
 VideoWrapper* Backend::get_videoWrapper()

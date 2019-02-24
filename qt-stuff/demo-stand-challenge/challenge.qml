@@ -549,10 +549,12 @@ Item {
                             enabled = false
                             text = "saving..."
 
+                            backend.set_currentScore(score.text);
+
                             request("http://".concat(backend.dbServer(),
                                                      "/user/saveScore/",
                                                      backend.get_currentProfile(
-                                                         ), "/", score.text),
+                                                         ), "/", backend.get_currentScore()),
                                     "POST", function (o) {
                                         enabled = true
                                         text = "Done"
@@ -564,17 +566,15 @@ Item {
                                             console.log("[error] Couldn't save the score. Player ID:",
                                                         backend.get_currentProfile(
                                                             ), "| score:",
-                                                        score.text)
+                                                        backend.get_currentScore())
                                             // FIXME dialog never opens
                                             dialogScoreError.open()
                                         }
 
-                                        scoreLayout.visible = false
-                                        score.text = 0
+                                        scoreLayout.visible = false;
+                                        score.text = 0;
 
-                                        backend.set_currentProfile(0)
-
-                                        nextWindow("welcome.qml")
+                                        nextWindow("finish.qml");
                                     })
                         }
                     }

@@ -32,5 +32,15 @@
         <file>img/check-mark.png</file>
         <file>img/button-terms-pressed.png</file>
         <file>img/button-terms.png</file>
+        <file>finish.qml</file>
+        <file>img/books-13.png</file>
+        <file>img/books-23.png</file>
+        <file>img/books-33.png</file>
+        <file>img/shelf-13.png</file>
+        <file>img/shelf-33.png</file>
+        <file>img/trophy.png</file>
+        <file>img/books-03.png</file>
+        <file>img/shadow-33.png</file>
+        <file>img/shadow-13.png</file>
     </qresource>
 </RCC>

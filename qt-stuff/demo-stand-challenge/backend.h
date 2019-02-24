@@ -63,6 +63,8 @@ public slots:
 
     void set_currentProfile(int id);
     int get_currentProfile();
+    void set_currentScore(int score);
+    int get_currentScore();
 
     VideoWrapper* get_videoWrapper();
 
@@ -91,6 +93,7 @@ private:
     const QString _endpointPose = "http://localhost:8080/predictions/pose";
     const QString _endpointHand = "http://localhost:8080/predictions/hand";
     int _currentProfile;
+    int _currentScore;
     bool _connected = false;
     QHash<QByteArray, QImage> _frames;
     // crop region width (and height) for the palms crop regions

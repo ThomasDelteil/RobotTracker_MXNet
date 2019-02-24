@@ -138,6 +138,28 @@ Backend::Backend(QObject *parent) : QObject(parent)
         return rez;
     });
 
+    _httpServer->route(
+                "/rank/<arg>",
+                QHttpServerRequest::Method::Get,
+                [](int score)
+    {
+        int rank = 0;
+
+        QSqlQuery query;
+        query.prepare("SELECT COUNT(score) "
+                      "FROM scores "
+                      "WHERE score > :score");
+        query.bindValue(":score", score);
+        query.exec();
+        if (query.first())
+        {
+            rank = query.value(0).toInt() + 1;
+        }
+        qDebug() << rank;
+
+        return QString::number(rank);
+    });
+
     if (_httpServer->listen(QHostAddress::Any, _port) == -1)
     {
         qWarning() << QString(

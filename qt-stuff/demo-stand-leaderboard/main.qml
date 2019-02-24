@@ -65,7 +65,6 @@ ApplicationWindow {
                     Layout.topMargin: parent.height * 0.02
                     Layout.alignment: Qt.AlignHCenter
                     font.family: typodermic.name
-                    // TODO check on super high resolution displays
                     font.pointSize: calculateFontSize(parent.width, 0.04)
                     color: "#43ADEE"
                     text: "LEADERBOARD"
