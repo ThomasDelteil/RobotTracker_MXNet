@@ -168,7 +168,7 @@ void Backend::requestHandFinished(QNetworkReply* reply)
         QString predicted = jsnObj["predicted"].toString();
 
         // only keep predictions values that are not "background" and above threshold (0.6)
-        if (predicted == "background" || jsnObj["value"].toDouble() < 0.6) {
+        if (predicted == "background" || predicted == "middle" || jsnObj["value"].toDouble() < 0.6) {
             predicted = "2";
         } else {
             auto prediction = accumulatedPalmPrediction(predicted == "open", isRight);
