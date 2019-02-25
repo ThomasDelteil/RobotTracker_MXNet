@@ -156,7 +156,7 @@ Item {
                             color: root.primaryColor
                             font.family: titilliumBold.name
                             font.bold: true
-                            text: "veryqtperson"
+                            text: ""//"veryqtperson"
 
                             onEditingFinished: {
                                 // to get rid of virtual keyboard showing up before switching the view
@@ -402,9 +402,9 @@ Item {
                                   "Hereby you agree that this challenge will collect ",
                                   "the entered user/nick name and the corresponding score ",
                                   "being shown on the leaderboard to the public during ",
-                                  "the event. After the event, nicknames and score ",
+                                  "the event. After the event, nicknames and scores ",
                                   "will be deleted.\n\n",
-                                  "Furthermore, the Qt Company and AWS are not liable ",
+                                  "Furthermore, The Qt Company and AWS are not liable ",
                                   "with regards self-hurting movements, embarrassing ",
                                   "behaviour or alike."
                                   )
