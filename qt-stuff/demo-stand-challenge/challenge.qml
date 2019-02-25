@@ -6,12 +6,15 @@ import QtMultimedia 5.12
 Item {
     id: chllng
 
+    signal nextWindow(string windowName)
+
     property int currentFPSvalue_camera: 0
     property int currentFPSvalue_trackers: 0
 
     property alias camera: camera
 
-    signal nextWindow(string windowName)
+    property int remainingSeconds: 300
+
 
     function processPoseResults(result) {
 
@@ -468,7 +471,7 @@ Item {
                     ImageButton {
                         id: btn_start
                         Layout.preferredHeight: parent.height * 0.6
-                        //Layout.maximumWidth: parent.width / 4
+                        Layout.maximumWidth: parent.width * 0.35
                         unpressedImage: "qrc:/img/button-start.png"
                         text: "START"
                         visible: enabled
@@ -480,7 +483,7 @@ Item {
                     ImageButton {
                         id: btn_stop
                         Layout.preferredHeight: parent.height * 0.6
-                        //Layout.maximumWidth: parent.width / 4
+                        Layout.maximumWidth: parent.width * 0.35
                         unpressedImage: "qrc:/img/button-stop.png"
                         text: "STOP"
                         enabled: !btn_start.enabled
@@ -493,6 +496,16 @@ Item {
                     Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+
+                        Text  {
+                            id: challengeTimer
+                            anchors.centerIn: parent
+                            font.family: titillium.name
+                            font.pointSize: root.primaryFontSize * 2
+                            font.bold: true
+                            text: "05:00"
+                            visible: false
+                        }
 
                         RowLayout {
                             id: scoreLayout
@@ -519,8 +532,10 @@ Item {
 
                             Text {
                                 id: score
-                                text: "0"
+                                font.family: titillium.name
                                 font.pointSize: root.primaryFontSize * 2
+                                font.bold: true
+                                text: "0"
                             }
 
                             FancyButton {
@@ -541,7 +556,7 @@ Item {
 
                     ImageButton {
                         Layout.preferredHeight: parent.height * 0.6
-                        //Layout.maximumWidth: parent.width / 4
+                        Layout.maximumWidth: parent.width * 0.35
                         unpressedImage: "qrc:/img/button-done.png"
                         text: "DONE"
                         enabled: !btn_stop.enabled
@@ -606,6 +621,20 @@ Item {
         }
     }
 
+    Timer {
+        id: challengeCountdown
+        interval: 1000
+        repeat: true
+        onTriggered: {
+            remainingSeconds--;
+            challengeTimer.text = secondsToMinutes(remainingSeconds);
+            if (remainingSeconds === 0)
+            {
+                btn_stop.clicked();
+            }
+        }
+    }
+
     Dialog {
         id: dialogScoreError
         x: (parent.width - width) / 2
@@ -641,18 +670,33 @@ Item {
         }
     }
 
-    function startChallenge() {
-        scoreLayout.visible = true
-        btn_start.enabled = false
-        robotsModel.sendChanges = true
-        tm_sendFrame.start()
+    function startChallenge()
+    {
+        scoreLayout.visible = false;
+        score.text = 0;
+
+        challengeTimer.visible = true;
+        challengeCountdown.start();
+
+        btn_start.enabled = false;
+        robotsModel.sendChanges = true;
+        tm_sendFrame.start();
+
     }
 
-    function stopChallenge() {
-        btn_start.enabled = true
-        robotsModel.sendChanges = false
-        tm_sendFrame.stop()
-        currentFPSvalue_trackers = 0
+    function stopChallenge()
+    {
+        scoreLayout.visible = true;
+
+        challengeTimer.visible = false;
+        challengeTimer.text = "05:00";
+        challengeCountdown.stop();
+        remainingSeconds = 300;
+
+        btn_start.enabled = true;
+        robotsModel.sendChanges = false;
+        tm_sendFrame.stop();
+        currentFPSvalue_trackers = 0;
     }
 
     function onCentroidChanged(item) {
@@ -691,5 +735,14 @@ Item {
         if (result == 1) {
             arm.close()
         }
+    }
+
+    function secondsToMinutes(secs)
+    {
+        var minutes = Math.floor(secs / 60);
+        var seconds = secs - (minutes * 60);
+        if (minutes < 10) { minutes = "0".concat(minutes); }
+        if (seconds < 10) { seconds = "0".concat(seconds); }
+        return minutes.concat(":", seconds);
     }
 }

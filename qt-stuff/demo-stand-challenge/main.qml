@@ -105,9 +105,9 @@ ApplicationWindow {
         }
     }
 
-    function getCurrentDateTime() {
-        return new Date().toISOString().replace(/[:|.|T]/g,
-                                                "-").replace("Z", "")
+    function getCurrentDateTime()
+    {
+        return new Date().toISOString().replace(/[:|.|T]/g, "-").replace("Z", "");
     }
 
     // HTTP-request to the URL
