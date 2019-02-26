@@ -33,7 +33,7 @@ Item {
     }
 
     Timer {
-        interval: 1000
+        interval: 300
         repeat: true
         running: root.sendChanges
         triggeredOnStart: true

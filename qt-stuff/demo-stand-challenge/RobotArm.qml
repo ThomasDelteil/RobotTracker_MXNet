@@ -129,7 +129,7 @@ QtObject {
             impl.move(impl.lastPosition)
             impl.lastSentPosition = impl.lastPosition
         }
-
+/*
         if (impl.openedChanged()) {
             if (impl.lastOpen) {
                 impl.open()
@@ -139,6 +139,7 @@ QtObject {
 
             impl.lastSentOpen = impl.lastOpen
         }
+	*/
     }
 
     function sendOpenClosedChanges() {
@@ -146,12 +147,14 @@ QtObject {
             return
         }
         var currentState = impl.lastOpen
+//	console.log(name + ': timer sendOpenClosedChanges: lastOpen=' + impl.lastOpen + ', impl.lastSentOpen=' + impl.lastSentOpen)
         if (impl.openedChanged(currentState)) {
+//	    console.log(name + ': state changed')
             if (currentState) {
-                console.log(impl.name +': sending OPEN')
+                console.log(name +': sending OPEN')
                 impl.open()
             } else {
-                console.log(impl.name +': sending CLOSE')
+                console.log(name +': sending CLOSE')
                 impl.close()
             }
 
@@ -208,7 +211,7 @@ QtObject {
             var doc = new XMLHttpRequest()
             doc.onreadystatechange = function () {
                 if (doc.readyState === XMLHttpRequest.DONE) {
-                    console.log(route + " succeeded")
+//                    console.log(route + " succeeded")
                     if (!!callback) {
                         callback(doc)
                     }
