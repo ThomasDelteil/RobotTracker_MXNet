@@ -48,7 +48,7 @@ QtObject {
     property real minY: -0.25
     property real maxY: 0.25
     property real rangeY: Math.abs(maxY - minY)
-    property real transferY: 0.15
+    property real transferY
 
     property real minZ: 0.1
     property real maxZ: 0.37
@@ -57,17 +57,17 @@ QtObject {
     property real minRoll: 0
     property real maxRoll: 0
     property real rangeRoll: Math.abs(maxRoll - minRoll)
-    property real transferRoll: 0
+    property real transferRoll
 
     property real minPitch: Math.PI / 2
     property real maxPitch: Math.PI / 2
     property real rangePitch: Math.abs(maxPitch - minPitch)
-    property real transferPitch: 0
+    property real transferPitch
 
     property real minYaw: 0 //-Math.PI / 2
     property real maxYaw: 0 //-Math.PI / 2
     property real rangeYaw: Math.abs(maxYaw - minYaw)
-    property real transferYaw: Math.PI / 2.0
+    property real transferYaw
 
     property bool calibrationNeeded: true
     property bool learningMode: true
@@ -276,13 +276,13 @@ QtObject {
             var pitch = root.minPitch
             var yaw = root.minYaw
 
+            // flipping the gropper
             var y = root.minY + root.rangeY * relativeY
-            if (name == 'left') {
-                if (y > transferY) {
-                    roll = transferRoll
-                    pitch = transferPitch
-                    yaw = transferYaw
-                }
+            if ((name == 'left' && y > transferY) ||
+                    (name == 'right' && y < transferY)) {
+                roll = transferRoll
+                pitch = transferPitch
+                yaw = transferYaw
             }
 
             return {

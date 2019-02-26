@@ -50,7 +50,10 @@ Item {
         name: 'left'
         proxy: proxy
 
+        transferY: 0.15
         transferRoll: Math.PI / 2.0
+        transferPitch: 0
+        transferYaw: Math.PI / 2.0
     }
 
     RobotArm {
@@ -59,7 +62,10 @@ Item {
         name: 'right'
         proxy: proxy
 
-        transferRoll: Math.PI / 2.0
+        transferY: -0.15
+        transferRoll: -Math.PI / 2.0
+        transferPitch: 0
+        transferYaw: -Math.PI / 2.0
     }
 
     Timer {
