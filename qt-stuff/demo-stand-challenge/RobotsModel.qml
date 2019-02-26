@@ -32,6 +32,18 @@ Item {
         }
     }
 
+    Timer {
+        interval: 1000
+        repeat: true
+        running: root.sendChanges
+        triggeredOnStart: true
+
+        onTriggered: {
+            left.sendOpenClosedChanges()
+            right.sendOpenClosedChanges()
+        }
+    }
+
     RobotArm {
         id: left
 

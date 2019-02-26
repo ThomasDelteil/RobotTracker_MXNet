@@ -141,6 +141,24 @@ QtObject {
         }
     }
 
+    function sendOpenClosedChanges() {
+        if (learningMode) {
+            return
+        }
+        var currentState = impl.lastOpen
+        if (impl.openedChanged(currentState)) {
+            if (currentState) {
+                console.log(impl.name +': sending OPEN')
+                impl.open()
+            } else {
+                console.log(impl.name +': sending CLOSE')
+                impl.close()
+            }
+
+            impl.lastSentOpen = currentState
+        }
+    }
+
     function mapToItem(itemWidth, itemHeight) {
         return Qt.point(Math.abs(itemWidth) * normalizedY, Math.abs(itemHeight) * (1 - normalizedZ))
     }
@@ -182,13 +200,10 @@ QtObject {
 
         property real threshold: 0.01
 
-        property int requestCount: 0
-
         function sendRequest(route, data, callback) {
             var url = root.proxy.httpUrl + "/" + route
             var dataString = !!data ? JSON.stringify(data) : null
-            requestCount++
-            console.log("Sending " + requestCount + " : "  + url + (!!dataString ? ' with data: ' + dataString : ''))
+            //console.log("Sending "  + url + (!!dataString ? ' with data: ' + dataString : ''))
 
             var doc = new XMLHttpRequest()
             doc.onreadystatechange = function () {
@@ -287,8 +302,8 @@ QtObject {
             return false
         }
 
-        function openedChanged() {
-            if (lastOpen === null) {
+        function openedChanged(currentState) {
+            if (currentState === null) {
                 return false
             }
 
@@ -296,7 +311,7 @@ QtObject {
                 return true
             }
 
-            return lastOpen !== lastSentOpen
+            return currentState !== lastSentOpen
         }
     }
 }
