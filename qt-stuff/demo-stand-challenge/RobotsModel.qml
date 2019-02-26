@@ -49,6 +49,8 @@ Item {
 
         name: 'left'
         proxy: proxy
+
+        transferRoll: Math.PI / 2.0
     }
 
     RobotArm {
@@ -56,6 +58,8 @@ Item {
 
         name: 'right'
         proxy: proxy
+
+        transferRoll: Math.PI / 2.0
     }
 
     Timer {
