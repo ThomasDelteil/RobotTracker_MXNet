@@ -48,6 +48,7 @@ QtObject {
     property real minY: -0.25
     property real maxY: 0.25
     property real rangeY: Math.abs(maxY - minY)
+    property real transferY
 
     property real minZ: 0.1
     property real maxZ: 0.37
@@ -56,14 +57,17 @@ QtObject {
     property real minRoll: 0
     property real maxRoll: 0
     property real rangeRoll: Math.abs(maxRoll - minRoll)
+    property real transferRoll
 
     property real minPitch: Math.PI / 2
     property real maxPitch: Math.PI / 2
     property real rangePitch: Math.abs(maxPitch - minPitch)
+    property real transferPitch
 
     property real minYaw: 0 //-Math.PI / 2
     property real maxYaw: 0 //-Math.PI / 2
     property real rangeYaw: Math.abs(maxYaw - minYaw)
+    property real transferYaw
 
     property bool calibrationNeeded: true
     property bool learningMode: true
@@ -129,7 +133,7 @@ QtObject {
             impl.move(impl.lastPosition)
             impl.lastSentPosition = impl.lastPosition
         }
-
+/*
         if (impl.openedChanged()) {
             if (impl.lastOpen) {
                 impl.open()
@@ -138,6 +142,27 @@ QtObject {
             }
 
             impl.lastSentOpen = impl.lastOpen
+        }
+	*/
+    }
+
+    function sendOpenClosedChanges() {
+        if (learningMode) {
+            return
+        }
+        var currentState = impl.lastOpen
+//	console.log(name + ': timer sendOpenClosedChanges: lastOpen=' + impl.lastOpen + ', impl.lastSentOpen=' + impl.lastSentOpen)
+        if (impl.openedChanged(currentState)) {
+//	    console.log(name + ': state changed')
+            if (currentState) {
+                console.log(name +': sending OPEN')
+                impl.open()
+            } else {
+                console.log(name +': sending CLOSE')
+                impl.close()
+            }
+
+            impl.lastSentOpen = currentState
         }
     }
 
@@ -182,18 +207,15 @@ QtObject {
 
         property real threshold: 0.01
 
-        property int requestCount: 0
-
         function sendRequest(route, data, callback) {
             var url = root.proxy.httpUrl + "/" + route
             var dataString = !!data ? JSON.stringify(data) : null
-            requestCount++
-            console.log("Sending " + requestCount + " : "  + url + (!!dataString ? ' with data: ' + dataString : ''))
+            //console.log("Sending "  + url + (!!dataString ? ' with data: ' + dataString : ''))
 
             var doc = new XMLHttpRequest()
             doc.onreadystatechange = function () {
                 if (doc.readyState === XMLHttpRequest.DONE) {
-                    console.log(route + " succeeded")
+//                    console.log(route + " succeeded")
                     if (!!callback) {
                         callback(doc)
                     }
@@ -253,13 +275,26 @@ QtObject {
         }
 
         function getPosition(relativeY, relativeZ) {
+            var roll = root.minRoll
+            var pitch = root.minPitch
+            var yaw = root.minYaw
+
+            // flipping the gropper
+            var y = root.minY + root.rangeY * relativeY
+            if ((name == 'left' && y > transferY) ||
+                    (name == 'right' && y < transferY)) {
+                roll = transferRoll
+                pitch = transferPitch
+                yaw = transferYaw
+            }
+
             return {
                 "x": root.minX, // constant
-                "y": root.minY + root.rangeY * relativeY,
+                "y": y,
                 "z": root.maxZ - root.rangeZ * relativeZ, //flit z coord vertically
-                "roll": root.minRoll,
-                "pitch": root.minPitch,
-                "yaw": root.minYaw
+                "roll": roll,
+                "pitch": pitch,
+                "yaw": yaw
             }
         }
 
@@ -287,8 +322,8 @@ QtObject {
             return false
         }
 
-        function openedChanged() {
-            if (lastOpen === null) {
+        function openedChanged(currentState) {
+            if (currentState === null) {
                 return false
             }
 
@@ -296,7 +331,7 @@ QtObject {
                 return true
             }
 
-            return lastOpen !== lastSentOpen
+            return currentState !== lastSentOpen
         }
     }
 }

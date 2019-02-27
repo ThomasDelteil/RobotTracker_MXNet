@@ -32,11 +32,28 @@ Item {
         }
     }
 
+    Timer {
+        interval: 300
+        repeat: true
+        running: root.sendChanges
+        triggeredOnStart: true
+
+        onTriggered: {
+            left.sendOpenClosedChanges()
+            right.sendOpenClosedChanges()
+        }
+    }
+
     RobotArm {
         id: left
 
         name: 'left'
         proxy: proxy
+
+        transferY: 0.15
+        transferRoll: Math.PI / 2.0
+        transferPitch: 0
+        transferYaw: Math.PI / 2.0
     }
 
     RobotArm {
@@ -44,6 +61,11 @@ Item {
 
         name: 'right'
         proxy: proxy
+
+        transferY: -0.15
+        transferRoll: -Math.PI / 2.0
+        transferPitch: 0
+        transferYaw: -Math.PI / 2.0
     }
 
     Timer {

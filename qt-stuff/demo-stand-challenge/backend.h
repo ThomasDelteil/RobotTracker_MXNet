@@ -105,7 +105,7 @@ private:
     QImage _rightPalm;
     QList<bool> _lastLeftPalmPredictions;
     QList<bool> _lastRightPalmPredictions;
-    const int _lastPalmPredictionsCount = 5;
+    const int _lastPalmPredictionsCount = 1;
     const int _timeForChallenge = 120; // seconds
 };
 

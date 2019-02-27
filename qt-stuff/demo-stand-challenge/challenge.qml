@@ -727,7 +727,7 @@ Item {
         }
 
         // @disable-check M126
-        if (result == 2) {
+        if (result == 0) {
             arm.open()
         }
 
