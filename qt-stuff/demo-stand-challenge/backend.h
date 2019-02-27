@@ -65,6 +65,7 @@ public slots:
     int get_currentProfile();
     void set_currentScore(int score);
     int get_currentScore();
+    int get_timeForChallenge();
 
     VideoWrapper* get_videoWrapper();
 
@@ -105,6 +106,7 @@ private:
     QList<bool> _lastLeftPalmPredictions;
     QList<bool> _lastRightPalmPredictions;
     const int _lastPalmPredictionsCount = 5;
+    const int _timeForChallenge = 120; // seconds
 };
 
 #endif // BACKEND_H

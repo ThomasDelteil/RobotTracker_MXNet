@@ -13,7 +13,7 @@ Item {
 
     property alias camera: camera
 
-    property int remainingSeconds: 300
+    property int remainingSeconds: backend.get_timeForChallenge()
 
 
     function processPoseResults(result) {
@@ -503,7 +503,7 @@ Item {
                             font.family: titillium.name
                             font.pointSize: root.primaryFontSize * 2
                             font.bold: true
-                            text: "05:00"
+                            text: "02:00"
                             visible: false
                         }
 
@@ -689,9 +689,9 @@ Item {
         scoreLayout.visible = true;
 
         challengeTimer.visible = false;
-        challengeTimer.text = "05:00";
+        challengeTimer.text = "02:00";
         challengeCountdown.stop();
-        remainingSeconds = 300;
+        remainingSeconds = backend.get_timeForChallenge();
 
         btn_start.enabled = true;
         robotsModel.sendChanges = false;

@@ -273,6 +273,11 @@ int Backend::get_currentScore()
     return _currentScore;
 }
 
+int Backend::get_timeForChallenge()
+{
+    return _timeForChallenge;
+}
+
 VideoWrapper* Backend::get_videoWrapper()
 {
     return videoWrapper;
