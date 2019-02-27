@@ -503,7 +503,7 @@ Item {
                             font.family: titillium.name
                             font.pointSize: root.primaryFontSize * 2
                             font.bold: true
-                            text: "02:00"
+                            text: secondsToMinutes(backend.get_timeForChallenge())
                             visible: false
                         }
 
@@ -689,7 +689,7 @@ Item {
         scoreLayout.visible = true;
 
         challengeTimer.visible = false;
-        challengeTimer.text = "02:00";
+        challengeTimer.text = secondsToMinutes(backend.get_timeForChallenge());
         challengeCountdown.stop();
         remainingSeconds = backend.get_timeForChallenge();
 
